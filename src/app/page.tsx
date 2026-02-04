@@ -66,20 +66,23 @@ export default function Home() {
       // Step 2: Wait for blob to be accessible (CDN propagation)
       setState("analyzing");
       let blobAccessible = false;
-      for (let i = 0; i < 10; i++) {
-        console.log(`Checking blob accessibility, attempt ${i + 1}/10`);
+      for (let i = 0; i < 30; i++) {
+        console.log(`Checking blob accessibility, attempt ${i + 1}/30`);
         try {
-          const checkResponse = await fetch(blob.url, { method: "HEAD" });
-          if (checkResponse.ok) {
+          const checkResponse = await fetch(blob.url, {
+            method: "GET",
+            headers: { "Range": "bytes=0-1" }
+          });
+          if (checkResponse.status >= 200 && checkResponse.status < 300) {
             blobAccessible = true;
             console.log("Blob is accessible");
             break;
           }
-        } catch {
-          // Ignore errors, keep trying
+        } catch (err) {
+          console.log(`Attempt ${i + 1} failed, retrying...`);
         }
-        // Wait 2 seconds between checks
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Wait 1 second between checks
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
       if (!blobAccessible) {
