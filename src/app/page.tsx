@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { upload } from "@vercel/blob/client";
+import { processVideoFile } from "@/lib/videoProcessor";
 
 type AnalysisState = "idle" | "uploading" | "analyzing" | "complete" | "error";
 
@@ -48,15 +49,28 @@ export default function Home() {
       return;
     }
 
-    // Create preview
+    // Create preview from original file
     const previewUrl = URL.createObjectURL(file);
     setVideoPreview(previewUrl);
     setError(null);
     setState("uploading");
 
     try {
-      // Step 1: Upload video directly to Vercel Blob (bypasses serverless function limit)
-      const blob = await upload(file.name, file, {
+      // Step 0: Process video (convert HEVC to H.264 for Gemini compatibility)
+      console.log("Processing video for Gemini compatibility...");
+      const { blob: processedBlob, filename: processedFilename } = await processVideoFile(file, (progress) => {
+        console.log(`Video processing: ${progress}%`);
+      });
+
+      console.log(`Video processed: ${processedFilename} (${processedBlob.size} bytes)`);
+
+      // Create a File object from the processed blob
+      const processedFile = new File([processedBlob], processedFilename, {
+        type: "video/mp4",
+      });
+
+      // Step 1: Upload processed video to Vercel Blob (bypasses serverless function limit)
+      const blob = await upload(processedFile.name, processedFile, {
         access: "public",
         handleUploadUrl: "/api/upload",
       });

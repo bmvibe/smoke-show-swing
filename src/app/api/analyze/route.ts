@@ -5,41 +5,56 @@ import { del } from "@vercel/blob";
 import { writeFile, unlink } from "fs/promises";
 import { join } from "path";
 import { tmpdir } from "os";
-import { execFile } from "child_process";
-import { promisify } from "util";
 
-const execFileAsync = promisify(execFile);
-
-async function convertVideoToMp4(inputPath: string, outputPath: string): Promise<void> {
-  try {
-    console.log(`Converting video from ${inputPath} to ${outputPath}`);
-    // Use ffmpeg to convert to MP4 with compatible codec
-    // Reduce quality and resolution for better Gemini compatibility
-    await execFileAsync("ffmpeg", [
-      "-i", inputPath,
-      "-vf", "scale=1280:-1",  // Scale down to max 1280px width
-      "-c:v", "libx264",  // H.264 codec
-      "-crf", "28",  // Quality (higher = lower quality, 28 is good balance)
-      "-c:a", "aac",  // AAC audio codec
-      "-b:a", "128k",  // Audio bitrate
-      "-movflags", "faststart",  // Enable streaming
-      "-y",  // Overwrite output
-      outputPath
-    ]);
-    console.log("Video conversion successful");
-  } catch (error) {
-    console.warn("FFmpeg not available, trying alternative approach:", error);
-    // If ffmpeg fails, try to use a fallback approach
-    // For now, we'll just copy and try
-    try {
-      const fs = await import("fs");
-      fs.copyFileSync(inputPath, outputPath);
-      console.log("Fallback: Copied file without conversion (ffmpeg not available)");
-    } catch (copyError) {
-      console.error("Fallback copy also failed:", copyError);
-      throw error;
-    }
+// Helper function to detect video codec from file
+function detectCodecFromBuffer(buffer: Buffer): { codec: string; details: string } {
+  // Check for ftypisom (MP4 file signature)
+  if (buffer.toString("hex", 4, 8) === "66747970") {
+    // It's an MP4 container, codec detection is more complex
+    // For now, we trust the client has done proper H.264 conversion
+    return { codec: "h264", details: "MP4 container (client-converted)" };
   }
+
+  // Check for common video file signatures
+  const hex = buffer.toString("hex", 0, 12);
+  console.log("File signature:", hex);
+
+  // HEVC signature is harder to detect without parsing
+  // but MOV files often have 'ftyp' with mdat
+  if (hex.includes("6674797070") || hex.includes("6d646174")) {
+    return { codec: "unknown", details: "MOV container detected" };
+  }
+
+  return { codec: "unknown", details: "Could not determine codec" };
+}
+
+// Server-side video validation and minimal processing
+async function validateAndPrepareVideo(buffer: Buffer, originalMimeType: string): Promise<Buffer> {
+  const { codec, details } = detectCodecFromBuffer(buffer);
+  console.log(`Detected codec info: ${codec} - ${details}`);
+
+  // Log file info for debugging
+  console.log(`Video buffer size: ${buffer.length} bytes`);
+  console.log(`Original MIME type: ${originalMimeType}`);
+
+  // If client sent proper H.264/MP4, use it directly
+  // If we detect issues, we'd need client-side processing (which we now have)
+  if (codec === "h264" || originalMimeType === "video/mp4") {
+    console.log("Video appears to be H.264/MP4, proceeding with Gemini upload");
+    return buffer;
+  }
+
+  // If we still have non-MP4 format, this shouldn't happen as client converts
+  // But if it does, throw a clear error
+  if (codec === "unknown") {
+    throw new Error(
+      `Unexpected video format detected: ${details}. ` +
+      `Please ensure you're uploading a video from your device and try again. ` +
+      `If the issue persists, try recording a new video.`
+    );
+  }
+
+  return buffer;
 }
 
 const SYSTEM_PROMPT = `You are an elite golf coach with decades of experience analyzing swings. You're known for your ability to identify subtle issues and create actionable training plans.
@@ -129,7 +144,6 @@ export const maxDuration = 60;
 
 export async function POST(request: Request) {
   let tempFilePath: string | null = null;
-  let rawFilePath: string | null = null;
   let blobUrl: string | null = null;
 
   try {
@@ -171,26 +185,16 @@ export async function POST(request: Request) {
     const videoBuffer = Buffer.from(await downloadResponse.arrayBuffer());
     console.log("Download successful, size:", videoBuffer.length);
 
-    console.log("Downloaded video size:", videoBuffer.length);
+    // Validate and prepare video (ensure it's H.264/MP4)
+    console.log("Validating video format...");
+    const validatedBuffer = await validateAndPrepareVideo(videoBuffer, mimeType || "video/mp4");
 
-    // Save raw file first
-    rawFilePath = join(tmpdir(), `golf-swing-raw-${Date.now()}.mov`);
-    await writeFile(rawFilePath, videoBuffer);
-    console.log("Raw file saved to:", rawFilePath);
-
-    // Try to convert to MP4 for better Gemini compatibility
+    // Save file for Gemini upload
     tempFilePath = join(tmpdir(), `golf-swing-${Date.now()}.mp4`);
-    console.log("Attempting to convert to MP4...");
-    try {
-      await convertVideoToMp4(rawFilePath, tempFilePath);
-      console.log("Converted video saved to:", tempFilePath);
-    } catch (conversionError) {
-      console.warn("Conversion failed, will try raw file:", conversionError);
-      // Fall back to original file
-      tempFilePath = rawFilePath;
-    }
+    await writeFile(tempFilePath, validatedBuffer);
+    console.log("Video file saved to:", tempFilePath);
 
-    // Always use video/mp4 for Gemini
+    // Always use video/mp4 for Gemini (client has already converted to this)
     const uploadMimeType = "video/mp4";
     console.log("Uploading to Gemini as:", uploadMimeType);
 
@@ -205,16 +209,29 @@ export async function POST(request: Request) {
 
     // Wait for file to be processed
     let geminiFile = uploadResult.file;
-    while (geminiFile.state === "PROCESSING") {
-      console.log("Waiting for Gemini to process file...");
+    let processingAttempts = 0;
+    const maxProcessingAttempts = 60; // Max 2 minutes (60 * 2 seconds)
+
+    while (geminiFile.state === "PROCESSING" && processingAttempts < maxProcessingAttempts) {
+      processingAttempts++;
+      console.log(`Waiting for Gemini to process file (attempt ${processingAttempts}/${maxProcessingAttempts})...`);
       await new Promise((resolve) => setTimeout(resolve, 2000));
       geminiFile = await fileManager.getFile(geminiFile.name);
       console.log("File state:", geminiFile.state);
     }
 
+    if (geminiFile.state === "PROCESSING") {
+      throw new Error(
+        "Video processing took too long. Gemini is still analyzing. Please wait a moment and try again."
+      );
+    }
+
     if (geminiFile.state === "FAILED") {
       console.error("Gemini file processing failed:", JSON.stringify(geminiFile, null, 2));
-      throw new Error(`Gemini failed to process video: ${geminiFile.state}`);
+      throw new Error(
+        `Gemini failed to process your video. This might be due to video quality or format issues. ` +
+        `Please try recording another swing with better lighting and a clearer view of your full body.`
+      );
     }
 
     console.log("Gemini file ready:", geminiFile.state, geminiFile.mimeType);
@@ -271,23 +288,16 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   } finally {
-    // Clean up converted video file
+    // Clean up temporary video file
     if (tempFilePath) {
       try {
         await unlink(tempFilePath);
+        console.log("Cleaned up temporary file:", tempFilePath);
       } catch (e) {
-        console.warn("Failed to delete converted video file:", e);
+        console.warn("Failed to delete temporary video file:", e);
       }
     }
-    // Clean up raw video file
-    if (rawFilePath) {
-      try {
-        await unlink(rawFilePath);
-      } catch (e) {
-        console.warn("Failed to delete raw video file:", e);
-      }
-    }
-    // Clean up Vercel Blob
+    // Clean up Vercel Blob (the source file)
     if (blobUrl) {
       try {
         await del(blobUrl);
