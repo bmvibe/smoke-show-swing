@@ -5,6 +5,33 @@ import { del } from "@vercel/blob";
 import { writeFile, unlink } from "fs/promises";
 import { join } from "path";
 import { tmpdir } from "os";
+import { execFile } from "child_process";
+import { promisify } from "util";
+
+const execFileAsync = promisify(execFile);
+
+async function convertVideoToMp4(inputPath: string, outputPath: string): Promise<void> {
+  try {
+    console.log(`Converting video from ${inputPath} to ${outputPath}`);
+    // Use ffmpeg to convert to MP4 with compatible codec
+    await execFileAsync("ffmpeg", [
+      "-i", inputPath,
+      "-c:v", "libx264",  // H.264 codec
+      "-c:a", "aac",      // AAC audio codec
+      "-movflags", "faststart",  // Enable streaming
+      "-preset", "veryfast",  // Faster encoding
+      "-y",  // Overwrite output
+      outputPath
+    ]);
+    console.log("Video conversion successful");
+  } catch (error) {
+    console.warn("FFmpeg not available or conversion failed, will try original file:", error);
+    // If ffmpeg fails, we'll just try with the original file
+    // Copy the input to output as fallback
+    const fs = await import("fs");
+    fs.copyFileSync(inputPath, outputPath);
+  }
+}
 
 const SYSTEM_PROMPT = `You are an elite golf coach with decades of experience analyzing swings. You're known for your ability to identify subtle issues and create actionable training plans.
 
@@ -93,6 +120,7 @@ export const maxDuration = 60;
 
 export async function POST(request: Request) {
   let tempFilePath: string | null = null;
+  let rawFilePath: string | null = null;
   let blobUrl: string | null = null;
 
   try {
@@ -135,12 +163,18 @@ export async function POST(request: Request) {
     console.log("Download successful, size:", videoBuffer.length);
 
     console.log("Downloaded video size:", videoBuffer.length);
-    tempFilePath = join(tmpdir(), `golf-swing-${Date.now()}.mp4`);
-    await writeFile(tempFilePath, videoBuffer);
-    console.log("File saved to:", tempFilePath);
 
-    // Always use video/mp4 for Gemini - it has better support than video/quicktime
-    // Most video formats (including .mov from iPhone) work fine as mp4
+    // Save raw file first
+    rawFilePath = join(tmpdir(), `golf-swing-raw-${Date.now()}.mov`);
+    await writeFile(rawFilePath, videoBuffer);
+    console.log("Raw file saved to:", rawFilePath);
+
+    // Convert to MP4 for better compatibility with Gemini
+    tempFilePath = join(tmpdir(), `golf-swing-${Date.now()}.mp4`);
+    await convertVideoToMp4(rawFilePath, tempFilePath);
+    console.log("Converted video saved to:", tempFilePath);
+
+    // Always use video/mp4 for Gemini - it has better support
     const uploadMimeType = "video/mp4";
     console.log("Uploading to Gemini as:", uploadMimeType);
 
@@ -221,12 +255,20 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   } finally {
-    // Clean up temp file
+    // Clean up converted video file
     if (tempFilePath) {
       try {
         await unlink(tempFilePath);
       } catch (e) {
-        console.warn("Failed to delete temp file:", e);
+        console.warn("Failed to delete converted video file:", e);
+      }
+    }
+    // Clean up raw video file
+    if (rawFilePath) {
+      try {
+        await unlink(rawFilePath);
+      } catch (e) {
+        console.warn("Failed to delete raw video file:", e);
       }
     }
     // Clean up Vercel Blob
