@@ -6,13 +6,6 @@ import { fetchFile } from "@ffmpeg/util";
 let ffmpeg: FFmpeg | null = null;
 let ffmpegInitialized = false;
 
-// Helper function to convert blob URLs
-async function toBlobURL(url: string, mimeType: string): Promise<string> {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  return URL.createObjectURL(new Blob([blob], { type: mimeType }));
-}
-
 export async function initFFmpeg(): Promise<FFmpeg> {
   if (ffmpegInitialized && ffmpeg) {
     console.log("[FFmpeg] Using cached FFmpeg instance");
@@ -29,20 +22,29 @@ export async function initFFmpeg(): Promise<FFmpeg> {
   try {
     const baseURL = "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm";
     console.log("[FFmpeg] Loading core files from CDN...");
-    console.log("[FFmpeg] Core URL:", baseURL);
+    console.log("[FFmpeg] Base URL:", baseURL);
 
-    const coreJS = await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript");
-    console.log("[FFmpeg] Core JS loaded:", coreJS.substring(0, 50) + "...");
+    const coreURL = `${baseURL}/ffmpeg-core.js`;
+    const wasmURL = `${baseURL}/ffmpeg-core.wasm`;
 
-    const wasmURL = await toBlobURL(
-      `${baseURL}/ffmpeg-core.wasm`,
-      "application/wasm"
-    );
-    console.log("[FFmpeg] WASM loaded:", wasmURL.substring(0, 50) + "...");
+    console.log("[FFmpeg] Core JS URL:", coreURL);
+    console.log("[FFmpeg] WASM URL:", wasmURL);
+
+    // Verify URLs are reachable
+    console.log("[FFmpeg] Verifying CDN connectivity...");
+    try {
+      const coreCheck = await fetch(coreURL, { method: "HEAD" });
+      console.log("[FFmpeg] Core JS HEAD request status:", coreCheck.status);
+      if (!coreCheck.ok) {
+        console.warn("[FFmpeg] Core JS HEAD check failed, but continuing...");
+      }
+    } catch (e) {
+      console.warn("[FFmpeg] Core JS connectivity check failed (may be OK):", e instanceof Error ? e.message : e);
+    }
 
     console.log("[FFmpeg] Calling ffmpegInstance.load()...");
     await ffmpegInstance.load({
-      coreURL: coreJS,
+      coreURL: coreURL,
       wasmURL: wasmURL,
     });
 
@@ -51,9 +53,15 @@ export async function initFFmpeg(): Promise<FFmpeg> {
     console.log("[FFmpeg] ✓ FFmpeg initialized successfully");
     return ffmpegInstance;
   } catch (error) {
-    console.error("[FFmpeg] ✗ Failed to initialize FFmpeg:", error);
-    console.error("[FFmpeg] Error details:", error instanceof Error ? error.message : String(error));
-    throw new Error(`Failed to initialize video processing: ${error instanceof Error ? error.message : "Unknown error"}`);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : "N/A";
+
+    console.error("[FFmpeg] ✗ Failed to initialize FFmpeg");
+    console.error("[FFmpeg] Error message:", errorMsg);
+    console.error("[FFmpeg] Error stack:", errorStack);
+    console.error("[FFmpeg] Full error object:", error);
+
+    throw new Error(`Failed to initialize video processing: ${errorMsg}`);
   }
 }
 

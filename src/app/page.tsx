@@ -124,7 +124,12 @@ export default function Home() {
       setAnalysis(result);
       setState("complete");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      const errorMsg = err instanceof Error ? err.message : "Something went wrong";
+      console.error("===== Upload Error =====");
+      console.error("Error message:", errorMsg);
+      console.error("Full error:", err);
+      console.error("=======================");
+      setError(errorMsg);
       setState("error");
     }
   }, []);
