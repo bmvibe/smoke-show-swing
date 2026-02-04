@@ -244,19 +244,56 @@ export async function POST(request: Request) {
 
     console.log("Gemini file ready:", geminiFile.state, geminiFile.mimeType);
 
-    // Generate content using the uploaded file
+    // Generate content using the uploaded file with retry logic for rate limits
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    const result = await model.generateContent([
-      {
-        fileData: {
-          mimeType: geminiFile.mimeType,
-          fileUri: geminiFile.uri,
-        },
-      },
-      { text: SYSTEM_PROMPT },
-    ]);
+    let result;
+    let retryCount = 0;
+    const maxRetries = 3;
+
+    while (retryCount < maxRetries) {
+      try {
+        console.log(`Calling Gemini generateContent (attempt ${retryCount + 1}/${maxRetries})...`);
+        result = await model.generateContent([
+          {
+            fileData: {
+              mimeType: geminiFile.mimeType,
+              fileUri: geminiFile.uri,
+            },
+          },
+          { text: SYSTEM_PROMPT },
+        ]);
+        break; // Success, exit retry loop
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        console.warn(`Attempt ${retryCount + 1} failed:`, errorMsg);
+
+        // Check if it's a rate limit error (429)
+        if (errorMsg.includes("429") || errorMsg.includes("Too Many Requests") || errorMsg.includes("exhausted")) {
+          retryCount++;
+          if (retryCount < maxRetries) {
+            // Exponential backoff: 2s, 4s, 8s
+            const delayMs = Math.pow(2, retryCount) * 1000;
+            console.log(`Rate limited. Waiting ${delayMs}ms before retry...`);
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+            continue; // Retry
+          } else {
+            throw new Error(
+              `API rate limit exceeded. Please try again in a few minutes. ` +
+              `If you frequently analyze swings, consider enabling billing in Google Cloud Console for higher limits.`
+            );
+          }
+        }
+
+        // For non-rate-limit errors, fail immediately
+        throw error;
+      }
+    }
+
+    if (!result) {
+      throw new Error("Failed to generate analysis after retries");
+    }
 
     const response = result.response;
     const text = response.text();
