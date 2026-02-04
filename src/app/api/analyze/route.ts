@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleAIFileManager } from "@google/generative-ai/server";
 import { NextResponse } from "next/server";
-import { del, head } from "@vercel/blob";
+import { del } from "@vercel/blob";
 import { writeFile, unlink } from "fs/promises";
 import { join } from "path";
 import { tmpdir } from "os";
@@ -115,28 +115,52 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get blob metadata and download URL
-    console.log("Getting blob info for:", videoUrl);
-    const blobInfo = await head(videoUrl);
-    console.log("Blob found - size:", blobInfo.size, "type:", blobInfo.contentType, "downloadUrl:", blobInfo.downloadUrl);
+    // Download video with retries
+    console.log("Downloading video from:", videoUrl);
 
-    // Use downloadUrl if available, otherwise use the original URL
-    const downloadUrl = blobInfo.downloadUrl || videoUrl;
-    console.log("Downloading from:", downloadUrl);
+    let videoBuffer: Buffer | null = null;
+    const maxRetries = 3;
 
-    let videoBuffer: Buffer;
-    const videoResponse = await fetch(downloadUrl);
-    if (!videoResponse.ok) {
-      console.error("Download failed:", videoResponse.status, videoResponse.statusText);
-      // Try the original URL as fallback
-      console.log("Trying original URL as fallback:", videoUrl);
-      const fallbackResponse = await fetch(videoUrl);
-      if (!fallbackResponse.ok) {
-        throw new Error(`Failed to download video: ${fallbackResponse.status} ${fallbackResponse.statusText}`);
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`Download attempt ${attempt}/${maxRetries}`);
+
+        // Add delay between retries
+        if (attempt > 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        }
+
+        const response = await fetch(videoUrl, {
+          headers: {
+            'Accept': '*/*',
+          },
+        });
+
+        console.log(`Attempt ${attempt} response:`, response.status, response.statusText);
+
+        if (response.ok) {
+          videoBuffer = Buffer.from(await response.arrayBuffer());
+          console.log("Download successful, size:", videoBuffer.length);
+          break;
+        }
+
+        // If 404, the blob might not be ready yet
+        if (response.status === 404 && attempt < maxRetries) {
+          console.log("Blob not found, retrying...");
+          continue;
+        }
+
+        throw new Error(`Download failed: ${response.status} ${response.statusText}`);
+      } catch (err) {
+        console.error(`Attempt ${attempt} error:`, err);
+        if (attempt === maxRetries) {
+          throw err;
+        }
       }
-      videoBuffer = Buffer.from(await fallbackResponse.arrayBuffer());
-    } else {
-      videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
+    }
+
+    if (!videoBuffer) {
+      throw new Error("Failed to download video after all retries");
     }
 
     console.log("Downloaded video size:", videoBuffer.length);
