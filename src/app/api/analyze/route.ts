@@ -86,6 +86,8 @@ Guidelines:
 
 IMPORTANT: Return ONLY valid JSON, no markdown formatting or code blocks.`;
 
+export const maxDuration = 60; // Allow up to 60 seconds for Vercel Pro, 10 for free
+
 export async function POST(request: Request) {
   try {
     const { video, mimeType } = await request.json();
@@ -98,13 +100,17 @@ export async function POST(request: Request) {
     }
 
     if (!process.env.GEMINI_API_KEY) {
+      console.error("GEMINI_API_KEY is not set");
       return NextResponse.json(
         { error: "API key not configured" },
         { status: 500 }
       );
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    // Try gemini-1.5-flash as it's widely available
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    console.log("Starting video analysis, mimeType:", mimeType, "video length:", video.length);
 
     const result = await model.generateContent([
       {
@@ -119,6 +125,8 @@ export async function POST(request: Request) {
     const response = result.response;
     const text = response.text();
 
+    console.log("Gemini response received, length:", text.length);
+
     // Parse the JSON response
     let analysis;
     try {
@@ -128,8 +136,9 @@ export async function POST(request: Request) {
         .replace(/```\n?/g, "")
         .trim();
       analysis = JSON.parse(cleanedText);
-    } catch {
+    } catch (parseError) {
       console.error("Failed to parse Gemini response:", text);
+      console.error("Parse error:", parseError);
       return NextResponse.json(
         { error: "Failed to parse analysis results" },
         { status: 500 }
@@ -139,8 +148,9 @@ export async function POST(request: Request) {
     return NextResponse.json(analysis);
   } catch (error) {
     console.error("Analysis error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Analysis failed. Please try again." },
+      { error: `Analysis failed: ${errorMessage}` },
       { status: 500 }
     );
   }
