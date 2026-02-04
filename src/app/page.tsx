@@ -178,18 +178,22 @@ export default function Home() {
               <TipCarousel
                 tips={[
                   {
+                    icon: "📱",
                     title: "Camera Position",
                     description: "Place your phone on a tripod or prop it up at waist height, about 10 feet away. Film from directly behind or face-on for best results."
                   },
                   {
+                    icon: "☀️",
                     title: "Lighting",
                     description: "Film outdoors in daylight or in a well-lit indoor space. Avoid backlighting (don't face the sun)."
                   },
                   {
+                    icon: "🎬",
                     title: "Framing",
                     description: "Make sure your full body and the club are visible throughout the entire swing. Leave some space above and below."
                   },
                   {
+                    icon: "⏱️",
                     title: "Video Length",
                     description: "Keep it under 30 seconds. Trim to just your swing - setup, backswing, impact, and follow-through."
                   }
@@ -283,7 +287,7 @@ export default function Home() {
   );
 }
 
-function TipCarousel({ tips }: { tips: Array<{ title: string; description: string }> }) {
+function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; description: string }> }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -329,16 +333,16 @@ function TipCarousel({ tips }: { tips: Array<{ title: string; description: strin
       onTouchEnd={handleTouchEnd}
     >
       {/* Carousel on mobile, grid on desktop */}
-      <div className="hidden sm:grid gap-4 sm:grid-cols-2">
+      <div className="hidden sm:grid gap-4 sm:grid-cols-2 auto-rows-fr">
         {tips.map((tip, idx) => (
-          <TipCard key={idx} title={tip.title} description={tip.description} />
+          <TipCard key={idx} icon={tip.icon} title={tip.title} description={tip.description} />
         ))}
       </div>
 
       {/* Mobile carousel */}
       <div className="sm:hidden">
         <div className="transition-opacity duration-300">
-          <TipCard title={tips[currentIndex].title} description={tips[currentIndex].description} />
+          <TipCard icon={tips[currentIndex].icon} title={tips[currentIndex].title} description={tips[currentIndex].description} />
         </div>
 
         {/* Navigation dots */}
@@ -364,11 +368,12 @@ function TipCarousel({ tips }: { tips: Array<{ title: string; description: strin
   );
 }
 
-function TipCard({ title, description }: { title: string; description: string }) {
+function TipCard({ icon, title, description }: { icon: string; title: string; description: string }) {
   return (
-    <div className="glass-card rounded-2xl p-6 hover:bg-card-hover hover:border-accent/40 cursor-default">
+    <div className="glass-card rounded-2xl p-6 hover:bg-card-hover hover:border-accent/40 cursor-default flex flex-col h-full">
+      <div className="text-3xl mb-3">{icon}</div>
       <h4 className="font-semibold mb-2 text-white text-lg">{title}</h4>
-      <p className="text-sm text-muted leading-relaxed">{description}</p>
+      <p className="text-sm text-muted leading-relaxed flex-1">{description}</p>
     </div>
   );
 }
