@@ -401,7 +401,7 @@ function ExpectCard({ icon, title, description }: { icon: string; title: string;
 function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing"; videoPreview: string | null }) {
   const messages = {
     uploading: "Uploading your video...",
-    analyzing: "Analyzing your swing...",
+    analyzing: "Analysing your swing...",
   };
 
   const subMessages = {
@@ -437,10 +437,10 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
 
         {state === "analyzing" && (
           <div className="mt-4 space-y-2">
-            <LoadingStep text="Reading the plane" done />
-            <LoadingStep text="Diagnosing the issue" active />
-            <LoadingStep text="Plotting the fix" />
-            <LoadingStep text="Building your protocol" />
+            <LoadingStep text="Checking grip & stance" done />
+            <LoadingStep text="Scanning backswing" active />
+            <LoadingStep text="Verifying impact" />
+            <LoadingStep text="Planning your fixes" />
           </div>
         )}
       </div>
