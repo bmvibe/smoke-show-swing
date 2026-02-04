@@ -399,6 +399,8 @@ function ExpectCard({ icon, title, description }: { icon: string; title: string;
 }
 
 function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing"; videoPreview: string | null }) {
+  const [currentStep, setCurrentStep] = useState(0);
+
   const messages = {
     uploading: "Uploading your video...",
     analyzing: "Analysing your swing...",
@@ -408,6 +410,23 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
     uploading: "Please wait while we upload to the cloud",
     analyzing: "Processing your video for analysis",
   };
+
+  const steps = [
+    "Checking grip & stance",
+    "Scanning backswing",
+    "Verifying impact",
+    "Planning your fixes"
+  ];
+
+  useEffect(() => {
+    if (state !== "analyzing") return;
+
+    const interval = setInterval(() => {
+      setCurrentStep((prev) => (prev + 1) % steps.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [state, steps.length]);
 
   return (
     <div className="py-8">
@@ -425,23 +444,23 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
           </div>
         )}
 
-        <div className="mb-4">
-          <div className="w-16 h-16 mx-auto mb-3 relative">
-            <div className="absolute inset-0 rounded-full border-4 border-accent/20"></div>
-            <div className="absolute inset-0 rounded-full border-4 border-accent border-t-transparent animate-spin"></div>
-          </div>
-        </div>
-
-        <h2 className="text-2xl font-bold mb-2 text-white">{messages[state]}</h2>
-        <p className="text-muted text-sm">{subMessages[state]}</p>
+        <h2 className="text-2xl font-bold mb-4 text-white">{messages[state]}</h2>
 
         {state === "analyzing" && (
-          <div className="mt-4 space-y-2">
-            <LoadingStep text="Checking grip & stance" done />
-            <LoadingStep text="Scanning backswing" active />
-            <LoadingStep text="Verifying impact" />
-            <LoadingStep text="Planning your fixes" />
+          <div className="space-y-2">
+            {steps.map((step, index) => (
+              <LoadingStep
+                key={index}
+                text={step}
+                done={index < currentStep}
+                active={index === currentStep}
+              />
+            ))}
           </div>
+        )}
+
+        {state === "uploading" && (
+          <p className="text-muted text-sm">{subMessages[state]}</p>
         )}
       </div>
     </div>
