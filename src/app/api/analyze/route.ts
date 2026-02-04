@@ -37,21 +37,26 @@ async function validateAndPrepareVideo(buffer: Buffer, originalMimeType: string)
   console.log(`Video buffer size: ${buffer.length} bytes`);
   console.log(`Original MIME type: ${originalMimeType}`);
 
+  // Check for iOS QuickTime/MOV format (indicates HEVC from iPhone)
+  const isQuickTime = originalMimeType === "video/quicktime" || originalMimeType === "video/mov";
+  const isMOVContainer = details.includes("MOV");
+
+  console.log(`Is QuickTime/MOV: ${isQuickTime}, MOV container: ${isMOVContainer}`);
+
+  // If it's a .mov file from iOS, it's likely HEVC which Gemini doesn't support well
+  if (isQuickTime || isMOVContainer) {
+    console.log("MOV/QuickTime file detected - likely HEVC from iOS, suggesting conversion");
+    throw new Error(
+      `Your iPhone video uses HEVC format which isn't supported yet. ` +
+      `Please convert to MP4: Search "convert MOV to MP4" online or use QuickTime on Mac (File → Export As → Greater Compatibility). ` +
+      `We're working on automatic conversion for iOS users.`
+    );
+  }
+
   // If client sent proper H.264/MP4, use it directly
-  // If we detect issues, we'd need client-side processing (which we now have)
   if (codec === "h264" || originalMimeType === "video/mp4") {
     console.log("Video appears to be H.264/MP4, proceeding with Gemini upload");
     return buffer;
-  }
-
-  // If we still have non-MP4 format, it's likely a .mov file with HEVC codec from iOS
-  if (codec === "unknown" && details.includes("MOV")) {
-    console.log("MOV file detected - likely HEVC from iOS, suggesting desktop conversion");
-    throw new Error(
-      `Your iPhone video uses a format (HEVC) that requires conversion. ` +
-      `Quick fix: Use an online converter (search "convert MOV to MP4") or convert on your Mac/PC before uploading. ` +
-      `We're working on fixing this for iOS users.`
-    );
   }
 
   if (codec === "unknown") {
