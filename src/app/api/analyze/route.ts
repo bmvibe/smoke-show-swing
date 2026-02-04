@@ -175,18 +175,23 @@ export async function POST(request: Request) {
       displayName: "golf-swing",
     });
 
-    console.log("File uploaded to Gemini:", uploadResult.file.uri);
+    console.log("File uploaded to Gemini:", uploadResult.file.uri, "state:", uploadResult.file.state);
 
     // Wait for file to be processed
     let geminiFile = uploadResult.file;
     while (geminiFile.state === "PROCESSING") {
+      console.log("Waiting for Gemini to process file...");
       await new Promise((resolve) => setTimeout(resolve, 2000));
       geminiFile = await fileManager.getFile(geminiFile.name);
+      console.log("File state:", geminiFile.state);
     }
 
     if (geminiFile.state === "FAILED") {
-      throw new Error("Gemini failed to process the video file");
+      console.error("Gemini file processing failed:", JSON.stringify(geminiFile, null, 2));
+      throw new Error(`Gemini failed to process video: ${geminiFile.state}`);
     }
+
+    console.log("Gemini file ready:", geminiFile.state, geminiFile.mimeType);
 
     // Generate content using the uploaded file
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
