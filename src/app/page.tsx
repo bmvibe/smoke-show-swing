@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { upload } from "@vercel/blob/client";
 
 type AnalysisState = "idle" | "uploading" | "analyzing" | "complete" | "error";
@@ -175,24 +175,26 @@ export default function Home() {
                 <span className="w-8 h-8 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-sm font-bold border border-accent/50">1</span>
                 How to Film Your Swing
               </h3>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <TipCard
-                  title="Camera Position"
-                  description="Place your phone on a tripod or prop it up at waist height, about 10 feet away. Film from directly behind or face-on for best results."
-                />
-                <TipCard
-                  title="Lighting"
-                  description="Film outdoors in daylight or in a well-lit indoor space. Avoid backlighting (don't face the sun)."
-                />
-                <TipCard
-                  title="Framing"
-                  description="Make sure your full body and the club are visible throughout the entire swing. Leave some space above and below."
-                />
-                <TipCard
-                  title="Video Length"
-                  description="Keep it under 30 seconds. Trim to just your swing - setup, backswing, impact, and follow-through."
-                />
-              </div>
+              <TipCarousel
+                tips={[
+                  {
+                    title: "Camera Position",
+                    description: "Place your phone on a tripod or prop it up at waist height, about 10 feet away. Film from directly behind or face-on for best results."
+                  },
+                  {
+                    title: "Lighting",
+                    description: "Film outdoors in daylight or in a well-lit indoor space. Avoid backlighting (don't face the sun)."
+                  },
+                  {
+                    title: "Framing",
+                    description: "Make sure your full body and the club are visible throughout the entire swing. Leave some space above and below."
+                  },
+                  {
+                    title: "Video Length",
+                    description: "Keep it under 30 seconds. Trim to just your swing - setup, backswing, impact, and follow-through."
+                  }
+                ]}
+              />
             </section>
 
             {/* Upload */}
@@ -278,6 +280,87 @@ export default function Home() {
         )}
       </div>
     </main>
+  );
+}
+
+function TipCarousel({ tips }: { tips: Array<{ title: string; description: string }> }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Auto-advance carousel every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % tips.length);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [tips.length]);
+
+  // Handle touch swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    setTouchEnd(e.changedTouches[0].clientX);
+    if (touchStart !== null) {
+      const distance = touchStart - e.changedTouches[0].clientX;
+      const isSwipeLeft = distance > 50;
+      const isSwipeRight = distance < -50;
+
+      if (isSwipeLeft) {
+        setCurrentIndex((prev) => (prev + 1) % tips.length);
+      } else if (isSwipeRight) {
+        setCurrentIndex((prev) => (prev - 1 + tips.length) % tips.length);
+      }
+    }
+    setTouchStart(null);
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
+  };
+
+  return (
+    <div
+      className="space-y-6"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Carousel on mobile, grid on desktop */}
+      <div className="hidden sm:grid gap-4 sm:grid-cols-2">
+        {tips.map((tip, idx) => (
+          <TipCard key={idx} title={tip.title} description={tip.description} />
+        ))}
+      </div>
+
+      {/* Mobile carousel */}
+      <div className="sm:hidden">
+        <div className="transition-opacity duration-300">
+          <TipCard title={tips[currentIndex].title} description={tips[currentIndex].description} />
+        </div>
+
+        {/* Navigation dots */}
+        <div className="flex justify-center gap-3 mt-6">
+          {tips.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => goToSlide(idx)}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                idx === currentIndex ? "w-8 bg-accent" : "w-2 bg-accent/30"
+              }`}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Step indicator */}
+        <div className="text-center mt-4 text-sm text-muted">
+          Step {currentIndex + 1} of {tips.length}
+        </div>
+      </div>
+    </div>
   );
 }
 
