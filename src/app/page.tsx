@@ -57,12 +57,14 @@ export default function Home() {
 
     try {
       // Step 0: Process video (convert HEVC to H.264 for Gemini compatibility)
-      console.log("Processing video for Gemini compatibility...");
+      console.log("===== Starting video processing =====");
+      console.log("Original file:", { name: file.name, size: file.size, type: file.type });
+
       const { blob: processedBlob, filename: processedFilename } = await processVideoFile(file, (progress) => {
-        console.log(`Video processing: ${progress}%`);
+        console.log(`Video processing progress: ${progress}%`);
       });
 
-      console.log(`Video processed: ${processedFilename} (${processedBlob.size} bytes)`);
+      console.log(`✓ Video processed: ${processedFilename} (${processedBlob.size} bytes, ${(processedBlob.size / (1024 * 1024)).toFixed(2)}MB)`);
 
       // Create a File object from the processed blob
       const processedFile = new File([processedBlob], processedFilename, {
