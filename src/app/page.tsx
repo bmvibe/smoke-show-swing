@@ -158,11 +158,10 @@ export default function Home() {
             {/* Hero */}
             <section className="text-center mb-16 py-8">
               <h2 className="text-5xl font-bold mb-6 text-white leading-tight">
-                Analyze Your Swing with AI
+                Instant golf swing improvements
               </h2>
               <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed">
-                Upload a video of your golf swing and get instant feedback from our
-                AI coach, plus a personalized training plan to improve your game.
+                Simply upload a video of your swing and we'll show you what needs to be fixed.
               </p>
             </section>
 
