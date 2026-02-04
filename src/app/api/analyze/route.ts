@@ -168,10 +168,14 @@ export async function POST(request: Request) {
     await writeFile(tempFilePath, videoBuffer);
     console.log("File saved to:", tempFilePath);
 
+    // Always upload as video/mp4 - Gemini handles most container formats this way
+    const uploadMimeType = "video/mp4";
+    console.log("Uploading to Gemini as:", uploadMimeType, "(original:", mimeType, ")");
+
     // Upload to Gemini File API
     const fileManager = new GoogleAIFileManager(process.env.GEMINI_API_KEY);
     const uploadResult = await fileManager.uploadFile(tempFilePath, {
-      mimeType: mimeType || "video/mp4",
+      mimeType: uploadMimeType,
       displayName: "golf-swing",
     });
 
