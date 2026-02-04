@@ -180,12 +180,12 @@ export default function Home() {
         {state === "idle" && (
           <>
             {/* Hero */}
-            <section className="text-center mb-10">
-              <h2 className="text-3xl font-bold mb-2 text-white">
-                Sort your swing in a minute
+            <section className="text-center mb-16 py-8">
+              <h2 className="text-5xl font-bold mb-6 text-white leading-tight">
+                Instant golf swing improvements
               </h2>
-              <p className="text-muted text-sm">
-                Upload a video. Get instant feedback. Get your training plan.
+              <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed">
+                Simply upload a video of your swing and we'll show you what needs to be fixed.
               </p>
             </section>
 
