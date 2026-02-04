@@ -5,6 +5,7 @@ import { del } from "@vercel/blob";
 import { writeFile, unlink } from "fs/promises";
 import { join } from "path";
 import { tmpdir } from "os";
+import { v2 as cloudinary } from "cloudinary";
 
 // Helper function to detect video codec from file
 function detectCodecFromBuffer(buffer: Buffer): { codec: string; details: string } {
@@ -28,6 +29,76 @@ function detectCodecFromBuffer(buffer: Buffer): { codec: string; details: string
   return { codec: "unknown", details: "Could not determine codec" };
 }
 
+// Helper function to convert HEVC/MOV to MP4 using Cloudinary
+async function convertHevcToMp4(buffer: Buffer, originalFilename: string): Promise<Buffer> {
+  // Check if Cloudinary is configured
+  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    console.warn("Cloudinary not configured, skipping conversion");
+    return buffer;
+  }
+
+  try {
+    // Configure Cloudinary
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
+
+    // Create a temporary file for upload
+    const tempInputPath = join(tmpdir(), `hevc-input-${Date.now()}.mov`);
+    await writeFile(tempInputPath, buffer);
+
+    console.log("Uploading HEVC file to Cloudinary for conversion...");
+
+    // Upload to Cloudinary with a resource type of "video"
+    const uploadResult = await cloudinary.uploader.upload(tempInputPath, {
+      resource_type: "video",
+      public_id: `golf-swing-${Date.now()}`,
+      overwrite: true,
+    });
+
+    console.log("Upload successful, requesting MP4 conversion...");
+
+    // Get the converted MP4 URL using Cloudinary's transformation
+    const mp4Url = cloudinary.url(uploadResult.public_id, {
+      resource_type: "video",
+      format: "mp4",
+      quality: "auto",
+      fetch_format: "auto",
+    });
+
+    console.log("Downloading converted MP4 from:", mp4Url);
+
+    // Download the converted MP4
+    const downloadResponse = await fetch(mp4Url);
+    if (!downloadResponse.ok) {
+      throw new Error(`Failed to download converted MP4: ${downloadResponse.status}`);
+    }
+
+    const convertedBuffer = Buffer.from(await downloadResponse.arrayBuffer());
+    console.log(`✓ Successfully converted HEVC to MP4: ${buffer.length} bytes -> ${convertedBuffer.length} bytes`);
+
+    // Clean up
+    try {
+      await unlink(tempInputPath);
+      // Delete from Cloudinary
+      await cloudinary.uploader.destroy(uploadResult.public_id, { resource_type: "video" });
+    } catch (e) {
+      console.warn("Failed to cleanup Cloudinary resources:", e);
+    }
+
+    return convertedBuffer;
+  } catch (error) {
+    console.error("Cloudinary conversion failed:", error);
+    throw new Error(
+      `Video conversion service temporarily unavailable. ` +
+      `If this persists, please try recording your video in MP4 format. ` +
+      `${error instanceof Error ? error.message : ""}`
+    );
+  }
+}
+
 // Server-side video validation and minimal processing
 async function validateAndPrepareVideo(buffer: Buffer, originalMimeType: string): Promise<Buffer> {
   const { codec, details } = detectCodecFromBuffer(buffer);
@@ -45,12 +116,9 @@ async function validateAndPrepareVideo(buffer: Buffer, originalMimeType: string)
 
   // If it's a .mov file from iOS, it's likely HEVC which Gemini doesn't support well
   if (isQuickTime || isMOVContainer) {
-    console.log("MOV/QuickTime file detected - likely HEVC from iOS, suggesting conversion");
-    throw new Error(
-      `Your iPhone video uses HEVC format which isn't supported yet. ` +
-      `Please convert to MP4: Search "convert MOV to MP4" online or use QuickTime on Mac (File → Export As → Greater Compatibility). ` +
-      `We're working on automatic conversion for iOS users.`
-    );
+    console.log("MOV/QuickTime file detected - likely HEVC from iOS, converting automatically...");
+    const convertedBuffer = await convertHevcToMp4(buffer, "golf-swing.mov");
+    return convertedBuffer;
   }
 
   // If client sent proper H.264/MP4, use it directly
