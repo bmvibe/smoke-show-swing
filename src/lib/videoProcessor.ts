@@ -163,17 +163,45 @@ export function isLikelyHevc(file: File): boolean {
   return isMov || isHeic || isHevcMimeType;
 }
 
+// Check if WebAssembly is supported
+function isWebAssemblySupported(): boolean {
+  try {
+    return typeof WebAssembly === "object" && typeof WebAssembly.instantiate === "function";
+  } catch (e) {
+    return false;
+  }
+}
+
 export async function processVideoFile(
   file: File,
   onProgress?: (progress: number) => void
 ): Promise<{ blob: Blob; filename: string }> {
-  // Always convert for consistency and Gemini compatibility
-  // This handles both HEVC and H.264 files, ensuring optimal format
   console.log(`[VideoProcessor] Starting video file processing: ${file.name} (${file.size} bytes, type: ${file.type})`);
 
+  // Check WebAssembly support
+  const wasmSupported = isWebAssemblySupported();
+  console.log(`[VideoProcessor] WebAssembly supported: ${wasmSupported}`);
+
+  if (!wasmSupported) {
+    throw new Error(
+      `Your device doesn't support the video processing technology required. ` +
+      `Please try uploading from a different device or browser.`
+    );
+  }
+
   try {
-    console.log(`[VideoProcessor] Initializing FFmpeg...`);
-    const convertedBlob = await detectAndConvertVideo(file, onProgress);
+    console.log(`[VideoProcessor] Initializing FFmpeg with 30-second timeout...`);
+
+    // Add timeout to FFmpeg initialization (30 seconds)
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => {
+        reject(new Error("FFmpeg initialization timed out (30s). Your connection may be slow or the service may be unavailable."));
+      }, 30000)
+    );
+
+    const conversionPromise = detectAndConvertVideo(file, onProgress);
+    const convertedBlob = await Promise.race([conversionPromise, timeoutPromise]);
+
     console.log(`[VideoProcessor] Conversion completed. Output size: ${convertedBlob.size} bytes`);
 
     // Create new filename for converted file
@@ -190,8 +218,17 @@ export async function processVideoFile(
     console.error(`[VideoProcessor] Stack:`, error instanceof Error ? error.stack : 'N/A');
 
     // Provide more specific error messages
-    if (errorMessage.includes("FFmpeg")) {
-      throw new Error(`Video conversion failed (FFmpeg issue). Please check your internet connection and try again. Error: ${errorMessage}`);
+    if (errorMessage.includes("timeout")) {
+      throw new Error(
+        `Video processing is taking too long. This might be a network issue. ` +
+        `Please check your internet connection and try again.`
+      );
+    }
+    if (errorMessage.includes("FFmpeg") || errorMessage.includes("initialize")) {
+      throw new Error(
+        `Video processing unavailable. Please ensure: 1) You have an internet connection, ` +
+        `2) You're using a modern browser, 3) Try clearing your browser cache or using a different browser.`
+      );
     }
     if (errorMessage.includes("wasm")) {
       throw new Error(`Video processing library failed to load. Please refresh the page and try again.`);
