@@ -159,7 +159,7 @@ export default function Home() {
         {state === "idle" && (
           <>
             {/* Hero */}
-            <section className="text-center mb-6">
+            <section className="text-center mb-10">
               <h2 className="text-3xl font-bold mb-2 text-white">
                 Sort your swing in a minute
               </h2>
@@ -169,7 +169,7 @@ export default function Home() {
             </section>
 
             {/* Upload */}
-            <section className="mb-6">
+            <section className="mb-10">
               <h3 className="text-base font-bold mb-3 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50">1</span>
                 Upload Your Video
@@ -315,7 +315,7 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
 
   return (
     <div
-      className="space-y-6"
+      className="space-y-8"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -452,7 +452,7 @@ function ResultsView({
   onReset: () => void;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-2xl font-bold text-white">Your Analysis</h2>
@@ -499,7 +499,7 @@ function ResultsView({
       {/* Improvements */}
       <section>
         <h3 className="text-base font-bold mb-3 text-white">Areas to Improve</h3>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {analysis.improvements.map((item, i) => (
             <div key={i} className="glass-card rounded-xl p-4 shadow-lg hover:shadow-xl hover:border-accent/40">
               <div className="flex items-start gap-3">
@@ -522,7 +522,7 @@ function ResultsView({
       {/* Training Plan */}
       <section>
         <h3 className="text-base font-bold mb-3 text-white">Training Plan</h3>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {analysis.trainingPlan.map((week) => (
             <div key={week.weekNumber} className="glass-card rounded-xl p-3 shadow-lg">
               <div className="flex items-center gap-2 mb-2">
@@ -549,7 +549,7 @@ function ResultsView({
       {analysis.resources.length > 0 && (
         <section>
           <h3 className="text-base font-bold mb-3 text-white">Learning Resources</h3>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {analysis.resources.map((resource, i) => (
               <a
                 key={i}
