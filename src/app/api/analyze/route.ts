@@ -139,8 +139,9 @@ export async function POST(request: Request) {
     await writeFile(tempFilePath, videoBuffer);
     console.log("File saved to:", tempFilePath);
 
-    // Use the original mimeType - Gemini should handle video/quicktime
-    const uploadMimeType = mimeType || "video/mp4";
+    // Always use video/mp4 for Gemini - it has better support than video/quicktime
+    // Most video formats (including .mov from iPhone) work fine as mp4
+    const uploadMimeType = "video/mp4";
     console.log("Uploading to Gemini as:", uploadMimeType);
 
     // Upload to Gemini File API
