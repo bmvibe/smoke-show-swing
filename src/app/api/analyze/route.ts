@@ -115,52 +115,24 @@ export async function POST(request: Request) {
       );
     }
 
-    // Download video with retries (Vercel Blob can have propagation delays)
+    // Download video (client should have verified it's accessible)
     console.log("Downloading video from:", videoUrl);
 
-    let videoBuffer: Buffer | null = null;
-    const maxRetries = 5;
+    const downloadResponse = await fetch(videoUrl, {
+      headers: {
+        'Accept': '*/*',
+        'Cache-Control': 'no-cache',
+      },
+    });
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        // Wait before each attempt (increasing delay)
-        const delay = attempt === 1 ? 1000 : 2000 * attempt;
-        console.log(`Download attempt ${attempt}/${maxRetries} (waiting ${delay}ms first)`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+    console.log("Download response:", downloadResponse.status, downloadResponse.statusText);
 
-        const response = await fetch(videoUrl, {
-          headers: {
-            'Accept': '*/*',
-            'Cache-Control': 'no-cache',
-          },
-        });
-
-        console.log(`Attempt ${attempt} response:`, response.status, response.statusText);
-
-        if (response.ok) {
-          videoBuffer = Buffer.from(await response.arrayBuffer());
-          console.log("Download successful, size:", videoBuffer.length);
-          break;
-        }
-
-        // If 404, the blob might not be ready yet
-        if (response.status === 404 && attempt < maxRetries) {
-          console.log("Blob not found, retrying with longer delay...");
-          continue;
-        }
-
-        throw new Error(`Download failed: ${response.status} ${response.statusText}`);
-      } catch (err) {
-        console.error(`Attempt ${attempt} error:`, err);
-        if (attempt === maxRetries) {
-          throw err;
-        }
-      }
+    if (!downloadResponse.ok) {
+      throw new Error(`Download failed: ${downloadResponse.status} ${downloadResponse.statusText}`);
     }
 
-    if (!videoBuffer) {
-      throw new Error("Failed to download video after all retries");
-    }
+    const videoBuffer = Buffer.from(await downloadResponse.arrayBuffer());
+    console.log("Download successful, size:", videoBuffer.length);
 
     console.log("Downloaded video size:", videoBuffer.length);
     tempFilePath = join(tmpdir(), `golf-swing-${Date.now()}.mp4`);

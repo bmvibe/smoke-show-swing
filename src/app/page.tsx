@@ -61,9 +61,32 @@ export default function Home() {
         handleUploadUrl: "/api/upload",
       });
 
-      setState("analyzing");
+      console.log("Upload complete, blob URL:", blob.url);
 
-      // Step 2: Send blob URL to analyze endpoint
+      // Step 2: Wait for blob to be accessible (CDN propagation)
+      setState("analyzing");
+      let blobAccessible = false;
+      for (let i = 0; i < 10; i++) {
+        console.log(`Checking blob accessibility, attempt ${i + 1}/10`);
+        try {
+          const checkResponse = await fetch(blob.url, { method: "HEAD" });
+          if (checkResponse.ok) {
+            blobAccessible = true;
+            console.log("Blob is accessible");
+            break;
+          }
+        } catch {
+          // Ignore errors, keep trying
+        }
+        // Wait 2 seconds between checks
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+
+      if (!blobAccessible) {
+        throw new Error("Video upload succeeded but file is not accessible. Please try again.");
+      }
+
+      // Step 3: Send blob URL to analyze endpoint
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
