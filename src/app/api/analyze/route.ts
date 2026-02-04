@@ -1,7 +1,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleAIFileManager } from "@google/generative-ai/server";
 import { NextResponse } from "next/server";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+import { writeFile, unlink } from "fs/promises";
+import { join } from "path";
+import { tmpdir } from "os";
 
 const SYSTEM_PROMPT = `You are an elite golf coach with decades of experience analyzing swings. You're known for your ability to identify subtle issues and create actionable training plans.
 
@@ -86,15 +88,18 @@ Guidelines:
 
 IMPORTANT: Return ONLY valid JSON, no markdown formatting or code blocks.`;
 
-export const maxDuration = 60; // Allow up to 60 seconds for Vercel Pro, 10 for free
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
-  try {
-    const { video, mimeType } = await request.json();
+  let tempFilePath: string | null = null;
 
-    if (!video || !mimeType) {
+  try {
+    const formData = await request.formData();
+    const file = formData.get("video") as File | null;
+
+    if (!file) {
       return NextResponse.json(
-        { error: "Missing video or mimeType" },
+        { error: "No video file provided" },
         { status: 400 }
       );
     }
@@ -107,16 +112,43 @@ export async function POST(request: Request) {
       );
     }
 
-    // Try gemini-1.5-flash as it's widely available
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Save file temporarily
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    tempFilePath = join(tmpdir(), `golf-swing-${Date.now()}.mp4`);
+    await writeFile(tempFilePath, buffer);
 
-    console.log("Starting video analysis, mimeType:", mimeType, "video length:", video.length);
+    console.log("File saved temporarily:", tempFilePath, "size:", buffer.length);
+
+    // Upload to Gemini File API
+    const fileManager = new GoogleAIFileManager(process.env.GEMINI_API_KEY);
+    const uploadResult = await fileManager.uploadFile(tempFilePath, {
+      mimeType: file.type,
+      displayName: "golf-swing",
+    });
+
+    console.log("File uploaded to Gemini:", uploadResult.file.uri);
+
+    // Wait for file to be processed
+    let geminiFile = uploadResult.file;
+    while (geminiFile.state === "PROCESSING") {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      geminiFile = await fileManager.getFile(geminiFile.name);
+    }
+
+    if (geminiFile.state === "FAILED") {
+      throw new Error("Gemini failed to process the video file");
+    }
+
+    // Generate content using the uploaded file
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const result = await model.generateContent([
       {
-        inlineData: {
-          mimeType: mimeType,
-          data: video,
+        fileData: {
+          mimeType: geminiFile.mimeType,
+          fileUri: geminiFile.uri,
         },
       },
       { text: SYSTEM_PROMPT },
@@ -130,7 +162,6 @@ export async function POST(request: Request) {
     // Parse the JSON response
     let analysis;
     try {
-      // Remove any potential markdown code blocks
       const cleanedText = text
         .replace(/```json\n?/g, "")
         .replace(/```\n?/g, "")
@@ -145,6 +176,13 @@ export async function POST(request: Request) {
       );
     }
 
+    // Clean up: delete the file from Gemini
+    try {
+      await fileManager.deleteFile(geminiFile.name);
+    } catch (e) {
+      console.warn("Failed to delete Gemini file:", e);
+    }
+
     return NextResponse.json(analysis);
   } catch (error) {
     console.error("Analysis error:", error);
@@ -153,5 +191,14 @@ export async function POST(request: Request) {
       { error: `Analysis failed: ${errorMessage}` },
       { status: 500 }
     );
+  } finally {
+    // Clean up temp file
+    if (tempFilePath) {
+      try {
+        await unlink(tempFilePath);
+      } catch (e) {
+        console.warn("Failed to delete temp file:", e);
+      }
+    }
   }
 }

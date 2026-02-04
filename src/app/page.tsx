@@ -54,23 +54,21 @@ export default function Home() {
     setState("uploading");
 
     try {
-      // Convert to base64
-      const base64 = await fileToBase64(file);
+      // Use FormData for file upload (handles large files better)
+      const formData = new FormData();
+      formData.append("video", file);
 
       setState("analyzing");
 
       // Send to API
       const response = await fetch("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          video: base64,
-          mimeType: file.type,
-        }),
+        body: formData,
       });
 
       if (!response.ok) {
-        throw new Error("Analysis failed. Please try again.");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Analysis failed. Please try again.");
       }
 
       const result = await response.json();
@@ -492,16 +490,3 @@ function UploadIcon() {
   );
 }
 
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      const result = reader.result as string;
-      // Remove the data URL prefix to get just the base64
-      const base64 = result.split(",")[1];
-      resolve(base64);
-    };
-    reader.onerror = reject;
-  });
-}
