@@ -172,7 +172,7 @@ export default function Home() {
             {/* How to Film */}
             <section className="mb-16">
               <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-accent/30 text-accent flex items-center justify-center text-sm font-bold border border-accent/50">1</span>
+                <span className="w-8 h-8 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-sm font-bold border border-accent/50">1</span>
                 How to Film Your Swing
               </h3>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -198,7 +198,7 @@ export default function Home() {
             {/* Upload */}
             <section className="mb-16">
               <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-accent/30 text-accent flex items-center justify-center text-sm font-bold border border-accent/50">2</span>
+                <span className="w-8 h-8 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-sm font-bold border border-accent/50">2</span>
                 Upload Your Video
               </h3>
               <div
@@ -229,7 +229,7 @@ export default function Home() {
             {/* What to Expect */}
             <section>
               <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-accent/30 text-accent flex items-center justify-center text-sm font-bold border border-accent/50">3</span>
+                <span className="w-8 h-8 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-sm font-bold border border-accent/50">3</span>
                 What You&apos;ll Get
               </h3>
               <div className="grid gap-4 sm:grid-cols-3">
@@ -426,14 +426,14 @@ function ResultsView({
           {analysis.improvements.map((item, i) => (
             <div key={i} className="glass-card rounded-3xl p-8 shadow-lg hover:shadow-xl hover:border-accent/40">
               <div className="flex items-start gap-6">
-                <span className="w-10 h-10 rounded-full bg-accent/30 text-accent flex items-center justify-center text-sm font-bold border border-accent/50 shrink-0">
+                <span className="w-10 h-10 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-sm font-bold border border-accent/50 shrink-0">
                   {i + 1}
                 </span>
                 <div className="flex-1">
                   <h4 className="font-semibold mb-2 text-white text-lg">{item.area}</h4>
                   <p className="text-sm text-muted mb-4">{item.issue}</p>
                   <div className="bg-accent/15 border border-accent/30 rounded-2xl p-4">
-                    <p className="text-sm text-white"><span className="font-semibold text-accent">Fix:</span> {item.fix}</p>
+                    <p className="text-sm text-white"><span className="font-semibold text-[#E1E4E8]">Fix:</span> {item.fix}</p>
                   </div>
                 </div>
               </div>
@@ -449,7 +449,7 @@ function ResultsView({
           {analysis.trainingPlan.map((week) => (
             <div key={week.weekNumber} className="glass-card rounded-3xl p-8 shadow-lg">
               <div className="flex items-center gap-4 mb-6">
-                <span className="px-4 py-2 bg-accent/30 text-accent text-sm font-semibold rounded-full border border-accent/50">
+                <span className="px-4 py-2 bg-accent/30 text-[#E1E4E8] text-sm font-semibold rounded-full border border-accent/50">
                   Week {week.weekNumber}
                 </span>
                 <span className="text-base text-muted font-medium">{week.focus}</span>
