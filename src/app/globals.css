@@ -1,26 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a4a9f;
-  --background-gradient: linear-gradient(135deg, #2563eb 0%, #1e3a8a 50%, #0f172a 100%);
-  --foreground: #ffffff;
-  --accent: #60a5fa;
-  --accent-dim: #3b82f6;
-  --card: rgba(15, 23, 42, 0.7);
-  --card-hover: rgba(15, 23, 42, 0.85);
-  --border: rgba(96, 165, 250, 0.2);
-  --muted: #cbd5e1;
+  /* Style Guide Colors */
+  --obsidian: #0F1115;
+  --ignition-blue: #0033A0;
+  --smoked-gold: #C5A059;
+  --cloud-silver: #E1E4E8;
+  --steel-blue: #2C3E50;
+
+  /* Semantic Tokens */
+  --background: var(--obsidian);
+  --background-gradient: linear-gradient(135deg, var(--obsidian) 0%, #1a1f2e 50%, #0d0f14 100%);
+  --foreground: var(--cloud-silver);
+  --accent: var(--ignition-blue);
+  --accent-dim: #001a7a;
+  --card: rgba(44, 62, 80, 0.6);
+  --card-hover: rgba(44, 62, 80, 0.85);
+  --border: rgba(197, 160, 89, 0.15);
+  --muted: #a8adb5;
+  --luxury: var(--smoked-gold);
 }
 
 @theme inline {
-  --color-background: #0a4a9f;
-  --color-foreground: var(--foreground);
-  --color-accent: var(--accent);
-  --color-accent-dim: var(--accent-dim);
-  --color-card: var(--card);
-  --color-card-hover: var(--card-hover);
+  --color-background: var(--obsidian);
+  --color-foreground: var(--cloud-silver);
+  --color-accent: var(--ignition-blue);
+  --color-accent-dim: #001a7a;
+  --color-card: var(--steel-blue);
+  --color-card-hover: rgba(44, 62, 80, 0.85);
   --color-border: var(--border);
   --color-muted: var(--muted);
+  --color-luxury: var(--smoked-gold);
 }
 
 body {
@@ -40,12 +50,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(96, 165, 250, 0.4);
+  background: rgba(0, 51, 160, 0.5);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(96, 165, 250, 0.6);
+  background: rgba(0, 51, 160, 0.7);
 }
 
 /* Smooth animations */
@@ -65,10 +75,10 @@ body {
 
 /* Enhanced card styling */
 .enhanced-card {
-  background: rgba(30, 58, 138, 0.5);
+  background: rgba(44, 62, 80, 0.5);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(96, 165, 250, 0.3);
+  border: 1px solid rgba(197, 160, 89, 0.2);
 }
 
 /* Smooth gradient animation */
@@ -83,5 +93,10 @@ body {
 
 /* Accent button hover effect */
 .accent-button:hover {
-  box-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
+  box-shadow: 0 0 20px rgba(0, 51, 160, 0.6), 0 0 40px rgba(197, 160, 89, 0.2);
+}
+
+/* Luxury accent for logo/special elements */
+.luxury-accent {
+  color: var(--smoked-gold);
 }

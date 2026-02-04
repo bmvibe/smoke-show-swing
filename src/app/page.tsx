@@ -136,17 +136,17 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-600 via-blue-800 to-slate-900">
+    <main className="min-h-screen" style={{ background: 'linear-gradient(135deg, #0F1115 0%, #1a1f2e 50%, #0d0f14 100%)' }}>
       {/* Header */}
       <header className="backdrop-blur-sm border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center shadow-lg">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#C5A059] to-[#A0815A] border border-[#C5A059]/60 flex items-center justify-center shadow-lg">
               <span className="text-3xl">🏌️</span>
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Smoke Show Golf</h1>
-              <p className="text-base text-muted">AI-powered swing analysis and coaching</p>
+              <h1 className="text-3xl font-bold text-[#E1E4E8]">Smoke Show Golf</h1>
+              <p className="text-base text-[#a8adb5]">AI-powered swing analysis and coaching</p>
             </div>
           </div>
         </div>
@@ -202,7 +202,8 @@ export default function Home() {
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-accent/40 rounded-3xl p-16 text-center cursor-pointer hover:border-accent hover:bg-card/50 transition-all enhanced-card shadow-lg"
+                className="border-2 border-dashed rounded-3xl p-16 text-center cursor-pointer transition-all enhanced-card shadow-lg hover:shadow-xl hover:border-[#C5A059]/40"
+                style={{ borderColor: 'rgba(0, 51, 160, 0.3)' }}
               >
                 <input
                   ref={fileInputRef}
@@ -214,8 +215,8 @@ export default function Home() {
                 <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-accent/10 border border-accent/40 flex items-center justify-center shadow-lg">
                   <UploadIcon />
                 </div>
-                <p className="font-semibold mb-3 text-xl text-white">Drop your video here or tap to browse</p>
-                <p className="text-sm text-muted">MP4, MOV, or WebM • Max 50MB • Under 30 seconds</p>
+                <p className="font-semibold mb-3 text-xl text-[#E1E4E8]">Drop your video here or tap to browse</p>
+                <p className="text-sm text-[#a8adb5]">MP4, MOV, or WebM • Max 50MB • Under 30 seconds</p>
               </div>
               {error && (
                 <p className="mt-6 text-red-300 text-sm text-center bg-red-500/10 border border-red-500/30 rounded-xl py-3 px-4">{error}</p>
