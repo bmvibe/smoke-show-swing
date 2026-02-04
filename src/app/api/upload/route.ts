@@ -13,6 +13,7 @@ export async function POST(request: Request) {
         return {
           allowedContentTypes: ["video/mp4", "video/quicktime", "video/webm", "video/mov", "video/x-m4v"],
           maximumSizeInBytes: 50 * 1024 * 1024, // 50MB
+          addRandomSuffix: true, // Allow duplicate filenames by adding random suffix
           tokenPayload: JSON.stringify({}),
         };
       },

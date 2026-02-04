@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { upload } from "@vercel/blob/client";
+import { processVideoFile } from "@/lib/videoProcessor";
 
 type AnalysisState = "idle" | "uploading" | "analyzing" | "complete" | "error";
 
@@ -48,15 +49,30 @@ export default function Home() {
       return;
     }
 
-    // Create preview
+    // Create preview from original file
     const previewUrl = URL.createObjectURL(file);
     setVideoPreview(previewUrl);
     setError(null);
     setState("uploading");
 
     try {
-      // Step 1: Upload video directly to Vercel Blob (bypasses serverless function limit)
-      const blob = await upload(file.name, file, {
+      // Step 0: Process video (convert HEVC to H.264 for Gemini compatibility)
+      console.log("===== Starting video processing =====");
+      console.log("Original file:", { name: file.name, size: file.size, type: file.type });
+
+      const { blob: processedBlob, filename: processedFilename } = await processVideoFile(file, (progress) => {
+        console.log(`Video processing progress: ${progress}%`);
+      });
+
+      console.log(`✓ Video processed: ${processedFilename} (${processedBlob.size} bytes, ${(processedBlob.size / (1024 * 1024)).toFixed(2)}MB)`);
+
+      // Create a File object from the processed blob
+      const processedFile = new File([processedBlob], processedFilename, {
+        type: "video/mp4",
+      });
+
+      // Step 1: Upload processed video to Vercel Blob (bypasses serverless function limit)
+      const blob = await upload(processedFile.name, processedFile, {
         access: "public",
         handleUploadUrl: "/api/upload",
       });
@@ -66,20 +82,23 @@ export default function Home() {
       // Step 2: Wait for blob to be accessible (CDN propagation)
       setState("analyzing");
       let blobAccessible = false;
-      for (let i = 0; i < 10; i++) {
-        console.log(`Checking blob accessibility, attempt ${i + 1}/10`);
+      for (let i = 0; i < 30; i++) {
+        console.log(`Checking blob accessibility, attempt ${i + 1}/30`);
         try {
-          const checkResponse = await fetch(blob.url, { method: "HEAD" });
-          if (checkResponse.ok) {
+          const checkResponse = await fetch(blob.url, {
+            method: "GET",
+            headers: { "Range": "bytes=0-1" }
+          });
+          if (checkResponse.status >= 200 && checkResponse.status < 300) {
             blobAccessible = true;
             console.log("Blob is accessible");
             break;
           }
-        } catch {
-          // Ignore errors, keep trying
+        } catch (err) {
+          console.log(`Attempt ${i + 1} failed, retrying...`);
         }
-        // Wait 2 seconds between checks
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Wait 1 second between checks
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
       if (!blobAccessible) {
@@ -105,7 +124,12 @@ export default function Home() {
       setAnalysis(result);
       setState("complete");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      const errorMsg = err instanceof Error ? err.message : "Something went wrong";
+      console.error("===== Upload Error =====");
+      console.error("Error message:", errorMsg);
+      console.error("Full error:", err);
+      console.error("=======================");
+      setError(errorMsg);
       setState("error");
     }
   }, []);
@@ -136,23 +160,23 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-600 via-blue-800 to-slate-900">
+    <main className="min-h-screen">
       {/* Header */}
       <header className="backdrop-blur-sm border-b border-border">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center shadow-lg">
-              <span className="text-3xl">🏌️</span>
+        <div className="max-w-4xl mx-auto px-4 py-3">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C5A059] to-[#A0815A] border border-[#C5A059]/60 flex items-center justify-center shadow-lg">
+              <span className="text-xl">🏌️</span>
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Smoke Show Golf</h1>
-              <p className="text-base text-muted">AI-powered swing analysis and coaching</p>
+              <h1 className="text-lg font-bold text-[#E1E4E8]">Smoke Show</h1>
+              <p className="text-xs text-[#a8adb5]">Golf swing analysis</p>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-4">
         {state === "idle" && (
           <>
             {/* Hero */}
@@ -165,43 +189,18 @@ export default function Home() {
               </p>
             </section>
 
-            {/* How to Film */}
-            <section className="mb-16">
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-accent/30 text-accent flex items-center justify-center text-sm font-bold border border-accent/50">1</span>
-                How to Film Your Swing
-              </h3>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <TipCard
-                  title="Camera Position"
-                  description="Place your phone on a tripod or prop it up at waist height, about 10 feet away. Film from directly behind or face-on for best results."
-                />
-                <TipCard
-                  title="Lighting"
-                  description="Film outdoors in daylight or in a well-lit indoor space. Avoid backlighting (don't face the sun)."
-                />
-                <TipCard
-                  title="Framing"
-                  description="Make sure your full body and the club are visible throughout the entire swing. Leave some space above and below."
-                />
-                <TipCard
-                  title="Video Length"
-                  description="Keep it under 30 seconds. Trim to just your swing - setup, backswing, impact, and follow-through."
-                />
-              </div>
-            </section>
-
             {/* Upload */}
-            <section className="mb-16">
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-accent/30 text-accent flex items-center justify-center text-sm font-bold border border-accent/50">2</span>
+            <section className="mb-10">
+              <h3 className="text-base font-bold mb-3 flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50">1</span>
                 Upload Your Video
               </h3>
               <div
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-accent/40 rounded-3xl p-16 text-center cursor-pointer hover:border-accent hover:bg-card/50 transition-all enhanced-card shadow-lg"
+                className="border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all enhanced-card shadow-lg hover:shadow-xl hover:border-[#C5A059]/40"
+                style={{ borderColor: 'rgba(0, 51, 160, 0.3)' }}
               >
                 <input
                   ref={fileInputRef}
@@ -210,22 +209,51 @@ export default function Home() {
                   onChange={handleInputChange}
                   className="hidden"
                 />
-                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-accent/10 border border-accent/40 flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-accent/10 border border-accent/40 flex items-center justify-center shadow-lg">
                   <UploadIcon />
                 </div>
-                <p className="font-semibold mb-3 text-xl text-white">Drop your video here or tap to browse</p>
-                <p className="text-sm text-muted">MP4, MOV, or WebM • Max 50MB • Under 30 seconds</p>
+                <p className="font-semibold mb-2 text-sm text-[#E1E4E8]">Drop the video.</p>
+                <p className="text-xs text-[#a8adb5]">MP4, MOV, or WebM • Max 50MB</p>
               </div>
               {error && (
                 <p className="mt-6 text-red-300 text-sm text-center bg-red-500/10 border border-red-500/30 rounded-xl py-3 px-4">{error}</p>
               )}
+
+              {/* How to Film - Part of Step 1 */}
+              <div className="mt-6">
+                <h4 className="text-sm font-bold mb-3 text-[#E1E4E8]">How to Film</h4>
+                <TipCarousel
+                  tips={[
+                    {
+                      icon: "📱",
+                      title: "Camera Position",
+                      description: "Place your phone on a tripod or prop it up at waist height, about 10 feet away. Film from directly behind or face-on for best results."
+                    },
+                    {
+                      icon: "☀️",
+                      title: "Lighting",
+                      description: "Film outdoors in daylight or in a well-lit indoor space. Avoid backlighting (don't face the sun)."
+                    },
+                    {
+                      icon: "🎬",
+                      title: "Framing",
+                      description: "Make sure your full body and the club are visible throughout the entire swing. Leave some space above and below."
+                    },
+                    {
+                      icon: "⏱️",
+                      title: "Video Length",
+                      description: "Keep it under 30 seconds. Trim to just your swing - setup, backswing, impact, and follow-through."
+                    }
+                  ]}
+                />
+              </div>
             </section>
 
             {/* What to Expect */}
             <section>
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-accent/30 text-accent flex items-center justify-center text-sm font-bold border border-accent/50">3</span>
-                What You&apos;ll Get
+              <h3 className="text-base font-bold mb-3 flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50">2</span>
+                What You'll Get
               </h3>
               <div className="grid gap-4 sm:grid-cols-3">
                 <ExpectCard
@@ -257,17 +285,17 @@ export default function Home() {
         )}
 
         {state === "error" && (
-          <div className="text-center py-20">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-500/20 border border-red-500/40 flex items-center justify-center shadow-lg">
-              <span className="text-3xl">❌</span>
+          <div className="text-center py-8">
+            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-red-500/20 border border-red-500/40 flex items-center justify-center shadow-lg">
+              <span className="text-xl">❌</span>
             </div>
-            <h2 className="text-3xl font-bold mb-3 text-white">Analysis Failed</h2>
-            <p className="text-muted mb-8 text-lg">{error || "Something went wrong. Please try again."}</p>
+            <h2 className="text-xl font-bold mb-2 text-white">Upload Failed</h2>
+            <p className="text-muted mb-4 text-xs">{error || "We couldn't process your video. Please try again."}</p>
             <button
               onClick={reset}
-              className="px-8 py-3 bg-accent text-black font-semibold rounded-full hover:bg-accent-dim accent-button shadow-lg"
+              className="px-6 py-2 bg-accent text-black font-semibold rounded-full hover:bg-accent-dim accent-button shadow-lg text-sm"
             >
-              Try Again
+              Start Over
             </button>
           </div>
         )}
@@ -276,21 +304,96 @@ export default function Home() {
   );
 }
 
-function TipCard({ title, description }: { title: string; description: string }) {
+function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; description: string }> }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Handle touch swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    setTouchEnd(e.changedTouches[0].clientX);
+    if (touchStart !== null) {
+      const distance = touchStart - e.changedTouches[0].clientX;
+      const isSwipeLeft = distance > 50;
+      const isSwipeRight = distance < -50;
+
+      if (isSwipeLeft) {
+        setCurrentIndex((prev) => (prev + 1) % tips.length);
+      } else if (isSwipeRight) {
+        setCurrentIndex((prev) => (prev - 1 + tips.length) % tips.length);
+      }
+    }
+    setTouchStart(null);
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
+  };
+
   return (
-    <div className="glass-card rounded-2xl p-6 hover:bg-card-hover hover:border-accent/40 cursor-default">
-      <h4 className="font-semibold mb-2 text-white text-lg">{title}</h4>
-      <p className="text-sm text-muted leading-relaxed">{description}</p>
+    <div
+      className="space-y-8"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Carousel on mobile, grid on desktop */}
+      <div className="hidden sm:grid gap-4 sm:grid-cols-2" style={{ gridAutoRows: '1fr' }}>
+        {tips.map((tip, idx) => (
+          <div key={idx} className="flex">
+            <TipCard icon={tip.icon} title={tip.title} description={tip.description} />
+          </div>
+        ))}
+      </div>
+
+      {/* Mobile carousel */}
+      <div className="sm:hidden">
+        <div className="transition-opacity duration-300">
+          <TipCard icon={tips[currentIndex].icon} title={tips[currentIndex].title} description={tips[currentIndex].description} />
+        </div>
+
+        {/* Navigation dots */}
+        <div className="flex justify-center gap-3 mt-6">
+          {tips.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => goToSlide(idx)}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                idx === currentIndex ? "w-8 bg-accent" : "w-2 bg-accent/30"
+              }`}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Step indicator */}
+        <div className="text-center mt-4 text-sm text-muted">
+          {currentIndex + 1} of {tips.length}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TipCard({ icon, title, description }: { icon: string; title: string; description: string }) {
+  return (
+    <div className="glass-card rounded-xl p-4 hover:bg-card-hover hover:border-accent/40 cursor-default flex flex-col w-full h-full">
+      <div className="text-2xl mb-2">{icon}</div>
+      <h4 className="font-semibold mb-1 text-white text-sm">{title}</h4>
+      <p className="text-xs text-muted leading-tight flex-1">{description}</p>
     </div>
   );
 }
 
 function ExpectCard({ icon, title, description }: { icon: string; title: string; description: string }) {
   return (
-    <div className="glass-card rounded-2xl p-6 text-center hover:bg-card-hover hover:border-accent/40 cursor-default">
-      <div className="text-4xl mb-4">{icon}</div>
-      <h4 className="font-semibold mb-2 text-white text-lg">{title}</h4>
-      <p className="text-sm text-muted leading-relaxed">{description}</p>
+    <div className="glass-card rounded-xl p-4 text-center hover:bg-card-hover hover:border-accent/40 cursor-default">
+      <div className="text-2xl mb-2">{icon}</div>
+      <h4 className="font-semibold mb-1 text-white text-sm">{title}</h4>
+      <p className="text-xs text-muted leading-tight">{description}</p>
     </div>
   );
 }
@@ -302,15 +405,15 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
   };
 
   const subMessages = {
-    uploading: "This should only take a moment",
-    analyzing: "Our AI coach is reviewing your technique",
+    uploading: "Please wait while we upload to the cloud",
+    analyzing: "Processing your video for analysis",
   };
 
   return (
-    <div className="py-24">
+    <div className="py-8">
       <div className="max-w-md mx-auto text-center">
         {videoPreview && (
-          <div className="mb-10 rounded-3xl overflow-hidden border border-accent/30 shadow-2xl enhanced-card">
+          <div className="mb-4 rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
             <video
               src={videoPreview}
               className="w-full aspect-video object-cover"
@@ -322,22 +425,22 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
           </div>
         )}
 
-        <div className="mb-8">
-          <div className="w-24 h-24 mx-auto mb-6 relative">
+        <div className="mb-4">
+          <div className="w-16 h-16 mx-auto mb-3 relative">
             <div className="absolute inset-0 rounded-full border-4 border-accent/20"></div>
             <div className="absolute inset-0 rounded-full border-4 border-accent border-t-transparent animate-spin"></div>
           </div>
         </div>
 
-        <h2 className="text-3xl font-bold mb-3 text-white">{messages[state]}</h2>
-        <p className="text-muted text-lg">{subMessages[state]}</p>
+        <h2 className="text-2xl font-bold mb-2 text-white">{messages[state]}</h2>
+        <p className="text-muted text-sm">{subMessages[state]}</p>
 
         {state === "analyzing" && (
-          <div className="mt-8 space-y-3">
-            <LoadingStep text="Detecting swing phases" done />
-            <LoadingStep text="Analyzing body position" active />
-            <LoadingStep text="Evaluating club path" />
-            <LoadingStep text="Generating training plan" />
+          <div className="mt-4 space-y-2">
+            <LoadingStep text="Reading the plane" done />
+            <LoadingStep text="Diagnosing the issue" active />
+            <LoadingStep text="Plotting the fix" />
+            <LoadingStep text="Building your protocol" />
           </div>
         )}
       </div>
@@ -370,22 +473,22 @@ function ResultsView({
   onReset: () => void;
 }) {
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between gap-6">
-        <h2 className="text-4xl font-bold text-white">Your Swing Analysis</h2>
+      <div className="flex items-center justify-between gap-4">
+        <h2 className="text-2xl font-bold text-white">Your Analysis</h2>
         <button
           onClick={onReset}
-          className="px-6 py-3 text-sm font-medium border border-accent/40 bg-accent/10 rounded-full hover:bg-accent/20 hover:border-accent text-white"
+          className="px-4 py-2 text-xs font-medium border border-accent/40 bg-accent/10 rounded-full hover:bg-accent/20 hover:border-accent text-white"
         >
           Analyze Another
         </button>
       </div>
 
       {/* Video + Summary */}
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         {videoPreview && (
-          <div className="rounded-3xl overflow-hidden border border-accent/30 shadow-2xl enhanced-card">
+          <div className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
             <video
               src={videoPreview}
               className="w-full aspect-video object-cover"
@@ -394,16 +497,16 @@ function ResultsView({
             />
           </div>
         )}
-        <div className="glass-card rounded-3xl p-8 shadow-lg">
-          <h3 className="font-bold text-white text-xl mb-4">Summary</h3>
-          <p className="text-muted">{analysis.summary}</p>
+        <div className="glass-card rounded-2xl p-4 shadow-lg">
+          <h3 className="font-bold text-white text-sm mb-2">Summary</h3>
+          <p className="text-muted text-xs">{analysis.summary}</p>
 
           {analysis.strengths.length > 0 && (
-            <div className="mt-4">
-              <h4 className="text-sm font-medium text-accent mb-2">Strengths</h4>
-              <ul className="space-y-1">
+            <div className="mt-2">
+              <h4 className="text-xs font-medium text-accent mb-1">Strengths</h4>
+              <ul className="space-y-0.5">
                 {analysis.strengths.map((strength, i) => (
-                  <li key={i} className="text-sm text-muted flex items-start gap-2">
+                  <li key={i} className="text-xs text-muted flex items-start gap-2">
                     <span className="text-accent mt-0.5">✓</span>
                     {strength}
                   </li>
@@ -416,19 +519,19 @@ function ResultsView({
 
       {/* Improvements */}
       <section>
-        <h3 className="text-2xl font-bold mb-6 text-white">Areas for Improvement</h3>
-        <div className="space-y-6">
+        <h3 className="text-base font-bold mb-3 text-white">Areas to Improve</h3>
+        <div className="space-y-4">
           {analysis.improvements.map((item, i) => (
-            <div key={i} className="glass-card rounded-3xl p-8 shadow-lg hover:shadow-xl hover:border-accent/40">
-              <div className="flex items-start gap-6">
-                <span className="w-10 h-10 rounded-full bg-accent/30 text-accent flex items-center justify-center text-sm font-bold border border-accent/50 shrink-0">
+            <div key={i} className="glass-card rounded-xl p-4 shadow-lg hover:shadow-xl hover:border-accent/40">
+              <div className="flex items-start gap-3">
+                <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50 shrink-0">
                   {i + 1}
                 </span>
                 <div className="flex-1">
-                  <h4 className="font-semibold mb-2 text-white text-lg">{item.area}</h4>
-                  <p className="text-sm text-muted mb-4">{item.issue}</p>
-                  <div className="bg-accent/15 border border-accent/30 rounded-2xl p-4">
-                    <p className="text-sm text-white"><span className="font-semibold text-accent">Fix:</span> {item.fix}</p>
+                  <h4 className="font-semibold mb-1 text-white text-sm">{item.area}</h4>
+                  <p className="text-xs text-muted mb-2">{item.issue}</p>
+                  <div className="bg-accent/15 border border-accent/30 rounded-lg p-2">
+                    <p className="text-xs text-white"><span className="font-semibold text-[#E1E4E8]">Fix:</span> {item.fix}</p>
                   </div>
                 </div>
               </div>
@@ -439,22 +542,22 @@ function ResultsView({
 
       {/* Training Plan */}
       <section>
-        <h3 className="text-2xl font-bold mb-6 text-white">Your Training Plan</h3>
-        <div className="space-y-6">
+        <h3 className="text-base font-bold mb-3 text-white">Training Plan</h3>
+        <div className="space-y-4">
           {analysis.trainingPlan.map((week) => (
-            <div key={week.weekNumber} className="glass-card rounded-3xl p-8 shadow-lg">
-              <div className="flex items-center gap-4 mb-6">
-                <span className="px-4 py-2 bg-accent/30 text-accent text-sm font-semibold rounded-full border border-accent/50">
-                  Week {week.weekNumber}
+            <div key={week.weekNumber} className="glass-card rounded-xl p-3 shadow-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2 py-1 bg-accent/30 text-[#E1E4E8] text-xs font-semibold rounded-full border border-accent/50">
+                  W{week.weekNumber}
                 </span>
-                <span className="text-base text-muted font-medium">{week.focus}</span>
+                <span className="text-xs text-muted font-medium">{week.focus}</span>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {week.drills.map((drill, i) => (
-                  <div key={i} className="border-l-3 border-accent/40 pl-6">
-                    <h5 className="font-semibold text-white text-base">{drill.name}</h5>
-                    <p className="text-sm text-muted mt-1">{drill.description}</p>
-                    <p className="text-xs text-accent/80 font-medium mt-2">{drill.reps}</p>
+                  <div key={i} className="border-l-2 border-accent/40 pl-2">
+                    <h5 className="font-semibold text-white text-xs">{drill.name}</h5>
+                    <p className="text-xs text-muted">{drill.description}</p>
+                    <p className="text-xs text-accent/80 font-medium">{drill.reps}</p>
                   </div>
                 ))}
               </div>
@@ -466,21 +569,21 @@ function ResultsView({
       {/* Resources */}
       {analysis.resources.length > 0 && (
         <section>
-          <h3 className="text-2xl font-bold mb-6 text-white">Recommended Videos</h3>
-          <div className="grid gap-6 sm:grid-cols-2">
+          <h3 className="text-base font-bold mb-3 text-white">Learning Resources</h3>
+          <div className="grid gap-4 sm:grid-cols-2">
             {analysis.resources.map((resource, i) => (
               <a
                 key={i}
                 href={resource.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="glass-card rounded-3xl p-6 hover:bg-card-hover hover:border-accent/50 block shadow-lg hover:shadow-xl transition-all"
+                className="glass-card rounded-xl p-3 hover:bg-card-hover hover:border-accent/50 block shadow-lg hover:shadow-xl transition-all"
               >
-                <h4 className="font-semibold mb-2 flex items-center gap-3 text-white text-lg">
-                  <span className="text-red-400 text-xl">▶</span>
+                <h4 className="font-semibold mb-1 flex items-center gap-2 text-white text-sm">
+                  <span className="text-red-400">▶</span>
                   {resource.title}
                 </h4>
-                <p className="text-sm text-muted leading-relaxed">{resource.description}</p>
+                <p className="text-xs text-muted">{resource.description}</p>
               </a>
             ))}
           </div>
@@ -488,13 +591,13 @@ function ResultsView({
       )}
 
       {/* CTA */}
-      <div className="text-center py-12 border-t border-accent/20">
-        <p className="text-muted mb-6 text-lg">Ready to see your improvement?</p>
+      <div className="text-center py-4 border-t border-accent/20">
+        <p className="text-muted mb-3 text-xs">Analyze another swing</p>
         <button
           onClick={onReset}
-          className="px-10 py-4 bg-accent text-black font-semibold rounded-full hover:bg-accent-dim accent-button shadow-lg hover:shadow-xl transition-all text-lg"
+          className="px-6 py-2 bg-accent text-black font-semibold rounded-full hover:bg-accent-dim accent-button shadow-lg hover:shadow-xl transition-all text-sm"
         >
-          Upload Another Swing
+          Upload Another Video
         </button>
       </div>
     </div>
