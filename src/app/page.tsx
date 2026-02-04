@@ -149,7 +149,7 @@ export default function Home() {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-[#E1E4E8]">Smoke Show Golf</h1>
-              <p className="text-base text-[#a8adb5]">AI-powered swing analysis and coaching</p>
+              <p className="text-base text-[#a8adb5]">The science of the strike. The soul of the game.</p>
             </div>
           </div>
         </div>
@@ -161,11 +161,10 @@ export default function Home() {
             {/* Hero */}
             <section className="text-center mb-16 py-8">
               <h2 className="text-5xl font-bold mb-6 text-white leading-tight">
-                Analyze Your Swing with AI
+                Show Your Swing
               </h2>
               <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed">
-                Upload a video of your golf swing and get instant feedback from our
-                AI coach, plus a personalized training plan to improve your game.
+                Upload a video. Get the verdict. Refine the ritual.
               </p>
             </section>
 
@@ -173,7 +172,7 @@ export default function Home() {
             <section className="mb-16">
               <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
                 <span className="w-8 h-8 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-sm font-bold border border-accent/50">1</span>
-                How to Film Your Swing
+                The Setup
               </h3>
               <TipCarousel
                 tips={[
@@ -205,7 +204,7 @@ export default function Home() {
             <section className="mb-16">
               <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
                 <span className="w-8 h-8 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-sm font-bold border border-accent/50">2</span>
-                Upload Your Video
+                The Move
               </h3>
               <div
                 onDragOver={(e) => e.preventDefault()}
@@ -224,8 +223,8 @@ export default function Home() {
                 <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-accent/10 border border-accent/40 flex items-center justify-center shadow-lg">
                   <UploadIcon />
                 </div>
-                <p className="font-semibold mb-3 text-xl text-[#E1E4E8]">Drop your video here or tap to browse</p>
-                <p className="text-sm text-[#a8adb5]">MP4, MOV, or WebM • Max 50MB • Under 30 seconds</p>
+                <p className="font-semibold mb-3 text-xl text-[#E1E4E8]">Drop the video.</p>
+                <p className="text-sm text-[#a8adb5]">MP4, MOV, or WebM • Max 50MB</p>
               </div>
               {error && (
                 <p className="mt-6 text-red-300 text-sm text-center bg-red-500/10 border border-red-500/30 rounded-xl py-3 px-4">{error}</p>
@@ -236,7 +235,7 @@ export default function Home() {
             <section>
               <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
                 <span className="w-8 h-8 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-sm font-bold border border-accent/50">3</span>
-                What You&apos;ll Get
+                The Arsenal
               </h3>
               <div className="grid gap-4 sm:grid-cols-3">
                 <ExpectCard
@@ -272,13 +271,13 @@ export default function Home() {
             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-500/20 border border-red-500/40 flex items-center justify-center shadow-lg">
               <span className="text-3xl">❌</span>
             </div>
-            <h2 className="text-3xl font-bold mb-3 text-white">Analysis Failed</h2>
-            <p className="text-muted mb-8 text-lg">{error || "Something went wrong. Please try again."}</p>
+            <h2 className="text-3xl font-bold mb-3 text-white">No Verdict.</h2>
+            <p className="text-muted mb-8 text-lg">{error || "The move didn't make it. Show me another."}</p>
             <button
               onClick={reset}
               className="px-8 py-3 bg-accent text-black font-semibold rounded-full hover:bg-accent-dim accent-button shadow-lg"
             >
-              Try Again
+              Start Over
             </button>
           </div>
         )}
@@ -354,7 +353,7 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
 
         {/* Step indicator */}
         <div className="text-center mt-4 text-sm text-muted">
-          Step {currentIndex + 1} of {tips.length}
+          {currentIndex + 1} of {tips.length}
         </div>
       </div>
     </div>
@@ -383,13 +382,13 @@ function ExpectCard({ icon, title, description }: { icon: string; title: string;
 
 function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing"; videoPreview: string | null }) {
   const messages = {
-    uploading: "Uploading your video...",
-    analyzing: "Analyzing your swing...",
+    uploading: "Decoding the move.",
+    analyzing: "The verdict. Pending.",
   };
 
   const subMessages = {
-    uploading: "This should only take a moment",
-    analyzing: "Our AI coach is reviewing your technique",
+    uploading: "Getting it from the cloud",
+    analyzing: "Reading the strike",
   };
 
   return (
@@ -420,10 +419,10 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
 
         {state === "analyzing" && (
           <div className="mt-8 space-y-3">
-            <LoadingStep text="Detecting swing phases" done />
-            <LoadingStep text="Analyzing body position" active />
-            <LoadingStep text="Evaluating club path" />
-            <LoadingStep text="Generating training plan" />
+            <LoadingStep text="Reading the plane" done />
+            <LoadingStep text="Diagnosing the issue" active />
+            <LoadingStep text="Plotting the fix" />
+            <LoadingStep text="Building your protocol" />
           </div>
         )}
       </div>
@@ -459,12 +458,12 @@ function ResultsView({
     <div className="space-y-10">
       {/* Header */}
       <div className="flex items-center justify-between gap-6">
-        <h2 className="text-4xl font-bold text-white">Your Swing Analysis</h2>
+        <h2 className="text-4xl font-bold text-white">The Verdict</h2>
         <button
           onClick={onReset}
           className="px-6 py-3 text-sm font-medium border border-accent/40 bg-accent/10 rounded-full hover:bg-accent/20 hover:border-accent text-white"
         >
-          Analyze Another
+          Another Move
         </button>
       </div>
 
@@ -481,12 +480,12 @@ function ResultsView({
           </div>
         )}
         <div className="glass-card rounded-3xl p-8 shadow-lg">
-          <h3 className="font-bold text-white text-xl mb-4">Summary</h3>
+          <h3 className="font-bold text-white text-xl mb-4">The Read</h3>
           <p className="text-muted">{analysis.summary}</p>
 
           {analysis.strengths.length > 0 && (
             <div className="mt-4">
-              <h4 className="text-sm font-medium text-accent mb-2">Strengths</h4>
+              <h4 className="text-sm font-medium text-accent mb-2">Pure.</h4>
               <ul className="space-y-1">
                 {analysis.strengths.map((strength, i) => (
                   <li key={i} className="text-sm text-muted flex items-start gap-2">
@@ -502,7 +501,7 @@ function ResultsView({
 
       {/* Improvements */}
       <section>
-        <h3 className="text-2xl font-bold mb-6 text-white">Areas for Improvement</h3>
+        <h3 className="text-2xl font-bold mb-6 text-white">Close the Gap</h3>
         <div className="space-y-6">
           {analysis.improvements.map((item, i) => (
             <div key={i} className="glass-card rounded-3xl p-8 shadow-lg hover:shadow-xl hover:border-accent/40">
@@ -525,7 +524,7 @@ function ResultsView({
 
       {/* Training Plan */}
       <section>
-        <h3 className="text-2xl font-bold mb-6 text-white">Your Training Plan</h3>
+        <h3 className="text-2xl font-bold mb-6 text-white">Refine the Ritual</h3>
         <div className="space-y-6">
           {analysis.trainingPlan.map((week) => (
             <div key={week.weekNumber} className="glass-card rounded-3xl p-8 shadow-lg">
@@ -552,7 +551,7 @@ function ResultsView({
       {/* Resources */}
       {analysis.resources.length > 0 && (
         <section>
-          <h3 className="text-2xl font-bold mb-6 text-white">Recommended Videos</h3>
+          <h3 className="text-2xl font-bold mb-6 text-white">The Arsenal</h3>
           <div className="grid gap-6 sm:grid-cols-2">
             {analysis.resources.map((resource, i) => (
               <a
@@ -575,12 +574,12 @@ function ResultsView({
 
       {/* CTA */}
       <div className="text-center py-12 border-t border-accent/20">
-        <p className="text-muted mb-6 text-lg">Ready to see your improvement?</p>
+        <p className="text-muted mb-6 text-lg">Time to refine.</p>
         <button
           onClick={onReset}
           className="px-10 py-4 bg-accent text-black font-semibold rounded-full hover:bg-accent-dim accent-button shadow-lg hover:shadow-xl transition-all text-lg"
         >
-          Upload Another Swing
+          Show Me Another
         </button>
       </div>
     </div>
