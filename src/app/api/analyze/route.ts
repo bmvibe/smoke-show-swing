@@ -14,22 +14,31 @@ async function convertVideoToMp4(inputPath: string, outputPath: string): Promise
   try {
     console.log(`Converting video from ${inputPath} to ${outputPath}`);
     // Use ffmpeg to convert to MP4 with compatible codec
+    // Reduce quality and resolution for better Gemini compatibility
     await execFileAsync("ffmpeg", [
       "-i", inputPath,
+      "-vf", "scale=1280:-1",  // Scale down to max 1280px width
       "-c:v", "libx264",  // H.264 codec
-      "-c:a", "aac",      // AAC audio codec
+      "-crf", "28",  // Quality (higher = lower quality, 28 is good balance)
+      "-c:a", "aac",  // AAC audio codec
+      "-b:a", "128k",  // Audio bitrate
       "-movflags", "faststart",  // Enable streaming
-      "-preset", "veryfast",  // Faster encoding
       "-y",  // Overwrite output
       outputPath
     ]);
     console.log("Video conversion successful");
   } catch (error) {
-    console.warn("FFmpeg not available or conversion failed, will try original file:", error);
-    // If ffmpeg fails, we'll just try with the original file
-    // Copy the input to output as fallback
-    const fs = await import("fs");
-    fs.copyFileSync(inputPath, outputPath);
+    console.warn("FFmpeg not available, trying alternative approach:", error);
+    // If ffmpeg fails, try to use a fallback approach
+    // For now, we'll just copy and try
+    try {
+      const fs = await import("fs");
+      fs.copyFileSync(inputPath, outputPath);
+      console.log("Fallback: Copied file without conversion (ffmpeg not available)");
+    } catch (copyError) {
+      console.error("Fallback copy also failed:", copyError);
+      throw error;
+    }
   }
 }
 
@@ -169,12 +178,19 @@ export async function POST(request: Request) {
     await writeFile(rawFilePath, videoBuffer);
     console.log("Raw file saved to:", rawFilePath);
 
-    // Convert to MP4 for better compatibility with Gemini
+    // Try to convert to MP4 for better Gemini compatibility
     tempFilePath = join(tmpdir(), `golf-swing-${Date.now()}.mp4`);
-    await convertVideoToMp4(rawFilePath, tempFilePath);
-    console.log("Converted video saved to:", tempFilePath);
+    console.log("Attempting to convert to MP4...");
+    try {
+      await convertVideoToMp4(rawFilePath, tempFilePath);
+      console.log("Converted video saved to:", tempFilePath);
+    } catch (conversionError) {
+      console.warn("Conversion failed, will try raw file:", conversionError);
+      // Fall back to original file
+      tempFilePath = rawFilePath;
+    }
 
-    // Always use video/mp4 for Gemini - it has better support
+    // Always use video/mp4 for Gemini
     const uploadMimeType = "video/mp4";
     console.log("Uploading to Gemini as:", uploadMimeType);
 
