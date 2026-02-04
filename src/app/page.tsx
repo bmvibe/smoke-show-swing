@@ -292,15 +292,6 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
-  // Auto-advance carousel every 4 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % tips.length);
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, [tips.length]);
-
   // Handle touch swipe
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
@@ -333,9 +324,11 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
       onTouchEnd={handleTouchEnd}
     >
       {/* Carousel on mobile, grid on desktop */}
-      <div className="hidden sm:grid gap-4 sm:grid-cols-2 auto-rows-fr">
+      <div className="hidden sm:grid gap-4 sm:grid-cols-2" style={{ gridAutoRows: '1fr' }}>
         {tips.map((tip, idx) => (
-          <TipCard key={idx} icon={tip.icon} title={tip.title} description={tip.description} />
+          <div key={idx} className="flex">
+            <TipCard icon={tip.icon} title={tip.title} description={tip.description} />
+          </div>
         ))}
       </div>
 
@@ -370,7 +363,7 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
 
 function TipCard({ icon, title, description }: { icon: string; title: string; description: string }) {
   return (
-    <div className="glass-card rounded-2xl p-6 hover:bg-card-hover hover:border-accent/40 cursor-default flex flex-col h-full">
+    <div className="glass-card rounded-2xl p-6 hover:bg-card-hover hover:border-accent/40 cursor-default flex flex-col w-full h-full">
       <div className="text-3xl mb-3">{icon}</div>
       <h4 className="font-semibold mb-2 text-white text-lg">{title}</h4>
       <p className="text-sm text-muted leading-relaxed flex-1">{description}</p>
