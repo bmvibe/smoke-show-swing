@@ -168,42 +168,10 @@ export default function Home() {
               </p>
             </section>
 
-            {/* How to Film */}
-            <section className="mb-6">
-              <h3 className="text-base font-bold mb-3 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50">1</span>
-                The Setup
-              </h3>
-              <TipCarousel
-                tips={[
-                  {
-                    icon: "📱",
-                    title: "Camera Position",
-                    description: "Place your phone on a tripod or prop it up at waist height, about 10 feet away. Film from directly behind or face-on for best results."
-                  },
-                  {
-                    icon: "☀️",
-                    title: "Lighting",
-                    description: "Film outdoors in daylight or in a well-lit indoor space. Avoid backlighting (don't face the sun)."
-                  },
-                  {
-                    icon: "🎬",
-                    title: "Framing",
-                    description: "Make sure your full body and the club are visible throughout the entire swing. Leave some space above and below."
-                  },
-                  {
-                    icon: "⏱️",
-                    title: "Video Length",
-                    description: "Keep it under 30 seconds. Trim to just your swing - setup, backswing, impact, and follow-through."
-                  }
-                ]}
-              />
-            </section>
-
             {/* Upload */}
             <section className="mb-6">
               <h3 className="text-base font-bold mb-3 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50">2</span>
+                <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50">1</span>
                 The Move
               </h3>
               <div
@@ -229,12 +197,41 @@ export default function Home() {
               {error && (
                 <p className="mt-6 text-red-300 text-sm text-center bg-red-500/10 border border-red-500/30 rounded-xl py-3 px-4">{error}</p>
               )}
+
+              {/* How to Film - Part of Step 1 */}
+              <div className="mt-6">
+                <h4 className="text-sm font-bold mb-3 text-[#E1E4E8]">The Setup</h4>
+                <TipCarousel
+                  tips={[
+                    {
+                      icon: "📱",
+                      title: "Camera Position",
+                      description: "Place your phone on a tripod or prop it up at waist height, about 10 feet away. Film from directly behind or face-on for best results."
+                    },
+                    {
+                      icon: "☀️",
+                      title: "Lighting",
+                      description: "Film outdoors in daylight or in a well-lit indoor space. Avoid backlighting (don't face the sun)."
+                    },
+                    {
+                      icon: "🎬",
+                      title: "Framing",
+                      description: "Make sure your full body and the club are visible throughout the entire swing. Leave some space above and below."
+                    },
+                    {
+                      icon: "⏱️",
+                      title: "Video Length",
+                      description: "Keep it under 30 seconds. Trim to just your swing - setup, backswing, impact, and follow-through."
+                    }
+                  ]}
+                />
+              </div>
             </section>
 
             {/* What to Expect */}
             <section>
               <h3 className="text-base font-bold mb-3 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50">3</span>
+                <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50">2</span>
                 The Arsenal
               </h3>
               <div className="grid gap-4 sm:grid-cols-3">
