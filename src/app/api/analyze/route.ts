@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleAIFileManager } from "@google/generative-ai/server";
 import { NextResponse } from "next/server";
-import { del } from "@vercel/blob";
+import { del, head } from "@vercel/blob";
 import { writeFile, unlink } from "fs/promises";
 import { join } from "path";
 import { tmpdir } from "os";
@@ -115,14 +115,27 @@ export async function POST(request: Request) {
       );
     }
 
+    // Verify the blob exists
+    console.log("Verifying blob at:", videoUrl);
+    let blobInfo;
+    try {
+      blobInfo = await head(videoUrl);
+      console.log("Blob info:", blobInfo.size, blobInfo.contentType);
+    } catch (headError) {
+      console.error("Blob verification failed:", headError);
+      throw new Error("Video not found in storage");
+    }
+
     // Download the video from Vercel Blob
-    console.log("Downloading video from:", videoUrl);
-    const videoResponse = await fetch(videoUrl);
+    console.log("Downloading video from:", blobInfo.url);
+    const videoResponse = await fetch(blobInfo.url);
     if (!videoResponse.ok) {
-      throw new Error("Failed to download video");
+      console.error("Download failed:", videoResponse.status, videoResponse.statusText);
+      throw new Error(`Failed to download video: ${videoResponse.status} ${videoResponse.statusText}`);
     }
 
     const videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
+    console.log("Downloaded video size:", videoBuffer.length);
     tempFilePath = join(tmpdir(), `golf-swing-${Date.now()}.mp4`);
     await writeFile(tempFilePath, videoBuffer);
 
