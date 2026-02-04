@@ -139,7 +139,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen" style={{ background: 'linear-gradient(135deg, #0F1115 0%, #1a1f2e 50%, #0d0f14 100%)' }}>
+    <main className="min-h-screen">
       {/* Header */}
       <header className="backdrop-blur-sm border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-8">
