@@ -136,17 +136,17 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-gradient-to-b from-blue-600 via-blue-800 to-slate-900">
       {/* Header */}
-      <header className="border-b border-border">
-        <div className="max-w-4xl mx-auto px-4 py-6">
+      <header className="backdrop-blur-sm border-b border-border">
+        <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center">
-              <span className="text-xl">🏌️</span>
+            <div className="w-14 h-14 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center shadow-lg">
+              <span className="text-3xl">🏌️</span>
             </div>
             <div>
-              <h1 className="text-xl font-bold">Smoke Show Golf</h1>
-              <p className="text-sm text-muted">The coach you need to smoke your drive</p>
+              <h1 className="text-3xl font-bold text-white">Smoke Show Golf</h1>
+              <p className="text-base text-muted">AI-powered swing analysis and coaching</p>
             </div>
           </div>
         </div>
@@ -156,20 +156,20 @@ export default function Home() {
         {state === "idle" && (
           <>
             {/* Hero */}
-            <section className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">
+            <section className="text-center mb-16 py-8">
+              <h2 className="text-5xl font-bold mb-6 text-white leading-tight">
                 Analyze Your Swing with AI
               </h2>
-              <p className="text-muted text-lg max-w-xl mx-auto">
+              <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed">
                 Upload a video of your golf swing and get instant feedback from our
                 AI coach, plus a personalized training plan to improve your game.
               </p>
             </section>
 
             {/* How to Film */}
-            <section className="mb-12">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-accent/20 text-accent flex items-center justify-center text-sm">1</span>
+            <section className="mb-16">
+              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-accent/30 text-accent flex items-center justify-center text-sm font-bold border border-accent/50">1</span>
                 How to Film Your Swing
               </h3>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -193,16 +193,16 @@ export default function Home() {
             </section>
 
             {/* Upload */}
-            <section className="mb-12">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-accent/20 text-accent flex items-center justify-center text-sm">2</span>
+            <section className="mb-16">
+              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-accent/30 text-accent flex items-center justify-center text-sm font-bold border border-accent/50">2</span>
                 Upload Your Video
               </h3>
               <div
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-border rounded-xl p-12 text-center cursor-pointer hover:border-accent hover:bg-card transition-colors"
+                className="border-2 border-dashed border-accent/40 rounded-3xl p-16 text-center cursor-pointer hover:border-accent hover:bg-card/50 transition-all enhanced-card shadow-lg"
               >
                 <input
                   ref={fileInputRef}
@@ -211,21 +211,21 @@ export default function Home() {
                   onChange={handleInputChange}
                   className="hidden"
                 />
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-card flex items-center justify-center">
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-accent/10 border border-accent/40 flex items-center justify-center shadow-lg">
                   <UploadIcon />
                 </div>
-                <p className="font-medium mb-2">Drop your video here or tap to browse</p>
+                <p className="font-semibold mb-3 text-xl text-white">Drop your video here or tap to browse</p>
                 <p className="text-sm text-muted">MP4, MOV, or WebM • Max 50MB • Under 30 seconds</p>
               </div>
               {error && (
-                <p className="mt-4 text-red-400 text-sm text-center">{error}</p>
+                <p className="mt-6 text-red-300 text-sm text-center bg-red-500/10 border border-red-500/30 rounded-xl py-3 px-4">{error}</p>
               )}
             </section>
 
             {/* What to Expect */}
             <section>
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-accent/20 text-accent flex items-center justify-center text-sm">3</span>
+              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-accent/30 text-accent flex items-center justify-center text-sm font-bold border border-accent/50">3</span>
                 What You&apos;ll Get
               </h3>
               <div className="grid gap-4 sm:grid-cols-3">
@@ -259,14 +259,14 @@ export default function Home() {
 
         {state === "error" && (
           <div className="text-center py-20">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/10 flex items-center justify-center">
-              <span className="text-2xl">❌</span>
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-500/20 border border-red-500/40 flex items-center justify-center shadow-lg">
+              <span className="text-3xl">❌</span>
             </div>
-            <h2 className="text-xl font-bold mb-2">Analysis Failed</h2>
-            <p className="text-muted mb-6">{error || "Something went wrong. Please try again."}</p>
+            <h2 className="text-3xl font-bold mb-3 text-white">Analysis Failed</h2>
+            <p className="text-muted mb-8 text-lg">{error || "Something went wrong. Please try again."}</p>
             <button
               onClick={reset}
-              className="px-6 py-3 bg-accent text-black font-medium rounded-full hover:bg-accent-dim"
+              className="px-8 py-3 bg-accent text-black font-semibold rounded-full hover:bg-accent-dim accent-button shadow-lg"
             >
               Try Again
             </button>
@@ -279,19 +279,19 @@ export default function Home() {
 
 function TipCard({ title, description }: { title: string; description: string }) {
   return (
-    <div className="bg-card border border-border rounded-lg p-4">
-      <h4 className="font-medium mb-1">{title}</h4>
-      <p className="text-sm text-muted">{description}</p>
+    <div className="glass-card rounded-2xl p-6 hover:bg-card-hover hover:border-accent/40 cursor-default">
+      <h4 className="font-semibold mb-2 text-white text-lg">{title}</h4>
+      <p className="text-sm text-muted leading-relaxed">{description}</p>
     </div>
   );
 }
 
 function ExpectCard({ icon, title, description }: { icon: string; title: string; description: string }) {
   return (
-    <div className="bg-card border border-border rounded-lg p-4 text-center">
-      <div className="text-2xl mb-2">{icon}</div>
-      <h4 className="font-medium mb-1">{title}</h4>
-      <p className="text-sm text-muted">{description}</p>
+    <div className="glass-card rounded-2xl p-6 text-center hover:bg-card-hover hover:border-accent/40 cursor-default">
+      <div className="text-4xl mb-4">{icon}</div>
+      <h4 className="font-semibold mb-2 text-white text-lg">{title}</h4>
+      <p className="text-sm text-muted leading-relaxed">{description}</p>
     </div>
   );
 }
@@ -308,10 +308,10 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
   };
 
   return (
-    <div className="py-20">
+    <div className="py-24">
       <div className="max-w-md mx-auto text-center">
         {videoPreview && (
-          <div className="mb-8 rounded-xl overflow-hidden border border-border">
+          <div className="mb-10 rounded-3xl overflow-hidden border border-accent/30 shadow-2xl enhanced-card">
             <video
               src={videoPreview}
               className="w-full aspect-video object-cover"
@@ -323,15 +323,15 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
           </div>
         )}
 
-        <div className="mb-6">
-          <div className="w-16 h-16 mx-auto mb-4 relative">
-            <div className="absolute inset-0 rounded-full border-4 border-border"></div>
+        <div className="mb-8">
+          <div className="w-24 h-24 mx-auto mb-6 relative">
+            <div className="absolute inset-0 rounded-full border-4 border-accent/20"></div>
             <div className="absolute inset-0 rounded-full border-4 border-accent border-t-transparent animate-spin"></div>
           </div>
         </div>
 
-        <h2 className="text-xl font-bold mb-2">{messages[state]}</h2>
-        <p className="text-muted">{subMessages[state]}</p>
+        <h2 className="text-3xl font-bold mb-3 text-white">{messages[state]}</h2>
+        <p className="text-muted text-lg">{subMessages[state]}</p>
 
         {state === "analyzing" && (
           <div className="mt-8 space-y-3">
@@ -371,22 +371,22 @@ function ResultsView({
   onReset: () => void;
 }) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Your Swing Analysis</h2>
+      <div className="flex items-center justify-between gap-6">
+        <h2 className="text-4xl font-bold text-white">Your Swing Analysis</h2>
         <button
           onClick={onReset}
-          className="px-4 py-2 text-sm border border-border rounded-full hover:bg-card"
+          className="px-6 py-3 text-sm font-medium border border-accent/40 bg-accent/10 rounded-full hover:bg-accent/20 hover:border-accent text-white"
         >
           Analyze Another
         </button>
       </div>
 
       {/* Video + Summary */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-8 md:grid-cols-2">
         {videoPreview && (
-          <div className="rounded-xl overflow-hidden border border-border">
+          <div className="rounded-3xl overflow-hidden border border-accent/30 shadow-2xl enhanced-card">
             <video
               src={videoPreview}
               className="w-full aspect-video object-cover"
@@ -395,8 +395,8 @@ function ResultsView({
             />
           </div>
         )}
-        <div className="bg-card border border-border rounded-xl p-6">
-          <h3 className="font-semibold mb-3">Summary</h3>
+        <div className="glass-card rounded-3xl p-8 shadow-lg">
+          <h3 className="font-bold text-white text-xl mb-4">Summary</h3>
           <p className="text-muted">{analysis.summary}</p>
 
           {analysis.strengths.length > 0 && (
@@ -417,19 +417,19 @@ function ResultsView({
 
       {/* Improvements */}
       <section>
-        <h3 className="text-lg font-semibold mb-4">Areas for Improvement</h3>
-        <div className="space-y-4">
+        <h3 className="text-2xl font-bold mb-6 text-white">Areas for Improvement</h3>
+        <div className="space-y-6">
           {analysis.improvements.map((item, i) => (
-            <div key={i} className="bg-card border border-border rounded-xl p-6">
-              <div className="flex items-start gap-4">
-                <span className="w-8 h-8 rounded-full bg-accent/20 text-accent flex items-center justify-center text-sm font-medium shrink-0">
+            <div key={i} className="glass-card rounded-3xl p-8 shadow-lg hover:shadow-xl hover:border-accent/40">
+              <div className="flex items-start gap-6">
+                <span className="w-10 h-10 rounded-full bg-accent/30 text-accent flex items-center justify-center text-sm font-bold border border-accent/50 shrink-0">
                   {i + 1}
                 </span>
-                <div>
-                  <h4 className="font-medium mb-1">{item.area}</h4>
-                  <p className="text-sm text-muted mb-3">{item.issue}</p>
-                  <div className="bg-accent/10 border border-accent/20 rounded-lg p-3">
-                    <p className="text-sm"><span className="font-medium text-accent">Fix:</span> {item.fix}</p>
+                <div className="flex-1">
+                  <h4 className="font-semibold mb-2 text-white text-lg">{item.area}</h4>
+                  <p className="text-sm text-muted mb-4">{item.issue}</p>
+                  <div className="bg-accent/15 border border-accent/30 rounded-2xl p-4">
+                    <p className="text-sm text-white"><span className="font-semibold text-accent">Fix:</span> {item.fix}</p>
                   </div>
                 </div>
               </div>
@@ -440,22 +440,22 @@ function ResultsView({
 
       {/* Training Plan */}
       <section>
-        <h3 className="text-lg font-semibold mb-4">Your Training Plan</h3>
-        <div className="space-y-4">
+        <h3 className="text-2xl font-bold mb-6 text-white">Your Training Plan</h3>
+        <div className="space-y-6">
           {analysis.trainingPlan.map((week) => (
-            <div key={week.weekNumber} className="bg-card border border-border rounded-xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="px-3 py-1 bg-accent/20 text-accent text-sm font-medium rounded-full">
+            <div key={week.weekNumber} className="glass-card rounded-3xl p-8 shadow-lg">
+              <div className="flex items-center gap-4 mb-6">
+                <span className="px-4 py-2 bg-accent/30 text-accent text-sm font-semibold rounded-full border border-accent/50">
                   Week {week.weekNumber}
                 </span>
-                <span className="text-sm text-muted">{week.focus}</span>
+                <span className="text-base text-muted font-medium">{week.focus}</span>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {week.drills.map((drill, i) => (
-                  <div key={i} className="border-l-2 border-border pl-4">
-                    <h5 className="font-medium text-sm">{drill.name}</h5>
-                    <p className="text-sm text-muted">{drill.description}</p>
-                    <p className="text-xs text-accent mt-1">{drill.reps}</p>
+                  <div key={i} className="border-l-3 border-accent/40 pl-6">
+                    <h5 className="font-semibold text-white text-base">{drill.name}</h5>
+                    <p className="text-sm text-muted mt-1">{drill.description}</p>
+                    <p className="text-xs text-accent/80 font-medium mt-2">{drill.reps}</p>
                   </div>
                 ))}
               </div>
@@ -467,21 +467,21 @@ function ResultsView({
       {/* Resources */}
       {analysis.resources.length > 0 && (
         <section>
-          <h3 className="text-lg font-semibold mb-4">Recommended Videos</h3>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <h3 className="text-2xl font-bold mb-6 text-white">Recommended Videos</h3>
+          <div className="grid gap-6 sm:grid-cols-2">
             {analysis.resources.map((resource, i) => (
               <a
                 key={i}
                 href={resource.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-card border border-border rounded-xl p-4 hover:bg-card-hover hover:border-accent/50 block"
+                className="glass-card rounded-3xl p-6 hover:bg-card-hover hover:border-accent/50 block shadow-lg hover:shadow-xl transition-all"
               >
-                <h4 className="font-medium mb-1 flex items-center gap-2">
-                  <span className="text-red-500">▶</span>
+                <h4 className="font-semibold mb-2 flex items-center gap-3 text-white text-lg">
+                  <span className="text-red-400 text-xl">▶</span>
                   {resource.title}
                 </h4>
-                <p className="text-sm text-muted">{resource.description}</p>
+                <p className="text-sm text-muted leading-relaxed">{resource.description}</p>
               </a>
             ))}
           </div>
@@ -489,11 +489,11 @@ function ResultsView({
       )}
 
       {/* CTA */}
-      <div className="text-center py-8 border-t border-border">
-        <p className="text-muted mb-4">Ready to see your improvement?</p>
+      <div className="text-center py-12 border-t border-accent/20">
+        <p className="text-muted mb-6 text-lg">Ready to see your improvement?</p>
         <button
           onClick={onReset}
-          className="px-8 py-3 bg-accent text-black font-medium rounded-full hover:bg-accent-dim"
+          className="px-10 py-4 bg-accent text-black font-semibold rounded-full hover:bg-accent-dim accent-button shadow-lg hover:shadow-xl transition-all text-lg"
         >
           Upload Another Swing
         </button>
@@ -505,7 +505,7 @@ function ResultsView({
 function UploadIcon() {
   return (
     <svg
-      className="w-8 h-8 text-muted"
+      className="w-10 h-10 text-accent"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
