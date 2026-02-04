@@ -115,31 +115,34 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify the blob exists
-    console.log("Verifying blob at:", videoUrl);
-    let blobInfo;
-    try {
-      blobInfo = await head(videoUrl);
-      console.log("Blob info:", blobInfo.size, blobInfo.contentType);
-    } catch (headError) {
-      console.error("Blob verification failed:", headError);
-      throw new Error("Video not found in storage");
-    }
+    // Get blob metadata and download URL
+    console.log("Getting blob info for:", videoUrl);
+    const blobInfo = await head(videoUrl);
+    console.log("Blob found - size:", blobInfo.size, "type:", blobInfo.contentType, "downloadUrl:", blobInfo.downloadUrl);
 
-    // Download the video from Vercel Blob
-    console.log("Downloading video from:", blobInfo.url);
-    const videoResponse = await fetch(blobInfo.url);
+    // Use downloadUrl if available, otherwise use the original URL
+    const downloadUrl = blobInfo.downloadUrl || videoUrl;
+    console.log("Downloading from:", downloadUrl);
+
+    let videoBuffer: Buffer;
+    const videoResponse = await fetch(downloadUrl);
     if (!videoResponse.ok) {
       console.error("Download failed:", videoResponse.status, videoResponse.statusText);
-      throw new Error(`Failed to download video: ${videoResponse.status} ${videoResponse.statusText}`);
+      // Try the original URL as fallback
+      console.log("Trying original URL as fallback:", videoUrl);
+      const fallbackResponse = await fetch(videoUrl);
+      if (!fallbackResponse.ok) {
+        throw new Error(`Failed to download video: ${fallbackResponse.status} ${fallbackResponse.statusText}`);
+      }
+      videoBuffer = Buffer.from(await fallbackResponse.arrayBuffer());
+    } else {
+      videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
     }
 
-    const videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
     console.log("Downloaded video size:", videoBuffer.length);
     tempFilePath = join(tmpdir(), `golf-swing-${Date.now()}.mp4`);
     await writeFile(tempFilePath, videoBuffer);
-
-    console.log("File saved temporarily:", tempFilePath, "size:", videoBuffer.length);
+    console.log("File saved to:", tempFilePath);
 
     // Upload to Gemini File API
     const fileManager = new GoogleAIFileManager(process.env.GEMINI_API_KEY);
