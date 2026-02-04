@@ -115,24 +115,23 @@ export async function POST(request: Request) {
       );
     }
 
-    // Download video with retries
+    // Download video with retries (Vercel Blob can have propagation delays)
     console.log("Downloading video from:", videoUrl);
 
     let videoBuffer: Buffer | null = null;
-    const maxRetries = 3;
+    const maxRetries = 5;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(`Download attempt ${attempt}/${maxRetries}`);
-
-        // Add delay between retries
-        if (attempt > 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-        }
+        // Wait before each attempt (increasing delay)
+        const delay = attempt === 1 ? 1000 : 2000 * attempt;
+        console.log(`Download attempt ${attempt}/${maxRetries} (waiting ${delay}ms first)`);
+        await new Promise(resolve => setTimeout(resolve, delay));
 
         const response = await fetch(videoUrl, {
           headers: {
             'Accept': '*/*',
+            'Cache-Control': 'no-cache',
           },
         });
 
@@ -146,7 +145,7 @@ export async function POST(request: Request) {
 
         // If 404, the blob might not be ready yet
         if (response.status === 404 && attempt < maxRetries) {
-          console.log("Blob not found, retrying...");
+          console.log("Blob not found, retrying with longer delay...");
           continue;
         }
 
