@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleAIFileManager } from "@google/generative-ai/server";
 import { NextResponse } from "next/server";
+import { del } from "@vercel/blob";
 import { writeFile, unlink } from "fs/promises";
 import { join } from "path";
 import { tmpdir } from "os";
@@ -92,17 +93,19 @@ export const maxDuration = 60;
 
 export async function POST(request: Request) {
   let tempFilePath: string | null = null;
+  let blobUrl: string | null = null;
 
   try {
-    const formData = await request.formData();
-    const file = formData.get("video") as File | null;
+    const { videoUrl, mimeType } = await request.json();
 
-    if (!file) {
+    if (!videoUrl) {
       return NextResponse.json(
-        { error: "No video file provided" },
+        { error: "No video URL provided" },
         { status: 400 }
       );
     }
+
+    blobUrl = videoUrl;
 
     if (!process.env.GEMINI_API_KEY) {
       console.error("GEMINI_API_KEY is not set");
@@ -112,18 +115,23 @@ export async function POST(request: Request) {
       );
     }
 
-    // Save file temporarily
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    tempFilePath = join(tmpdir(), `golf-swing-${Date.now()}.mp4`);
-    await writeFile(tempFilePath, buffer);
+    // Download the video from Vercel Blob
+    console.log("Downloading video from:", videoUrl);
+    const videoResponse = await fetch(videoUrl);
+    if (!videoResponse.ok) {
+      throw new Error("Failed to download video");
+    }
 
-    console.log("File saved temporarily:", tempFilePath, "size:", buffer.length);
+    const videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
+    tempFilePath = join(tmpdir(), `golf-swing-${Date.now()}.mp4`);
+    await writeFile(tempFilePath, videoBuffer);
+
+    console.log("File saved temporarily:", tempFilePath, "size:", videoBuffer.length);
 
     // Upload to Gemini File API
     const fileManager = new GoogleAIFileManager(process.env.GEMINI_API_KEY);
     const uploadResult = await fileManager.uploadFile(tempFilePath, {
-      mimeType: file.type,
+      mimeType: mimeType || "video/mp4",
       displayName: "golf-swing",
     });
 
@@ -198,6 +206,15 @@ export async function POST(request: Request) {
         await unlink(tempFilePath);
       } catch (e) {
         console.warn("Failed to delete temp file:", e);
+      }
+    }
+    // Clean up Vercel Blob
+    if (blobUrl) {
+      try {
+        await del(blobUrl);
+        console.log("Deleted blob:", blobUrl);
+      } catch (e) {
+        console.warn("Failed to delete blob:", e);
       }
     }
   }

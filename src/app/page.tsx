@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import { upload } from "@vercel/blob/client";
 
 type AnalysisState = "idle" | "uploading" | "analyzing" | "complete" | "error";
 
@@ -54,16 +55,22 @@ export default function Home() {
     setState("uploading");
 
     try {
-      // Use FormData for file upload (handles large files better)
-      const formData = new FormData();
-      formData.append("video", file);
+      // Step 1: Upload video directly to Vercel Blob (bypasses serverless function limit)
+      const blob = await upload(file.name, file, {
+        access: "public",
+        handleUploadUrl: "/api/upload",
+      });
 
       setState("analyzing");
 
-      // Send to API
+      // Step 2: Send blob URL to analyze endpoint
       const response = await fetch("/api/analyze", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          videoUrl: blob.url,
+          mimeType: file.type,
+        }),
       });
 
       if (!response.ok) {
