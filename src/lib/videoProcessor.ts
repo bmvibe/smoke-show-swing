@@ -182,61 +182,54 @@ export async function processVideoFile(
   const wasmSupported = isWebAssemblySupported();
   console.log(`[VideoProcessor] WebAssembly supported: ${wasmSupported}`);
 
-  if (!wasmSupported) {
-    throw new Error(
-      `Your device doesn't support the video processing technology required. ` +
-      `Please try uploading from a different device or browser.`
-    );
+  // Try to convert video, but fallback to original if conversion fails
+  let convertedBlob: Blob | File = file;
+  let wasConverted = false;
+
+  if (wasmSupported) {
+    try {
+      console.log(`[VideoProcessor] Attempting video conversion with 30-second timeout...`);
+
+      // Add timeout to FFmpeg initialization (30 seconds)
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => {
+          reject(new Error("FFmpeg initialization timed out (30s). Your connection may be slow or the service may be unavailable."));
+        }, 30000)
+      );
+
+      const conversionPromise = detectAndConvertVideo(file, onProgress);
+      convertedBlob = await Promise.race([conversionPromise, timeoutPromise]);
+      wasConverted = true;
+
+      console.log(`[VideoProcessor] ✓ Conversion successful. Output size: ${convertedBlob.size} bytes`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.warn(`[VideoProcessor] Conversion failed, using original file: ${errorMessage}`);
+      console.warn(`[VideoProcessor] Stack:`, error instanceof Error ? error.stack : 'N/A');
+
+      // Log what went wrong for debugging
+      if (errorMessage.includes("timeout")) {
+        console.warn("[VideoProcessor] Timeout during conversion - network may be slow");
+      } else if (errorMessage.includes("FFmpeg") || errorMessage.includes("initialize")) {
+        console.warn("[VideoProcessor] FFmpeg initialization failed - may be WebAssembly issue on this device");
+      }
+
+      // Continue with original file - server will handle it or reject with proper error
+      convertedBlob = file;
+      wasConverted = false;
+    }
+  } else {
+    console.warn(`[VideoProcessor] WebAssembly not supported - using original file`);
+    convertedBlob = file;
+    wasConverted = false;
   }
 
-  try {
-    console.log(`[VideoProcessor] Initializing FFmpeg with 30-second timeout...`);
+  // Create new filename
+  const filename = `swing-${Date.now()}.${file.name.split('.').pop()}`;
+  console.log(`[VideoProcessor] Output filename: ${filename} (converted: ${wasConverted})`);
 
-    // Add timeout to FFmpeg initialization (30 seconds)
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => {
-        reject(new Error("FFmpeg initialization timed out (30s). Your connection may be slow or the service may be unavailable."));
-      }, 30000)
-    );
-
-    const conversionPromise = detectAndConvertVideo(file, onProgress);
-    const convertedBlob = await Promise.race([conversionPromise, timeoutPromise]);
-
-    console.log(`[VideoProcessor] Conversion completed. Output size: ${convertedBlob.size} bytes`);
-
-    // Create new filename for converted file
-    const filename = `swing-${Date.now()}.mp4`;
-    console.log(`[VideoProcessor] Created output filename: ${filename}`);
-
-    return {
-      blob: convertedBlob,
-      filename,
-    };
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`[VideoProcessor] Processing failed: ${errorMessage}`);
-    console.error(`[VideoProcessor] Stack:`, error instanceof Error ? error.stack : 'N/A');
-
-    // Provide more specific error messages
-    if (errorMessage.includes("timeout")) {
-      throw new Error(
-        `Video processing is taking too long. This might be a network issue. ` +
-        `Please check your internet connection and try again.`
-      );
-    }
-    if (errorMessage.includes("FFmpeg") || errorMessage.includes("initialize")) {
-      throw new Error(
-        `Video processing unavailable. Please ensure: 1) You have an internet connection, ` +
-        `2) You're using a modern browser, 3) Try clearing your browser cache or using a different browser.`
-      );
-    }
-    if (errorMessage.includes("wasm")) {
-      throw new Error(`Video processing library failed to load. Please refresh the page and try again.`);
-    }
-    if (errorMessage.includes("file")) {
-      throw new Error(`Could not read your video file. Please make sure the file is valid and try again.`);
-    }
-
-    throw error;
-  }
+  return {
+    blob: convertedBlob,
+    filename,
+  };
 }

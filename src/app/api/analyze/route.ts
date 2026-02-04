@@ -44,8 +44,16 @@ async function validateAndPrepareVideo(buffer: Buffer, originalMimeType: string)
     return buffer;
   }
 
-  // If we still have non-MP4 format, this shouldn't happen as client converts
-  // But if it does, throw a clear error
+  // If we still have non-MP4 format, it's likely a .mov file with HEVC codec from iOS
+  if (codec === "unknown" && details.includes("MOV")) {
+    console.log("MOV file detected - likely HEVC from iOS, suggesting desktop conversion");
+    throw new Error(
+      `Your iPhone video uses a format (HEVC) that requires conversion. ` +
+      `Quick fix: Use an online converter (search "convert MOV to MP4") or convert on your Mac/PC before uploading. ` +
+      `We're working on fixing this for iOS users.`
+    );
+  }
+
   if (codec === "unknown") {
     throw new Error(
       `Unexpected video format detected: ${details}. ` +
