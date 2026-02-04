@@ -59,7 +59,6 @@ export default function Home() {
       const blob = await upload(file.name, file, {
         access: "public",
         handleUploadUrl: "/api/upload",
-        addRandomSuffix: true,
       });
 
       console.log("Upload complete, blob URL:", blob.url);
