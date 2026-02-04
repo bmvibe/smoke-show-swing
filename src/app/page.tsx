@@ -166,11 +166,11 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C5A059] to-[#A0815A] border border-[#C5A059]/60 flex items-center justify-center shadow-lg">
-              <span className="text-xl">🏌️</span>
+              <span className="text-xl">⛳</span>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-[#E1E4E8]">Smoke Show</h1>
-              <p className="text-xs text-[#a8adb5]">Golf swing analysis</p>
+              <h1 className="text-lg font-bold text-[#E1E4E8]">Smokeshow Golf</h1>
+              <p className="text-xs text-[#a8adb5]">AI swing coach</p>
             </div>
           </div>
         </div>
@@ -182,7 +182,7 @@ export default function Home() {
             {/* Hero */}
             <section className="text-center mb-16 py-8">
               <h2 className="text-5xl font-bold mb-6 text-white leading-tight">
-                Instant golf swing improvements
+                Fix your golf swing in a minute
               </h2>
               <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed">
                 Simply upload a video of your swing and we'll show you what needs to be fixed.
@@ -193,7 +193,7 @@ export default function Home() {
             <section className="mb-10">
               <h3 className="text-base font-bold mb-3 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50">1</span>
-                Upload Your Video
+                Upload A Video Of Your Swing
               </h3>
               <div
                 onDragOver={(e) => e.preventDefault()}
@@ -219,9 +219,9 @@ export default function Home() {
                 <p className="mt-6 text-red-300 text-sm text-center bg-red-500/10 border border-red-500/30 rounded-xl py-3 px-4">{error}</p>
               )}
 
-              {/* How to Film - Part of Step 1 */}
+              {/* Video Tips - Part of Step 1 */}
               <div className="mt-6">
-                <h4 className="text-sm font-bold mb-3 text-[#E1E4E8]">How to Film</h4>
+                <h4 className="text-sm font-bold mb-3 text-[#E1E4E8]">Video Tips</h4>
                 <TipCarousel
                   tips={[
                     {
