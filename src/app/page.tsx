@@ -149,7 +149,7 @@ export default function Home() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-[#E1E4E8]">Smoke Show</h1>
-              <p className="text-xs text-[#a8adb5]">The strike.</p>
+              <p className="text-xs text-[#a8adb5]">Golf swing analysis</p>
             </div>
           </div>
         </div>
@@ -161,10 +161,10 @@ export default function Home() {
             {/* Hero */}
             <section className="text-center mb-6">
               <h2 className="text-3xl font-bold mb-2 text-white">
-                Show Your Swing
+                Sort your swing in a minute
               </h2>
               <p className="text-muted text-sm">
-                Upload a video. Get the verdict. Refine the ritual.
+                Upload a video. Get instant feedback. Get your training plan.
               </p>
             </section>
 
@@ -172,7 +172,7 @@ export default function Home() {
             <section className="mb-6">
               <h3 className="text-base font-bold mb-3 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50">1</span>
-                The Move
+                Upload Your Video
               </h3>
               <div
                 onDragOver={(e) => e.preventDefault()}
@@ -200,7 +200,7 @@ export default function Home() {
 
               {/* How to Film - Part of Step 1 */}
               <div className="mt-6">
-                <h4 className="text-sm font-bold mb-3 text-[#E1E4E8]">The Setup</h4>
+                <h4 className="text-sm font-bold mb-3 text-[#E1E4E8]">How to Film</h4>
                 <TipCarousel
                   tips={[
                     {
@@ -232,7 +232,7 @@ export default function Home() {
             <section>
               <h3 className="text-base font-bold mb-3 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50">2</span>
-                The Arsenal
+                What You'll Get
               </h3>
               <div className="grid gap-4 sm:grid-cols-3">
                 <ExpectCard
@@ -268,8 +268,8 @@ export default function Home() {
             <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-red-500/20 border border-red-500/40 flex items-center justify-center shadow-lg">
               <span className="text-xl">❌</span>
             </div>
-            <h2 className="text-xl font-bold mb-2 text-white">No Verdict.</h2>
-            <p className="text-muted mb-4 text-xs">{error || "The move didn't make it. Show me another."}</p>
+            <h2 className="text-xl font-bold mb-2 text-white">Upload Failed</h2>
+            <p className="text-muted mb-4 text-xs">{error || "We couldn't process your video. Please try again."}</p>
             <button
               onClick={reset}
               className="px-6 py-2 bg-accent text-black font-semibold rounded-full hover:bg-accent-dim accent-button shadow-lg text-sm"
@@ -379,13 +379,13 @@ function ExpectCard({ icon, title, description }: { icon: string; title: string;
 
 function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing"; videoPreview: string | null }) {
   const messages = {
-    uploading: "Decoding the move.",
-    analyzing: "The verdict. Pending.",
+    uploading: "Uploading your video...",
+    analyzing: "Analyzing your swing...",
   };
 
   const subMessages = {
-    uploading: "Getting it from the cloud",
-    analyzing: "Reading the strike",
+    uploading: "Please wait while we upload to the cloud",
+    analyzing: "Processing your video for analysis",
   };
 
   return (
@@ -455,12 +455,12 @@ function ResultsView({
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
-        <h2 className="text-2xl font-bold text-white">The Verdict</h2>
+        <h2 className="text-2xl font-bold text-white">Your Analysis</h2>
         <button
           onClick={onReset}
           className="px-4 py-2 text-xs font-medium border border-accent/40 bg-accent/10 rounded-full hover:bg-accent/20 hover:border-accent text-white"
         >
-          Another Move
+          Analyze Another
         </button>
       </div>
 
@@ -477,12 +477,12 @@ function ResultsView({
           </div>
         )}
         <div className="glass-card rounded-2xl p-4 shadow-lg">
-          <h3 className="font-bold text-white text-sm mb-2">The Read</h3>
+          <h3 className="font-bold text-white text-sm mb-2">Summary</h3>
           <p className="text-muted text-xs">{analysis.summary}</p>
 
           {analysis.strengths.length > 0 && (
             <div className="mt-2">
-              <h4 className="text-xs font-medium text-accent mb-1">Pure.</h4>
+              <h4 className="text-xs font-medium text-accent mb-1">Strengths</h4>
               <ul className="space-y-0.5">
                 {analysis.strengths.map((strength, i) => (
                   <li key={i} className="text-xs text-muted flex items-start gap-2">
@@ -498,7 +498,7 @@ function ResultsView({
 
       {/* Improvements */}
       <section>
-        <h3 className="text-base font-bold mb-3 text-white">Close the Gap</h3>
+        <h3 className="text-base font-bold mb-3 text-white">Areas to Improve</h3>
         <div className="space-y-3">
           {analysis.improvements.map((item, i) => (
             <div key={i} className="glass-card rounded-xl p-4 shadow-lg hover:shadow-xl hover:border-accent/40">
@@ -521,7 +521,7 @@ function ResultsView({
 
       {/* Training Plan */}
       <section>
-        <h3 className="text-base font-bold mb-3 text-white">Refine the Ritual</h3>
+        <h3 className="text-base font-bold mb-3 text-white">Training Plan</h3>
         <div className="space-y-3">
           {analysis.trainingPlan.map((week) => (
             <div key={week.weekNumber} className="glass-card rounded-xl p-3 shadow-lg">
@@ -548,7 +548,7 @@ function ResultsView({
       {/* Resources */}
       {analysis.resources.length > 0 && (
         <section>
-          <h3 className="text-base font-bold mb-3 text-white">The Arsenal</h3>
+          <h3 className="text-base font-bold mb-3 text-white">Learning Resources</h3>
           <div className="grid gap-3 sm:grid-cols-2">
             {analysis.resources.map((resource, i) => (
               <a
@@ -571,12 +571,12 @@ function ResultsView({
 
       {/* CTA */}
       <div className="text-center py-4 border-t border-accent/20">
-        <p className="text-muted mb-3 text-xs">Time to refine.</p>
+        <p className="text-muted mb-3 text-xs">Analyze another swing</p>
         <button
           onClick={onReset}
           className="px-6 py-2 bg-accent text-black font-semibold rounded-full hover:bg-accent-dim accent-button shadow-lg hover:shadow-xl transition-all text-sm"
         >
-          Show Me Another
+          Upload Another Video
         </button>
       </div>
     </div>
