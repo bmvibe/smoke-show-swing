@@ -21,9 +21,9 @@ export default function VantaBackground() {
     threeScript.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js";
     threeScript.async = true;
 
-    // Load Vanta Waves
+    // Load Vanta FOG
     const vantaScript = document.createElement("script");
-    vantaScript.src = "https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js";
+    vantaScript.src = "https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.fog.min.js";
     vantaScript.async = true;
 
     threeScript.onload = () => {
@@ -32,10 +32,10 @@ export default function VantaBackground() {
     };
 
     vantaScript.onload = () => {
-      console.log("Vanta loaded");
+      console.log("Vanta FOG loaded");
       if (vantaRef.current && !vantaEffect.current) {
         try {
-          vantaEffect.current = window.VANTA.WAVES({
+          vantaEffect.current = window.VANTA.FOG({
             el: vantaRef.current,
             THREE: window.THREE,
             mouseControls: true,
@@ -43,15 +43,15 @@ export default function VantaBackground() {
             gyroControls: false,
             minHeight: 200.0,
             minWidth: 200.0,
-            scale: 1.0,
-            scaleMobile: 1.0,
-            color: 0x1a2332,
-            shininess: 40.0,
-            waveHeight: 20.0,
-            waveSpeed: 1.0,
-            zoom: 0.75,
+            highlightColor: 0x9da09d,
+            midtoneColor: 0x1b1b1b,
+            lowlightColor: 0x313131,
+            baseColor: 0x30516,
+            blurFactor: 0.76,
+            speed: 2.70,
+            zoom: 0.80
           });
-          console.log("Vanta effect created:", vantaEffect.current);
+          console.log("Vanta FOG effect created:", vantaEffect.current);
         } catch (err) {
           console.error("Error creating Vanta effect:", err);
         }
