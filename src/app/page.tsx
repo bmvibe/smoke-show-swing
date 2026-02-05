@@ -163,21 +163,6 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       <VantaBackground />
-      {/* Header */}
-      <header className="backdrop-blur-sm border-b border-border">
-        <div className="max-w-4xl mx-auto px-4 py-3">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C5A059] to-[#A0815A] border border-[#C5A059]/60 flex items-center justify-center shadow-lg text-white">
-              <FlameIcon />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-[#E1E4E8]">Smoke Show</h1>
-              <p className="text-xs text-[#a8adb5]">Golf swing analysis</p>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <div className="max-w-4xl mx-auto px-4 py-4">
         {state === "idle" && (
           <>
