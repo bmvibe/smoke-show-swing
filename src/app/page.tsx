@@ -417,10 +417,11 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
   const [currentStep, setCurrentStep] = useState(0);
 
   const steps = [
-    "Reading the plane",
-    "Diagnosing the issue",
-    "Plotting the fix",
-    "Building your protocol"
+    "Checking grip and stance",
+    "Scanning backswing",
+    "Verifying impact",
+    "Identifying swing fixes",
+    "Compiling training plan"
   ];
 
   useEffect(() => {
