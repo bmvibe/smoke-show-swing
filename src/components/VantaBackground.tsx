@@ -7,11 +7,18 @@ export default function VantaBackground() {
   const [vantaEffect, setVantaEffect] = useState<any>(null);
 
   useEffect(() => {
+    console.log("VantaBackground mounted, vantaRef:", vantaRef.current);
+
     if (!vantaEffect && vantaRef.current) {
+      console.log("Starting Vanta initialization...");
+
       // Dynamically import Vanta and Three.js to avoid SSR issues
       import("vanta/dist/vanta.waves.min")
         .then((WAVES) => {
+          console.log("Vanta WAVES loaded:", WAVES);
           return import("three").then((THREE) => {
+            console.log("Three.js loaded:", THREE);
+
             const effect = (WAVES as any).default({
               el: vantaRef.current,
               THREE: THREE,
@@ -28,6 +35,8 @@ export default function VantaBackground() {
               waveSpeed: 1.0,
               zoom: 0.75,
             });
+
+            console.log("Vanta effect created:", effect);
             setVantaEffect(effect);
           });
         })
@@ -38,6 +47,7 @@ export default function VantaBackground() {
 
     return () => {
       if (vantaEffect) {
+        console.log("Destroying Vanta effect");
         vantaEffect.destroy();
       }
     };
@@ -47,7 +57,11 @@ export default function VantaBackground() {
     <div
       ref={vantaRef}
       className="fixed inset-0 -z-10"
-      style={{ width: "100%", height: "100vh" }}
+      style={{
+        width: "100%",
+        height: "100vh",
+        backgroundColor: "#0F1115" // Fallback background
+      }}
     />
   );
 }
