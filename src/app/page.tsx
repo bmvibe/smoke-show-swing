@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, ReactElement } from "react";
 import { upload } from "@vercel/blob/client";
 import { processVideoFile } from "@/lib/videoProcessor";
 
@@ -379,7 +379,7 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
 }
 
 function TipCard({ icon, title, description }: { icon: string; title: string; description: string }) {
-  const iconMap: { [key: string]: JSX.Element } = {
+  const iconMap: { [key: string]: ReactElement } = {
     camera: <CameraIcon />,
     sun: <SunIcon />,
     film: <FilmIcon />,
@@ -396,7 +396,7 @@ function TipCard({ icon, title, description }: { icon: string; title: string; de
 }
 
 function ExpectCard({ icon, title, description }: { icon: string; title: string; description: string }) {
-  const iconMap: { [key: string]: JSX.Element } = {
+  const iconMap: { [key: string]: ReactElement } = {
     chart: <ChartIcon />,
     target: <TargetIcon />,
     clipboard: <ClipboardIcon />,
