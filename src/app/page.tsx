@@ -3,7 +3,6 @@
 import { useState, useRef, useCallback, useEffect, ReactElement } from "react";
 import { upload } from "@vercel/blob/client";
 import { processVideoFile } from "@/lib/videoProcessor";
-import VantaBackground from "@/components/VantaBackground";
 import { motion, AnimatePresence } from "framer-motion";
 
 type AnalysisState = "idle" | "uploading" | "analyzing" | "complete" | "error";
@@ -163,7 +162,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      <VantaBackground />
       <div className="max-w-4xl mx-auto px-4 py-4">
         {state === "idle" && (
           <>
