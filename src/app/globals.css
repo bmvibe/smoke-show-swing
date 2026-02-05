@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bitcount:wght@400&display=swap');
 
 :root {
   /* Style Guide Colors */
@@ -41,9 +41,9 @@ body {
   min-height: 100vh;
 }
 
-/* Heading styles with Noto Serif Japanese */
+/* Heading styles with Bitcount Single */
 h1, h2 {
-  font-family: "Noto Serif JP", serif;
+  font-family: "Bitcount Single", monospace;
 }
 
 /* Custom scrollbar for dark mode */
