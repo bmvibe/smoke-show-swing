@@ -166,7 +166,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C5A059] to-[#A0815A] border border-[#C5A059]/60 flex items-center justify-center shadow-lg text-white">
-              <GolfIcon />
+              <FlameIcon />
             </div>
             <div>
               <h1 className="text-lg font-bold text-[#E1E4E8]">Smoke Show</h1>
@@ -181,7 +181,7 @@ export default function Home() {
           <>
             {/* Hero */}
             <section className="text-center mb-16 py-8">
-              <h2 className="text-4xl font-bold mb-6 text-white leading-tight">
+              <h2 className="text-[3.6rem] mb-6 text-white leading-tight font-doto">
                 Fix your golf swing in a minute
               </h2>
               <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed">
@@ -200,7 +200,7 @@ export default function Home() {
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
                 className="border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all enhanced-card shadow-lg hover:shadow-xl hover:border-[#C5A059]/40"
-                style={{ borderColor: 'rgba(0, 51, 160, 0.3)' }}
+                style={{ borderColor: 'rgba(255, 255, 255, 0.3)' }}
               >
                 <input
                   ref={fileInputRef}
@@ -635,11 +635,10 @@ function UploadIcon() {
   );
 }
 
-function GolfIcon() {
+function FlameIcon() {
   return (
     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l14 9-9 1-5-10z" />
-      <circle cx="7" cy="20" r="2" strokeWidth={2} />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2c.8 2.2 2 4.2 4 6-1 1-1.5 2.5-1.5 4 0 2.5 2 4.5 4.5 4.5.3 0 .5 0 .8-.1-1.1 2.8-3.8 4.6-7.3 4.6-4.1 0-7.5-3.4-7.5-7.5 0-2.4 1.2-4.6 3-6C9 5 10.2 3.5 12 2z" />
     </svg>
   );
 }

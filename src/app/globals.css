@@ -3,7 +3,7 @@
 :root {
   /* Style Guide Colors */
   --obsidian: #0F1115;
-  --ignition-blue: #0033A0;
+  --ignition-blue: #FFFFFF;
   --smoked-gold: #C5A059;
   --cloud-silver: #E1E4E8;
   --steel-blue: #2C3E50;
@@ -13,7 +13,7 @@
   --background-gradient: linear-gradient(135deg, var(--obsidian) 0%, #1a1f2e 50%, #0d0f14 100%);
   --foreground: var(--cloud-silver);
   --accent: var(--ignition-blue);
-  --accent-dim: #001a7a;
+  --accent-dim: #E1E4E8;
   --card: rgba(44, 62, 80, 0.6);
   --card-hover: rgba(44, 62, 80, 0.85);
   --border: rgba(197, 160, 89, 0.15);
@@ -25,7 +25,7 @@
   --color-background: var(--obsidian);
   --color-foreground: var(--cloud-silver);
   --color-accent: var(--ignition-blue);
-  --color-accent-dim: #001a7a;
+  --color-accent-dim: #E1E4E8;
   --color-card: var(--steel-blue);
   --color-card-hover: rgba(44, 62, 80, 0.85);
   --color-border: var(--border);
@@ -40,6 +40,11 @@ body {
   min-height: 100vh;
 }
 
+.font-doto {
+  font-family: 'Doto', sans-serif;
+  font-weight: 500;
+}
+
 /* Custom scrollbar for dark mode */
 ::-webkit-scrollbar {
   width: 8px;
@@ -50,12 +55,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 51, 160, 0.5);
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 51, 160, 0.7);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 /* Smooth animations */
@@ -93,7 +98,7 @@ body {
 
 /* Accent button hover effect */
 .accent-button:hover {
-  box-shadow: 0 0 20px rgba(0, 51, 160, 0.6), 0 0 40px rgba(197, 160, 89, 0.2);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(197, 160, 89, 0.2);
 }
 
 /* Luxury accent for logo/special elements */
