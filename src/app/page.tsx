@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect, ReactElement } from "react";
 import { upload } from "@vercel/blob/client";
 import { processVideoFile } from "@/lib/videoProcessor";
 import VantaBackground from "@/components/VantaBackground";
+import { motion, AnimatePresence } from "framer-motion";
 
 type AnalysisState = "idle" | "uploading" | "analyzing" | "complete" | "error";
 
@@ -263,13 +264,15 @@ export default function Home() {
           </>
         )}
 
-        {(state === "uploading" || state === "analyzing") && (
-          <LoadingState state={state} videoPreview={videoPreview} />
-        )}
+        <AnimatePresence mode="wait">
+          {(state === "uploading" || state === "analyzing") && (
+            <LoadingState key="loading" state={state} videoPreview={videoPreview} />
+          )}
 
-        {state === "complete" && analysis && (
-          <ResultsView analysis={analysis} videoPreview={videoPreview} onReset={reset} />
-        )}
+          {state === "complete" && analysis && (
+            <ResultsView key="results" analysis={analysis} videoPreview={videoPreview} onReset={reset} />
+          )}
+        </AnimatePresence>
 
         {state === "error" && (
           <div className="text-center py-8">
@@ -400,6 +403,7 @@ function ExpectCard({ icon, title, description }: { icon: string; title: string;
 
 function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing"; videoPreview: string | null }) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
 
   const steps = [
     "Checking grip and stance",
@@ -410,7 +414,11 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
   ];
 
   useEffect(() => {
-    if (state === "analyzing") {
+    if (state === "analyzing" && !hasStarted) {
+      // Immediately show first step as active
+      setCurrentStep(0);
+      setHasStarted(true);
+
       const stepDuration = 3000; // 3 seconds per step
       const interval = setInterval(() => {
         setCurrentStep((prev) => {
@@ -423,7 +431,7 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
 
       return () => clearInterval(interval);
     }
-  }, [state, steps.length]);
+  }, [state, hasStarted, steps.length]);
 
   const messages = {
     uploading: "Uploading your video...",
@@ -436,10 +444,20 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
   };
 
   return (
-    <div className="py-8">
+    <motion.div
+      className="py-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <div className="max-w-md mx-auto text-center">
         {videoPreview && (
-          <div className="mb-4 rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
+          <motion.div
+            className="mb-4 rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card"
+            layout
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+          >
             <video
               src={videoPreview}
               className="w-full object-cover"
@@ -449,14 +467,19 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
               muted
               playsInline
             />
-          </div>
+          </motion.div>
         )}
 
         <h2 className="text-2xl font-bold mb-2 text-white">{messages[state]}</h2>
         <p className="text-muted text-sm mb-4">{subMessages[state]}</p>
 
         {state === "analyzing" && (
-          <div className="mt-4 space-y-2 max-w-xs mx-auto">
+          <motion.div
+            className="mt-4 space-y-2 max-w-xs mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
             {steps.map((text, index) => (
               <LoadingStep
                 key={text}
@@ -465,10 +488,10 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
                 active={index === currentStep}
               />
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -497,9 +520,19 @@ function ResultsView({
   onReset: () => void;
 }) {
   return (
-    <div className="space-y-6">
+    <motion.div
+      className="space-y-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between gap-4">
+      <motion.div
+        className="flex items-center justify-between gap-4"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
         <h2 className="text-2xl font-bold text-white">Your Analysis</h2>
         <button
           onClick={onReset}
@@ -507,21 +540,32 @@ function ResultsView({
         >
           Analyze Another
         </button>
-      </div>
+      </motion.div>
 
       {/* Video + Summary */}
       <div className="grid gap-4 md:grid-cols-2">
         {videoPreview && (
-          <div className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
+          <motion.div
+            className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card"
+            initial={{ height: "600px" }}
+            animate={{ height: "auto" }}
+            transition={{ duration: 0.6, ease: "easeInOut", delay: 0.2 }}
+            layout
+          >
             <video
               src={videoPreview}
               className="w-full aspect-video object-cover"
               controls
               playsInline
             />
-          </div>
+          </motion.div>
         )}
-        <div className="glass-card rounded-2xl p-4 shadow-lg">
+        <motion.div
+          className="glass-card rounded-2xl p-4 shadow-lg"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
           <h3 className="font-bold text-white text-sm mb-2">Summary</h3>
           <p className="text-muted text-xs">{analysis.summary}</p>
 
@@ -538,11 +582,15 @@ function ResultsView({
               </ul>
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
 
       {/* Improvements */}
-      <section>
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
         <h3 className="text-base font-bold mb-3 text-white">Areas to Improve</h3>
         <p className="text-xs text-muted mb-4">These are the money shots—fix these and you'll be striping it down the fairway in no time. 🎯</p>
         <div className="space-y-4">
@@ -563,10 +611,14 @@ function ResultsView({
             </div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Training Plan */}
-      <section>
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
+      >
         <h3 className="text-base font-bold mb-3 text-white">Training Plan</h3>
         <p className="text-xs text-muted mb-4">Your personalized roadmap to crushing it on the course. Stick with this and watch your handicap drop. 💪</p>
         <div className="space-y-4">
@@ -599,10 +651,15 @@ function ResultsView({
             </div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* CTA */}
-      <div className="text-center py-4 border-t border-accent/20">
+      <motion.div
+        className="text-center py-4 border-t border-accent/20"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.7 }}
+      >
         <p className="text-muted mb-3 text-xs">Got more swings to analyze? Let's keep the momentum going!</p>
         <button
           onClick={onReset}
@@ -610,8 +667,8 @@ function ResultsView({
         >
           Upload Another Video
         </button>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
