@@ -42,7 +42,7 @@ body {
 }
 
 /* Heading styles with Cormorant Garamond */
-h1, h2, h3, h4, h5, h6 {
+h1, h2 {
   font-family: "Cormorant Garamond", serif;
   font-weight: 700;
 }
