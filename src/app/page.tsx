@@ -471,16 +471,11 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
         )}
 
         <motion.div
-          className="text-left"
+          className="text-left pl-8"
           exit={{ opacity: 0 }}
           transition={{ duration: 1.0 }}
         >
-          <div className="flex items-center gap-3 mb-2">
-            <h2 className="text-2xl font-bold text-white">{messages[state]}</h2>
-            {state === "analyzing" && (
-              <span className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin"></span>
-            )}
-          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">{messages[state]}</h2>
           <p className="text-muted text-sm mb-4">{subMessages[state]}</p>
 
           {state === "analyzing" && (
@@ -535,9 +530,14 @@ function ResultsView({
       {/* Header */}
       <motion.div
         className="flex items-center justify-between gap-4"
-        initial={{ opacity: 0, y: 800 }}
+        initial={{ opacity: 0, y: 200 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: 2.0 }}
+        transition={{
+          duration: 0.6,
+          ease: [0.25, 0.1, 0.25, 1],
+          delay: 2.0
+        }}
+        style={{ willChange: "transform, opacity" }}
       >
         <h2 className="text-2xl font-bold text-white">Your Analysis</h2>
         <button
@@ -551,9 +551,14 @@ function ResultsView({
       {/* Video + Summary */}
       <motion.div
         className="grid gap-4 md:grid-cols-2"
-        initial={{ opacity: 0, y: 800 }}
+        initial={{ opacity: 0, y: 200 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: 2.0 }}
+        transition={{
+          duration: 0.6,
+          ease: [0.25, 0.1, 0.25, 1],
+          delay: 2.0
+        }}
+        style={{ willChange: "transform, opacity" }}
       >
         {videoPreview && (
           <div className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
@@ -587,9 +592,14 @@ function ResultsView({
 
       {/* Improvements */}
       <motion.section
-        initial={{ opacity: 0, y: 800 }}
+        initial={{ opacity: 0, y: 150 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: 2.3 }}
+        transition={{
+          duration: 0.6,
+          ease: [0.25, 0.1, 0.25, 1],
+          delay: 2.2
+        }}
+        style={{ willChange: "transform, opacity" }}
       >
         <h3 className="text-base font-bold mb-3 text-white">Areas to Improve</h3>
         <p className="text-xs text-muted mb-4">These are the money shots—fix these and you'll be striping it down the fairway in no time. 🎯</p>
@@ -615,9 +625,14 @@ function ResultsView({
 
       {/* Training Plan */}
       <motion.section
-        initial={{ opacity: 0, y: 800 }}
+        initial={{ opacity: 0, y: 150 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: 2.5 }}
+        transition={{
+          duration: 0.6,
+          ease: [0.25, 0.1, 0.25, 1],
+          delay: 2.4
+        }}
+        style={{ willChange: "transform, opacity" }}
       >
         <h3 className="text-base font-bold mb-3 text-white">Training Plan</h3>
         <p className="text-xs text-muted mb-4">Your personalized roadmap to crushing it on the course. Stick with this and watch your handicap drop. 💪</p>
@@ -656,9 +671,14 @@ function ResultsView({
       {/* CTA */}
       <motion.div
         className="text-center py-4 border-t border-accent/20"
-        initial={{ opacity: 0, y: 800 }}
+        initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: 2.7 }}
+        transition={{
+          duration: 0.6,
+          ease: [0.25, 0.1, 0.25, 1],
+          delay: 2.6
+        }}
+        style={{ willChange: "transform, opacity" }}
       >
         <p className="text-muted mb-3 text-xs">Got more swings to analyze? Let's keep the momentum going!</p>
         <button
