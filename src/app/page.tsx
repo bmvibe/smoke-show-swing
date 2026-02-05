@@ -521,7 +521,8 @@ function ResultsView({
           <div className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
             <video
               src={videoPreview}
-              className="w-full aspect-video object-cover"
+              className="w-full object-cover"
+              style={{ minHeight: "400px" }}
               controls
               playsInline
             />
@@ -533,7 +534,7 @@ function ResultsView({
 
           {analysis.strengths.length > 0 && (
             <div className="mt-2">
-              <h4 className="text-xs font-medium text-accent mb-1">Strengths</h4>
+              <h4 className="text-xs font-medium text-accent mb-1">What You're Doing Right 🔥</h4>
               <ul className="space-y-0.5">
                 {analysis.strengths.map((strength, i) => (
                   <li key={i} className="text-xs text-muted flex items-start gap-2">
@@ -550,6 +551,7 @@ function ResultsView({
       {/* Improvements */}
       <section>
         <h3 className="text-base font-bold mb-3 text-white">Areas to Improve</h3>
+        <p className="text-xs text-muted mb-4">These are the money shots—fix these and you'll be striping it down the fairway in no time. 🎯</p>
         <div className="space-y-4">
           {analysis.improvements.map((item, i) => (
             <div key={i} className="glass-card rounded-xl p-4 shadow-lg hover:shadow-xl hover:border-accent/40">
@@ -573,6 +575,7 @@ function ResultsView({
       {/* Training Plan */}
       <section>
         <h3 className="text-base font-bold mb-3 text-white">Training Plan</h3>
+        <p className="text-xs text-muted mb-4">Your personalized roadmap to crushing it on the course. Stick with this and watch your handicap drop. 💪</p>
         <div className="space-y-4">
           {analysis.trainingPlan.map((week) => (
             <div key={week.weekNumber} className="glass-card rounded-xl p-3 shadow-lg">
@@ -585,9 +588,22 @@ function ResultsView({
               <div className="space-y-2">
                 {week.drills.map((drill, i) => (
                   <div key={i} className="border-l-2 border-accent/40 pl-2">
-                    <h5 className="font-semibold text-white text-xs">{drill.name}</h5>
-                    <p className="text-xs text-muted">{drill.description}</p>
-                    <p className="text-xs text-accent/80 font-medium">{drill.reps}</p>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <h5 className="font-semibold text-white text-xs">{drill.name}</h5>
+                        <p className="text-xs text-muted">{drill.description}</p>
+                        <p className="text-xs text-accent/80 font-medium">{drill.reps}</p>
+                      </div>
+                      <a
+                        href={`https://www.youtube.com/results?search_query=golf+${encodeURIComponent(drill.name)}+drill+tutorial`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-red-400 hover:text-red-300 transition-colors shrink-0"
+                        title="Watch tutorial on YouTube"
+                      >
+                        <PlayIcon />
+                      </a>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -622,7 +638,7 @@ function ResultsView({
 
       {/* CTA */}
       <div className="text-center py-4 border-t border-accent/20">
-        <p className="text-muted mb-3 text-xs">Analyze another swing</p>
+        <p className="text-muted mb-3 text-xs">Got more swings to analyze? Let's keep the momentum going!</p>
         <button
           onClick={onReset}
           className="px-6 py-2 bg-accent text-black font-semibold rounded-full hover:bg-accent-dim accent-button shadow-lg hover:shadow-xl transition-all text-sm"
