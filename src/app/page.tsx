@@ -183,7 +183,7 @@ export default function Home() {
           <>
             {/* Hero */}
             <section className="text-center mb-16 py-8">
-              <h2 className="text-[3.6rem] mb-6 text-white leading-tight font-doto">
+              <h2 className="text-[3.6rem] mb-6 text-white leading-tight font-doto-extrabold">
                 Fix your golf swing in a minute
               </h2>
               <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed">
