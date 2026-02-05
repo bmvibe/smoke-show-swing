@@ -447,14 +447,14 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 1.0 }}
     >
-      <div className="max-w-md mx-auto text-center">
+      <div className="max-w-md mx-auto">
         {videoPreview && (
           <motion.div
             className="mb-4 rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card"
-            layout
-            transition={{ duration: 0.5, ease: "easeInOut" }}
+            exit={{ height: "120px" }}
+            transition={{ duration: 1.0, ease: "easeInOut", delay: 1.0 }}
           >
             <video
               src={videoPreview}
@@ -468,26 +468,32 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
           </motion.div>
         )}
 
-        <h2 className="text-2xl font-bold mb-2 text-white">{messages[state]}</h2>
-        <p className="text-muted text-sm mb-4">{subMessages[state]}</p>
+        <motion.div
+          className="text-left"
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.0 }}
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <h2 className="text-2xl font-bold text-white">{messages[state]}</h2>
+            {state === "analyzing" && (
+              <span className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin"></span>
+            )}
+          </div>
+          <p className="text-muted text-sm mb-4">{subMessages[state]}</p>
 
-        {state === "analyzing" && (
-          <motion.div
-            className="mt-4 space-y-2 max-w-xs mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-          >
-            {steps.map((text, index) => (
-              <LoadingStep
-                key={text}
-                text={text}
-                done={index < currentStep}
-                active={index === currentStep}
-              />
-            ))}
-          </motion.div>
-        )}
+          {state === "analyzing" && (
+            <div className="mt-4 space-y-2 max-w-xs">
+              {steps.map((text, index) => (
+                <LoadingStep
+                  key={text}
+                  text={text}
+                  done={index < currentStep}
+                  active={index === currentStep}
+                />
+              ))}
+            </div>
+          )}
+        </motion.div>
       </div>
     </motion.div>
   );
@@ -541,29 +547,23 @@ function ResultsView({
       </motion.div>
 
       {/* Video + Summary */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <motion.div
+        className="grid gap-4 md:grid-cols-2"
+        initial={{ opacity: 0, y: 100 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut", delay: 2.0 }}
+      >
         {videoPreview && (
-          <motion.div
-            className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card"
-            initial={{ height: "600px" }}
-            animate={{ height: "auto" }}
-            transition={{ duration: 0.6, ease: "easeInOut", delay: 0.2 }}
-            layout
-          >
+          <div className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
             <video
               src={videoPreview}
               className="w-full aspect-video object-cover"
               controls
               playsInline
             />
-          </motion.div>
+          </div>
         )}
-        <motion.div
-          className="glass-card rounded-2xl p-4 shadow-lg"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
+        <div className="glass-card rounded-2xl p-4 shadow-lg">
           <h3 className="font-bold text-white text-sm mb-2">Summary</h3>
           <p className="text-muted text-xs">{analysis.summary}</p>
 
@@ -580,14 +580,14 @@ function ResultsView({
               </ul>
             </div>
           )}
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
 
       {/* Improvements */}
       <motion.section
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
+        transition={{ duration: 0.6, ease: "easeOut", delay: 2.4 }}
       >
         <h3 className="text-base font-bold mb-3 text-white">Areas to Improve</h3>
         <p className="text-xs text-muted mb-4">These are the money shots—fix these and you'll be striping it down the fairway in no time. 🎯</p>
@@ -613,9 +613,9 @@ function ResultsView({
 
       {/* Training Plan */}
       <motion.section
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.6 }}
+        transition={{ duration: 0.6, ease: "easeOut", delay: 2.6 }}
       >
         <h3 className="text-base font-bold mb-3 text-white">Training Plan</h3>
         <p className="text-xs text-muted mb-4">Your personalized roadmap to crushing it on the course. Stick with this and watch your handicap drop. 💪</p>
@@ -654,9 +654,9 @@ function ResultsView({
       {/* CTA */}
       <motion.div
         className="text-center py-4 border-t border-accent/20"
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.7 }}
+        transition={{ duration: 0.6, ease: "easeOut", delay: 2.8 }}
       >
         <p className="text-muted mb-3 text-xs">Got more swings to analyze? Let's keep the momentum going!</p>
         <button
