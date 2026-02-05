@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, ReactElement } from "react";
 import { upload } from "@vercel/blob/client";
 import { processVideoFile } from "@/lib/videoProcessor";
 
@@ -165,8 +165,8 @@ export default function Home() {
       <header className="backdrop-blur-sm border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C5A059] to-[#A0815A] border border-[#C5A059]/60 flex items-center justify-center shadow-lg">
-              <span className="text-xl">🏌️</span>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C5A059] to-[#A0815A] border border-[#C5A059]/60 flex items-center justify-center shadow-lg text-white">
+              <GolfIcon />
             </div>
             <div>
               <h1 className="text-lg font-bold text-[#E1E4E8]">Smoke Show</h1>
@@ -181,8 +181,8 @@ export default function Home() {
           <>
             {/* Hero */}
             <section className="text-center mb-16 py-8">
-              <h2 className="text-5xl font-bold mb-6 text-white leading-tight">
-                Instant golf swing improvements
+              <h2 className="text-4xl font-bold mb-6 text-white leading-tight">
+                Fix your golf swing in a minute
               </h2>
               <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed">
                 Simply upload a video of your swing and we'll show you what needs to be fixed.
@@ -193,7 +193,7 @@ export default function Home() {
             <section className="mb-10">
               <h3 className="text-base font-bold mb-3 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50">1</span>
-                Upload Your Video
+                Upload your swing here
               </h3>
               <div
                 onDragOver={(e) => e.preventDefault()}
@@ -212,8 +212,8 @@ export default function Home() {
                 <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-accent/10 border border-accent/40 flex items-center justify-center shadow-lg">
                   <UploadIcon />
                 </div>
-                <p className="font-semibold mb-2 text-sm text-[#E1E4E8]">Drop the video.</p>
-                <p className="text-xs text-[#a8adb5]">MP4, MOV, or WebM • Max 50MB</p>
+                <p className="font-semibold mb-2 text-sm text-[#E1E4E8]">Drop your video here or click to browse</p>
+                <p className="text-xs text-[#a8adb5]">Under 20 seconds will get the best results</p>
               </div>
               {error && (
                 <p className="mt-6 text-red-300 text-sm text-center bg-red-500/10 border border-red-500/30 rounded-xl py-3 px-4">{error}</p>
@@ -225,22 +225,22 @@ export default function Home() {
                 <TipCarousel
                   tips={[
                     {
-                      icon: "📱",
-                      title: "Camera Position",
-                      description: "Place your phone on a tripod or prop it up at waist height, about 10 feet away. Film from directly behind or face-on for best results."
+                      icon: "camera",
+                      title: "Camera setup",
+                      description: "Film at waist height and keep the phone steady or use a tripod. Film from behind about 10 foot away"
                     },
                     {
-                      icon: "☀️",
+                      icon: "sun",
                       title: "Lighting",
                       description: "Film outdoors in daylight or in a well-lit indoor space. Avoid backlighting (don't face the sun)."
                     },
                     {
-                      icon: "🎬",
+                      icon: "film",
                       title: "Framing",
                       description: "Make sure your full body and the club are visible throughout the entire swing. Leave some space above and below."
                     },
                     {
-                      icon: "⏱️",
+                      icon: "clock",
                       title: "Video Length",
                       description: "Keep it under 30 seconds. Trim to just your swing - setup, backswing, impact, and follow-through."
                     }
@@ -257,17 +257,17 @@ export default function Home() {
               </h3>
               <div className="grid gap-4 sm:grid-cols-3">
                 <ExpectCard
-                  icon="📊"
+                  icon="chart"
                   title="Swing Analysis"
                   description="Detailed breakdown of your posture, grip, backswing, downswing, impact, and follow-through."
                 />
                 <ExpectCard
-                  icon="🎯"
+                  icon="target"
                   title="Key Improvements"
                   description="Specific issues identified with clear explanations of what to fix and why."
                 />
                 <ExpectCard
-                  icon="📋"
+                  icon="clipboard"
                   title="Training Plan"
                   description="Multi-week schedule with drills you can do at the driving range, plus video tutorials."
                 />
@@ -286,8 +286,8 @@ export default function Home() {
 
         {state === "error" && (
           <div className="text-center py-8">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-red-500/20 border border-red-500/40 flex items-center justify-center shadow-lg">
-              <span className="text-xl">❌</span>
+            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-red-500/20 border border-red-500/40 flex items-center justify-center shadow-lg text-red-400">
+              <ErrorIcon />
             </div>
             <h2 className="text-xl font-bold mb-2 text-white">Upload Failed</h2>
             <p className="text-muted mb-4 text-xs">{error || "We couldn't process your video. Please try again."}</p>
@@ -379,9 +379,16 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
 }
 
 function TipCard({ icon, title, description }: { icon: string; title: string; description: string }) {
+  const iconMap: { [key: string]: ReactElement } = {
+    camera: <CameraIcon />,
+    sun: <SunIcon />,
+    film: <FilmIcon />,
+    clock: <ClockIcon />,
+  };
+
   return (
     <div className="glass-card rounded-xl p-4 hover:bg-card-hover hover:border-accent/40 cursor-default flex flex-col w-full h-full">
-      <div className="text-2xl mb-2">{icon}</div>
+      <div className="text-white mb-2">{iconMap[icon]}</div>
       <h4 className="font-semibold mb-1 text-white text-sm">{title}</h4>
       <p className="text-xs text-muted leading-tight flex-1">{description}</p>
     </div>
@@ -389,9 +396,15 @@ function TipCard({ icon, title, description }: { icon: string; title: string; de
 }
 
 function ExpectCard({ icon, title, description }: { icon: string; title: string; description: string }) {
+  const iconMap: { [key: string]: ReactElement } = {
+    chart: <ChartIcon />,
+    target: <TargetIcon />,
+    clipboard: <ClipboardIcon />,
+  };
+
   return (
     <div className="glass-card rounded-xl p-4 text-center hover:bg-card-hover hover:border-accent/40 cursor-default">
-      <div className="text-2xl mb-2">{icon}</div>
+      <div className="text-white mb-2 flex justify-center">{iconMap[icon]}</div>
       <h4 className="font-semibold mb-1 text-white text-sm">{title}</h4>
       <p className="text-xs text-muted leading-tight">{description}</p>
     </div>
@@ -580,7 +593,7 @@ function ResultsView({
                 className="glass-card rounded-xl p-3 hover:bg-card-hover hover:border-accent/50 block shadow-lg hover:shadow-xl transition-all"
               >
                 <h4 className="font-semibold mb-1 flex items-center gap-2 text-white text-sm">
-                  <span className="text-red-400">▶</span>
+                  <span className="text-red-400"><PlayIcon /></span>
                   {resource.title}
                 </h4>
                 <p className="text-xs text-muted">{resource.description}</p>
@@ -618,6 +631,94 @@ function UploadIcon() {
         strokeWidth={1.5}
         d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
       />
+    </svg>
+  );
+}
+
+function GolfIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l14 9-9 1-5-10z" />
+      <circle cx="7" cy="20" r="2" strokeWidth={2} />
+    </svg>
+  );
+}
+
+function CameraIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+      <circle cx="12" cy="13" r="3" strokeWidth={2} />
+    </svg>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4" strokeWidth={2} />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" />
+    </svg>
+  );
+}
+
+function FilmIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+    </svg>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" strokeWidth={2} />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2" />
+    </svg>
+  );
+}
+
+function ChartIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    </svg>
+  );
+}
+
+function TargetIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" strokeWidth={2} />
+      <circle cx="12" cy="12" r="6" strokeWidth={2} />
+      <circle cx="12" cy="12" r="2" strokeWidth={2} />
+    </svg>
+  );
+}
+
+function ClipboardIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+    </svg>
+  );
+}
+
+function ErrorIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" strokeWidth={2} />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 9l-6 6m0-6l6 6" />
+    </svg>
+  );
+}
+
+function PlayIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   );
 }
