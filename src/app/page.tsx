@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect, ReactElement } from "react";
 import { upload } from "@vercel/blob/client";
 import { processVideoFile } from "@/lib/videoProcessor";
+import VantaBackground from "@/components/VantaBackground";
 
 type AnalysisState = "idle" | "uploading" | "analyzing" | "complete" | "error";
 
@@ -161,6 +162,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
+      <VantaBackground />
       {/* Header */}
       <header className="backdrop-blur-sm border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-3">
