@@ -416,14 +416,15 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
     "Checking grip & stance",
     "Scanning backswing",
     "Verifying impact",
-    "Planning your fixes"
+    "Planning your fixes",
+    "Writing training guide"
   ];
 
   useEffect(() => {
     if (state !== "analyzing") return;
 
     const interval = setInterval(() => {
-      setCurrentStep((prev) => (prev + 1) % steps.length);
+      setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
     }, 2000);
 
     return () => clearInterval(interval);
