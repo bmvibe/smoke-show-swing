@@ -599,7 +599,7 @@ function ResultsView({
       </section>
 
       {/* Resources */}
-      {analysis.resources?.length > 0 && (
+      {analysis.resources && analysis.resources.length > 0 && (
         <section>
           <h3 className="text-base font-bold mb-3 text-white">Learning Resources</h3>
           <div className="grid gap-4 sm:grid-cols-2">
