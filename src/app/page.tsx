@@ -21,9 +21,10 @@ interface SwingAnalysis {
       name: string;
       description: string;
       reps: string;
+      youtubeSearch?: string;
     }[];
   }[];
-  resources: {
+  resources?: {
     title: string;
     url: string;
     description: string;
@@ -571,12 +572,23 @@ function ResultsView({
                 </span>
                 <span className="text-xs text-muted font-medium">{week.focus}</span>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {week.drills.map((drill, i) => (
                   <div key={i} className="border-l-2 border-accent/40 pl-2">
                     <h5 className="font-semibold text-white text-xs">{drill.name}</h5>
                     <p className="text-xs text-muted">{drill.description}</p>
                     <p className="text-xs text-accent/80 font-medium">{drill.reps}</p>
+                    {drill.youtubeSearch && (
+                      <a
+                        href={`https://www.youtube.com/results?search_query=${encodeURIComponent(drill.youtubeSearch)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 mt-1 text-xs text-accent hover:text-accent-dim transition-colors"
+                      >
+                        <span>▶</span>
+                        Watch tutorial
+                      </a>
+                    )}
                   </div>
                 ))}
               </div>

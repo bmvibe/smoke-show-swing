@@ -164,7 +164,8 @@ Analyze this golf swing video and provide feedback in the following JSON format.
         {
           "name": "Drill name",
           "description": "How to perform the drill",
-          "reps": "e.g., 3 sets of 10 swings"
+          "reps": "e.g., 3 sets of 10 swings",
+          "youtubeSearch": "Exact search query to find tutorial videos on YouTube"
         }
       ]
     },
@@ -175,7 +176,8 @@ Analyze this golf swing video and provide feedback in the following JSON format.
         {
           "name": "Drill name",
           "description": "How to perform the drill",
-          "reps": "e.g., 3 sets of 10 swings"
+          "reps": "e.g., 3 sets of 10 swings",
+          "youtubeSearch": "Exact search query to find tutorial videos on YouTube"
         }
       ]
     },
@@ -186,7 +188,8 @@ Analyze this golf swing video and provide feedback in the following JSON format.
         {
           "name": "Drill name",
           "description": "How to perform the drill",
-          "reps": "e.g., 3 sets of 10 swings"
+          "reps": "e.g., 3 sets of 10 swings",
+          "youtubeSearch": "Exact search query to find tutorial videos on YouTube"
         }
       ]
     },
@@ -197,16 +200,10 @@ Analyze this golf swing video and provide feedback in the following JSON format.
         {
           "name": "Drill name",
           "description": "How to perform the drill",
-          "reps": "e.g., 3 sets of 10 swings"
+          "reps": "e.g., 3 sets of 10 swings",
+          "youtubeSearch": "Exact search query to find tutorial videos on YouTube"
         }
       ]
-    }
-  ],
-  "resources": [
-    {
-      "title": "Video title",
-      "url": "https://youtube.com/watch?v=...",
-      "description": "Why this video is helpful for them"
     }
   ]
 }
@@ -215,7 +212,7 @@ Guidelines:
 - Identify 2-4 key improvements, prioritized by impact
 - Each week's training plan should build on the previous week
 - Include 2-3 drills per week that can be done at a driving range
-- Recommend 2-4 real YouTube tutorial videos from well-known golf instructors (Rick Shiels, Me and My Golf, Athletic Motion Golf, etc.)
+- For each drill, provide a specific YouTube search query (e.g., "golf grip drill tutorial" or "backswing practice drill")
 - Be encouraging but honest
 - Use technical golf terminology but explain it briefly
 
