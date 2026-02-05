@@ -1,57 +1,72 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+
+declare global {
+  interface Window {
+    VANTA: any;
+    THREE: any;
+  }
+}
 
 export default function VantaBackground() {
   const vantaRef = useRef<HTMLDivElement>(null);
-  const [vantaEffect, setVantaEffect] = useState<any>(null);
+  const vantaEffect = useRef<any>(null);
 
   useEffect(() => {
-    console.log("VantaBackground mounted, vantaRef:", vantaRef.current);
+    console.log("VantaBackground mounted");
 
-    if (!vantaEffect && vantaRef.current) {
-      console.log("Starting Vanta initialization...");
+    // Load Three.js
+    const threeScript = document.createElement("script");
+    threeScript.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js";
+    threeScript.async = true;
 
-      // Dynamically import Vanta and Three.js to avoid SSR issues
-      import("vanta/dist/vanta.waves.min")
-        .then((WAVES) => {
-          console.log("Vanta WAVES loaded:", WAVES);
-          return import("three").then((THREE) => {
-            console.log("Three.js loaded:", THREE);
+    // Load Vanta Waves
+    const vantaScript = document.createElement("script");
+    vantaScript.src = "https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js";
+    vantaScript.async = true;
 
-            const effect = (WAVES as any).default({
-              el: vantaRef.current,
-              THREE: THREE,
-              mouseControls: true,
-              touchControls: true,
-              gyroControls: false,
-              minHeight: 200.0,
-              minWidth: 200.0,
-              scale: 1.0,
-              scaleMobile: 1.0,
-              color: 0x1a2332, // Lighter blue-gray for better visibility
-              shininess: 40.0,
-              waveHeight: 20.0,
-              waveSpeed: 1.0,
-              zoom: 0.75,
-            });
+    threeScript.onload = () => {
+      console.log("Three.js loaded");
+      document.head.appendChild(vantaScript);
+    };
 
-            console.log("Vanta effect created:", effect);
-            setVantaEffect(effect);
+    vantaScript.onload = () => {
+      console.log("Vanta loaded");
+      if (vantaRef.current && !vantaEffect.current) {
+        try {
+          vantaEffect.current = window.VANTA.WAVES({
+            el: vantaRef.current,
+            THREE: window.THREE,
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.0,
+            minWidth: 200.0,
+            scale: 1.0,
+            scaleMobile: 1.0,
+            color: 0x1a2332,
+            shininess: 40.0,
+            waveHeight: 20.0,
+            waveSpeed: 1.0,
+            zoom: 0.75,
           });
-        })
-        .catch((err) => {
-          console.error("Failed to load Vanta:", err);
-        });
-    }
-
-    return () => {
-      if (vantaEffect) {
-        console.log("Destroying Vanta effect");
-        vantaEffect.destroy();
+          console.log("Vanta effect created:", vantaEffect.current);
+        } catch (err) {
+          console.error("Error creating Vanta effect:", err);
+        }
       }
     };
-  }, [vantaEffect]);
+
+    document.head.appendChild(threeScript);
+
+    return () => {
+      if (vantaEffect.current) {
+        console.log("Destroying Vanta effect");
+        vantaEffect.current.destroy();
+      }
+    };
+  }, []);
 
   return (
     <div
@@ -60,7 +75,7 @@ export default function VantaBackground() {
       style={{
         width: "100%",
         height: "100vh",
-        backgroundColor: "#0F1115" // Fallback background
+        backgroundColor: "#0F1115"
       }}
     />
   );
