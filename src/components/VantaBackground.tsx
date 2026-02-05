@@ -43,13 +43,13 @@ export default function VantaBackground() {
             gyroControls: false,
             minHeight: 200.0,
             minWidth: 200.0,
-            highlightColor: 0x9da09d,
-            midtoneColor: 0x1b1b1b,
-            lowlightColor: 0x313131,
+            highlightColor: 0x4081b,
+            midtoneColor: 0x341f1f,
+            lowlightColor: 0x828284,
             baseColor: 0x30516,
-            blurFactor: 0.76,
-            speed: 2.70,
-            zoom: 0.80
+            blurFactor: 0.77,
+            speed: 3.10,
+            zoom: 1.30
           });
           console.log("Vanta FOG effect created:", vantaEffect.current);
         } catch (err) {
