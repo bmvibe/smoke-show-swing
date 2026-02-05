@@ -262,11 +262,13 @@ export default function Home() {
           </>
         )}
 
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           {(state === "uploading" || state === "analyzing") && (
             <LoadingState key="loading" state={state} videoPreview={videoPreview} />
           )}
+        </AnimatePresence>
 
+        <AnimatePresence>
           {state === "complete" && analysis && (
             <ResultsView key="results" analysis={analysis} videoPreview={videoPreview} onReset={reset} />
           )}
@@ -533,9 +535,9 @@ function ResultsView({
       {/* Header */}
       <motion.div
         className="flex items-center justify-between gap-4"
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: 800 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
+        transition={{ duration: 0.8, ease: "easeOut", delay: 2.0 }}
       >
         <h2 className="text-2xl font-bold text-white">Your Analysis</h2>
         <button
@@ -549,7 +551,7 @@ function ResultsView({
       {/* Video + Summary */}
       <motion.div
         className="grid gap-4 md:grid-cols-2"
-        initial={{ opacity: 0, y: 100 }}
+        initial={{ opacity: 0, y: 800 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut", delay: 2.0 }}
       >
@@ -585,9 +587,9 @@ function ResultsView({
 
       {/* Improvements */}
       <motion.section
-        initial={{ opacity: 0, y: 50 }}
+        initial={{ opacity: 0, y: 800 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: 2.4 }}
+        transition={{ duration: 0.8, ease: "easeOut", delay: 2.3 }}
       >
         <h3 className="text-base font-bold mb-3 text-white">Areas to Improve</h3>
         <p className="text-xs text-muted mb-4">These are the money shots—fix these and you'll be striping it down the fairway in no time. 🎯</p>
@@ -613,9 +615,9 @@ function ResultsView({
 
       {/* Training Plan */}
       <motion.section
-        initial={{ opacity: 0, y: 50 }}
+        initial={{ opacity: 0, y: 800 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: 2.6 }}
+        transition={{ duration: 0.8, ease: "easeOut", delay: 2.5 }}
       >
         <h3 className="text-base font-bold mb-3 text-white">Training Plan</h3>
         <p className="text-xs text-muted mb-4">Your personalized roadmap to crushing it on the course. Stick with this and watch your handicap drop. 💪</p>
@@ -654,9 +656,9 @@ function ResultsView({
       {/* CTA */}
       <motion.div
         className="text-center py-4 border-t border-accent/20"
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 800 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: 2.8 }}
+        transition={{ duration: 0.8, ease: "easeOut", delay: 2.7 }}
       >
         <p className="text-muted mb-3 text-xs">Got more swings to analyze? Let's keep the momentum going!</p>
         <button
