@@ -414,6 +414,31 @@ function ExpectCard({ icon, title, description }: { icon: string; title: string;
 }
 
 function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing"; videoPreview: string | null }) {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const steps = [
+    "Reading the plane",
+    "Diagnosing the issue",
+    "Plotting the fix",
+    "Building your protocol"
+  ];
+
+  useEffect(() => {
+    if (state === "analyzing") {
+      const stepDuration = 3000; // 3 seconds per step
+      const interval = setInterval(() => {
+        setCurrentStep((prev) => {
+          if (prev < steps.length - 1) {
+            return prev + 1;
+          }
+          return prev;
+        });
+      }, stepDuration);
+
+      return () => clearInterval(interval);
+    }
+  }, [state, steps.length]);
+
   const messages = {
     uploading: "Uploading your video...",
     analyzing: "Analyzing your swing...",
@@ -452,10 +477,14 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
 
         {state === "analyzing" && (
           <div className="mt-4 space-y-2">
-            <LoadingStep text="Reading the plane" done />
-            <LoadingStep text="Diagnosing the issue" active />
-            <LoadingStep text="Plotting the fix" />
-            <LoadingStep text="Building your protocol" />
+            {steps.map((text, index) => (
+              <LoadingStep
+                key={text}
+                text={text}
+                done={index < currentStep}
+                active={index === currentStep}
+              />
+            ))}
           </div>
         )}
       </div>
