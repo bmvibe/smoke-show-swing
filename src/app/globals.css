@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700&display=swap');
 
 :root {
   /* Style Guide Colors */
@@ -41,9 +41,9 @@ body {
   min-height: 100vh;
 }
 
-/* Heading styles with Cormorant Garamond */
+/* Heading styles with Noto Serif Japanese */
 h1, h2 {
-  font-family: "Cormorant Garamond", serif;
+  font-family: "Noto Serif JP", serif;
   font-weight: 700;
 }
 
