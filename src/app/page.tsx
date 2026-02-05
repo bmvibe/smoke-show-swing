@@ -452,15 +452,8 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
           </div>
         )}
 
-        <div className="mb-4">
-          <div className="w-16 h-16 mx-auto mb-3 relative">
-            <div className="absolute inset-0 rounded-full border-4 border-accent/20"></div>
-            <div className="absolute inset-0 rounded-full border-4 border-accent border-t-transparent animate-spin"></div>
-          </div>
-        </div>
-
         <h2 className="text-2xl font-bold mb-2 text-white">{messages[state]}</h2>
-        <p className="text-muted text-sm">{subMessages[state]}</p>
+        <p className="text-muted text-sm mb-4">{subMessages[state]}</p>
 
         {state === "analyzing" && (
           <div className="mt-4 space-y-2 max-w-xs mx-auto">
@@ -481,8 +474,10 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
 
 function LoadingStep({ text, done, active }: { text: string; done?: boolean; active?: boolean }) {
   return (
-    <div className={`flex items-center gap-3 ${!active ? "text-muted" : "text-white"}`}>
-      {active ? (
+    <div className={`flex items-center gap-3 ${done ? "text-white" : !active ? "text-muted" : "text-white"}`}>
+      {done ? (
+        <span className="text-accent shrink-0">✓</span>
+      ) : active ? (
         <span className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin shrink-0"></span>
       ) : (
         <span className="w-4 h-4 shrink-0"></span>
@@ -605,30 +600,6 @@ function ResultsView({
           ))}
         </div>
       </section>
-
-      {/* Resources */}
-      {analysis.resources.length > 0 && (
-        <section>
-          <h3 className="text-base font-bold mb-3 text-white">Learning Resources</h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {analysis.resources.map((resource, i) => (
-              <a
-                key={i}
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="glass-card rounded-xl p-3 hover:bg-card-hover hover:border-accent/50 block shadow-lg hover:shadow-xl transition-all"
-              >
-                <h4 className="font-semibold mb-1 flex items-center gap-2 text-white text-sm">
-                  <span className="text-red-400"><PlayIcon /></span>
-                  {resource.title}
-                </h4>
-                <p className="text-xs text-muted">{resource.description}</p>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* CTA */}
       <div className="text-center py-4 border-t border-accent/20">
