@@ -44,7 +44,6 @@ body {
 /* Heading styles with Noto Serif Japanese */
 h1, h2 {
   font-family: "Noto Serif JP", serif;
-  font-weight: 700;
 }
 
 /* Custom scrollbar for dark mode */
