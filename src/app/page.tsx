@@ -442,7 +442,8 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
           <div className="mb-4 rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
             <video
               src={videoPreview}
-              className="w-full aspect-video object-cover"
+              className="w-full object-cover"
+              style={{ minHeight: "500px", maxHeight: "600px" }}
               autoPlay
               loop
               muted
@@ -462,7 +463,7 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
         <p className="text-muted text-sm">{subMessages[state]}</p>
 
         {state === "analyzing" && (
-          <div className="mt-4 space-y-2">
+          <div className="mt-4 space-y-2 max-w-xs mx-auto">
             {steps.map((text, index) => (
               <LoadingStep
                 key={text}
@@ -480,15 +481,13 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
 
 function LoadingStep({ text, done, active }: { text: string; done?: boolean; active?: boolean }) {
   return (
-    <div className={`flex items-center gap-3 justify-center ${!done && !active ? "text-muted" : ""}`}>
-      {done ? (
-        <span className="text-accent">✓</span>
-      ) : active ? (
-        <span className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin"></span>
+    <div className={`flex items-center gap-3 ${!active ? "text-muted" : "text-white"}`}>
+      {active ? (
+        <span className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin shrink-0"></span>
       ) : (
-        <span className="w-4 h-4 rounded-full border border-muted"></span>
+        <span className="w-4 h-4 shrink-0"></span>
       )}
-      <span>{text}</span>
+      <span className="text-left">{text}</span>
     </div>
   );
 }
@@ -521,8 +520,7 @@ function ResultsView({
           <div className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
             <video
               src={videoPreview}
-              className="w-full object-cover"
-              style={{ minHeight: "400px" }}
+              className="w-full aspect-video object-cover"
               controls
               playsInline
             />
@@ -588,22 +586,18 @@ function ResultsView({
               <div className="space-y-2">
                 {week.drills.map((drill, i) => (
                   <div key={i} className="border-l-2 border-accent/40 pl-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1">
-                        <h5 className="font-semibold text-white text-xs">{drill.name}</h5>
-                        <p className="text-xs text-muted">{drill.description}</p>
-                        <p className="text-xs text-accent/80 font-medium">{drill.reps}</p>
-                      </div>
-                      <a
-                        href={`https://www.youtube.com/results?search_query=golf+${encodeURIComponent(drill.name)}+drill+tutorial`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-red-400 hover:text-red-300 transition-colors shrink-0"
-                        title="Watch tutorial on YouTube"
-                      >
-                        <PlayIcon />
-                      </a>
-                    </div>
+                    <h5 className="font-semibold text-white text-xs">{drill.name}</h5>
+                    <p className="text-xs text-muted mb-1">{drill.description}</p>
+                    <p className="text-xs text-accent/80 font-medium mb-2">{drill.reps}</p>
+                    <a
+                      href={`https://www.youtube.com/results?search_query=golf+${encodeURIComponent(drill.name)}+drill+tutorial`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 transition-colors font-medium"
+                    >
+                      <PlayIcon />
+                      <span>Watch tutorial videos</span>
+                    </a>
                   </div>
                 ))}
               </div>
