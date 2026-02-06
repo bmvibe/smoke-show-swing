@@ -189,10 +189,11 @@ export default function Home() {
     <main className="min-h-screen">
       {/* Floating Glass Logo */}
       <div
-        className="fixed top-6 left-6 z-50 px-6 py-3 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-[1500ms] ease-in-out"
+        className="fixed top-6 left-6 z-50 px-6 py-3 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
         style={{
           transform: logoVisible ? 'translateY(0)' : 'translateY(-120px)',
-          opacity: logoVisible ? 1 : 0
+          opacity: logoVisible ? 1 : 0,
+          transition: 'transform 1500ms ease-in-out, opacity 1500ms ease-in-out'
         }}
       >
         <span className="text-white text-lg font-light tracking-wide">striped.</span>
