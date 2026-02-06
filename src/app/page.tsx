@@ -244,28 +244,28 @@ export default function Home() {
 
               {/* How to Film - Part of Step 1 */}
               <div className="mt-6">
-                <h4 className="text-sm font-light tracking-wide uppercase mb-3 text-[#E1E4E8]">How to Film</h4>
+                <h4 className="text-sm font-light tracking-wide uppercase mb-3 text-[#E1E4E8]">Video tips</h4>
                 <TipCarousel
                   tips={[
                     {
                       icon: "camera",
                       title: "Camera setup",
-                      description: "Film at waist height and keep the phone steady or use a tripod. Film from behind about 10 foot away"
+                      description: "Set your phone at about waist height. Keep it steady (tripod's ideal but not essential). Stand about 10 feet back, filming from behind."
                     },
                     {
                       icon: "sun",
                       title: "Lighting",
-                      description: "Film outdoors in daylight or in a well-lit indoor space. Avoid backlighting (don't face the sun)."
+                      description: "Daylight's your mate here. Film outside or somewhere bright. Don't stand facing the sun—you'll just be a silhouette."
                     },
                     {
                       icon: "film",
                       title: "Framing",
-                      description: "Make sure your full body and the club are visible throughout the entire swing. Leave some space above and below."
+                      description: "Make sure we can see all of you and the club throughout. Leave a bit of space top and bottom so nothing gets cut off."
                     },
                     {
                       icon: "clock",
                       title: "Video Length",
-                      description: "Keep it under 30 seconds. Trim to just your swing - setup, backswing, impact, and follow-through."
+                      description: "Keep it around 20 seconds. Just the good stuff—your setup, swing back, hit, and follow through. No need for the walk-up."
                     }
                   ]}
                 />
@@ -282,17 +282,17 @@ export default function Home() {
                 <ExpectCard
                   icon="chart"
                   title="Swing Analysis"
-                  description="Detailed breakdown of your posture, grip, backswing, downswing, impact, and follow-through."
+                  description="A proper look at everything—how you stand, hold the club, swing back, come through, and finish. The full story."
                 />
                 <ExpectCard
                   icon="target"
                   title="Key Improvements"
-                  description="Specific issues identified with clear explanations of what to fix and why."
+                  description="The exact bits that need sorting, explained in plain English. No jargon, just what to change and why it matters."
                 />
                 <ExpectCard
                   icon="clipboard"
                   title="Training Plan"
-                  description="Multi-week schedule with drills you can do at the driving range, plus video tutorials."
+                  description="A week-by-week game plan with drills you can actually do at the range. Video guides included so you know you're doing it right."
                 />
               </div>
             </section>
