@@ -304,13 +304,10 @@ export default function Home() {
           </>
         )}
 
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {(state === "uploading" || state === "analyzing") && (
             <LoadingState key="loading" state={state} videoPreview={videoPreview} />
           )}
-        </AnimatePresence>
-
-        <AnimatePresence>
           {state === "complete" && analysis && (
             <ResultsView key="results" analysis={analysis} videoPreview={videoPreview} onReset={reset} />
           )}
@@ -576,12 +573,11 @@ function ResultsView({
   return (
     <motion.div
       className="space-y-6"
-      initial={{ opacity: 0, y: '100vh' }}
+      initial={{ opacity: 0, y: 600 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
-        duration: 1.0,
-        ease: [0.25, 0.1, 0.25, 1],
-        delay: 1.0
+        duration: 0.8,
+        ease: [0.25, 0.1, 0.25, 1]
       }}
       style={{ willChange: "transform, opacity" }}
     >
@@ -715,11 +711,11 @@ function HandicapGauge({ handicap }: { handicap: { min: number; max: number; com
   // Calculate final rotation for the needle (semicircle from -90deg to 90deg)
   const finalRotation = -90 + (midpoint / maxHandicap) * 180;
 
-  // Animate needle after content settles (delay to match ResultsView animation + duration)
+  // Animate needle after content settles
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimatedRotation(finalRotation);
-    }, 2000); // 1.0s delay + 1.0s duration = 2.0s
+    }, 800); // Match ResultsView animation duration
     return () => clearTimeout(timer);
   }, [finalRotation]);
 
