@@ -256,22 +256,22 @@ export default function Home() {
                     {
                       icon: "camera",
                       title: "Camera setup",
-                      description: "Phone at waist height, kept steady. Film from behind, about 10 feet back."
+                      description: "Setup the phone at waist height, keep it steady. Film from behind, about 10 feet back."
                     },
                     {
                       icon: "sun",
                       title: "Lighting",
-                      description: "Daylight's your mate here. Film outside or somewhere bright. Don't stand facing the sun—you'll just be a silhouette."
+                      description: "You need good lighting, outside or somewhere bright. Don't face the phone into the sun though!"
                     },
                     {
                       icon: "film",
                       title: "Framing",
-                      description: "Make sure we can see all of you and the club throughout. Leave a bit of space top and bottom so nothing gets cut off."
+                      description: "Make sure your entire body and club path is visible throughout. Your hands should be in the middle of the shot"
                     },
                     {
                       icon: "clock",
                       title: "Video Length",
-                      description: "Keep it around 20 seconds. Just the good stuff—your setup, swing back, hit, and follow through. No need for the walk-up."
+                      description: "Keep it less than 20 secs. Just the good stuff: Setup, backswing, impact and follow through. We need the full story"
                     }
                   ]}
                 />
@@ -288,7 +288,7 @@ export default function Home() {
                 <ExpectCard
                   icon="chart"
                   title="Swing Analysis"
-                  description="A proper look at everything—how you stand, hold the club, swing back, come through, and finish. The full story."
+                  description="A proper look at everything, how you stand, hold the club, swing back, come through, and finish. The full story."
                 />
                 <ExpectCard
                   icon="target"
@@ -633,7 +633,7 @@ function ResultsView({
       {/* Improvements */}
       <section>
         <h3 className="text-base font-light tracking-wide uppercase mb-3 text-white">Areas to Improve</h3>
-        <p className="text-xs text-muted mb-4 font-light">These are the money shots—fix these and you'll be striping it down the fairway in no time. 🎯</p>
+        <p className="text-xs text-muted mb-4 font-light">These are the money shots, fix these and you'll be striping it down the fairway in no time. 🎯</p>
         <div className="space-y-4">
           {analysis.improvements.map((item, i) => (
             <div key={i} className="glass-card rounded-xl p-4 shadow-lg hover:shadow-xl hover:border-accent/40">

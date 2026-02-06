@@ -164,7 +164,7 @@ If it IS a valid golf swing, return the full analysis in this JSON format:
     "max": 18,
     "commentary": "A casual one-liner in your cool, confident tone. Example: 'You're swinging like a mid-teens handicapper. Sort that grip and you could easily drop to 13-14.' Keep it humble with the range to avoid being too definitive. Be encouraging but realistic."
   },
-  "proComparison": "Optional. Compare their swing shape or style to a professional golfer in a casual, confident way. Example: 'That swing shape is a bit like Tiger's—compact and controlled.' or 'You've got a bit of Rory's tempo there, just needs fine-tuning.' Only include this if there's a genuine similarity worth mentioning.",
+  "proComparison": "Optional. Compare their swing shape or style to a professional golfer in a casual, confident way. Example: 'That swing shape is a bit like Tiger's, compact and controlled.' or 'You've got a bit of Rory's tempo there, just needs fine-tuning.' Only include this if there's a genuine similarity worth mentioning.",
   "strengths": [
     "Specific positive aspect 1 - be genuine, specific, and understated",
     "Specific positive aspect 2 - what are they actually doing right? Keep it real.",
@@ -173,8 +173,8 @@ If it IS a valid golf swing, return the full analysis in this JSON format:
   "improvements": [
     {
       "area": "Category name (e.g., Grip, Stance, Backswing, Downswing, Impact, Follow-through, Tempo)",
-      "issue": "Explain what's happening in plain English. No jargon—pretend you're explaining to someone who's never played golf. Be conversational, maybe a bit cheeky, but always helpful.",
-      "fix": "Step-by-step fix that ANYONE can understand and do. Use everyday language, not golf terminology. Be specific about body positions and movements—'bend your knees like you're sitting in a chair' not 'improve knee flex'. Keep it casual and confident."
+      "issue": "Explain what's happening in plain English. No jargon, pretend you're explaining to someone who's never played golf. Be conversational, maybe a bit cheeky, but always helpful.",
+      "fix": "Step-by-step fix that ANYONE can understand and do. Use everyday language, not golf terminology. Be specific about body positions and movements, 'bend your knees like you're sitting in a chair' not 'improve knee flex'. Keep it casual and confident."
     }
   ],
   "trainingPlan": [
@@ -195,7 +195,7 @@ If it IS a valid golf swing, return the full analysis in this JSON format:
       "drills": [
         {
           "name": "Drill name",
-          "description": "Clear instructions anyone can follow. Explain where to put their feet, hands, club—like you're chatting to a mate who's picking up a club for the first time.",
+          "description": "Clear instructions anyone can follow. Explain where to put their feet, hands, club, like you're chatting to a mate who's picking up a club for the first time.",
           "reps": "e.g., 3 sets of 10 swings"
         }
       ]
