@@ -162,6 +162,11 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
+      {/* Floating Glass Logo */}
+      <div className="fixed top-6 right-6 z-50 px-6 py-3 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+        <span className="text-white text-lg font-light tracking-wide">striped</span>
+      </div>
+
       <div className="max-w-4xl mx-auto px-4 py-4">
         {state === "idle" && (
           <>
