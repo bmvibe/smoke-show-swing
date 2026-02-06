@@ -576,22 +576,17 @@ function ResultsView({
   return (
     <motion.div
       className="space-y-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
+      initial={{ opacity: 0, y: '100vh' }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 1.0,
+        ease: [0.25, 0.1, 0.25, 1],
+        delay: 1.0
+      }}
+      style={{ willChange: "transform, opacity" }}
     >
       {/* Header */}
-      <motion.div
-        className="flex items-center justify-between gap-4"
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 0.8,
-          ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.8
-        }}
-        style={{ willChange: "transform, opacity" }}
-      >
+      <div className="flex items-center justify-between gap-4">
         <h2 className="text-2xl font-light tracking-wide uppercase text-white">Your Analysis</h2>
         <button
           onClick={onReset}
@@ -599,20 +594,10 @@ function ResultsView({
         >
           Analyze Another
         </button>
-      </motion.div>
+      </div>
 
       {/* Video + Summary */}
-      <motion.div
-        className="grid gap-4 md:grid-cols-2"
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 0.8,
-          ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.8
-        }}
-        style={{ willChange: "transform, opacity" }}
-      >
+      <div className="grid gap-4 md:grid-cols-2">
         {videoPreview && (
           <div className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
             <video
@@ -641,33 +626,15 @@ function ResultsView({
             </div>
           )}
         </div>
-      </motion.div>
+      </div>
 
       {/* Handicap Prediction */}
-      <motion.div
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 0.8,
-          ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.8
-        }}
-        style={{ willChange: "transform, opacity" }}
-      >
+      <div>
         <HandicapGauge handicap={analysis.handicap} />
-      </motion.div>
+      </div>
 
       {/* Improvements */}
-      <motion.section
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 0.8,
-          ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.8
-        }}
-        style={{ willChange: "transform, opacity" }}
-      >
+      <section>
         <h3 className="text-base font-light tracking-wide uppercase mb-3 text-white">Areas to Improve</h3>
         <p className="text-xs text-muted mb-4 font-light">These are the money shots—fix these and you'll be striping it down the fairway in no time. 🎯</p>
         <div className="space-y-4">
@@ -688,19 +655,10 @@ function ResultsView({
             </div>
           ))}
         </div>
-      </motion.section>
+      </section>
 
       {/* Training Plan */}
-      <motion.section
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 0.8,
-          ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.8
-        }}
-        style={{ willChange: "transform, opacity" }}
-      >
+      <section>
         <h3 className="text-base font-light tracking-wide uppercase mb-3 text-white">Training Plan</h3>
         <p className="text-xs text-muted mb-4 font-light">Your personalized roadmap to crushing it on the course. Stick with this and watch your handicap drop. 💪</p>
         <div className="space-y-4">
@@ -733,20 +691,10 @@ function ResultsView({
             </div>
           ))}
         </div>
-      </motion.section>
+      </section>
 
       {/* CTA */}
-      <motion.div
-        className="text-center py-4 border-t border-accent/20"
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 0.8,
-          ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.8
-        }}
-        style={{ willChange: "transform, opacity" }}
-      >
+      <div className="text-center py-4 border-t border-accent/20">
         <p className="text-muted mb-3 text-xs font-light">Got more swings to analyze? Let's keep the momentum going!</p>
         <button
           onClick={onReset}
@@ -754,7 +702,7 @@ function ResultsView({
         >
           Upload Another Video
         </button>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
@@ -771,7 +719,7 @@ function HandicapGauge({ handicap }: { handicap: { min: number; max: number; com
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimatedRotation(finalRotation);
-    }, 3600); // 2.8s delay + 0.8s duration = 3.6s
+    }, 2000); // 1.0s delay + 1.0s duration = 2.0s
     return () => clearTimeout(timer);
   }, [finalRotation]);
 
