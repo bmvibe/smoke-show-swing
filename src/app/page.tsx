@@ -494,8 +494,8 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
   };
 
   const subMessages = {
-    uploading: "Please wait while we upload to the cloud",
-    analyzing: "Processing your video for analysis",
+    uploading: "This'll just take a moment",
+    analyzing: "Hang tight, we're breaking down your swing",
   };
 
   return (
@@ -724,10 +724,10 @@ function ResultsView({
                       href={`https://www.youtube.com/results?search_query=golf+${encodeURIComponent(drill.name)}+drill+tutorial`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 transition-colors font-light"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 mt-1 text-xs text-white bg-red-600 hover:bg-red-500 rounded-lg transition-colors font-light tracking-wide uppercase"
                     >
                       <PlayIcon />
-                      <span>Watch tutorial videos</span>
+                      <span>Watch Tutorials</span>
                     </a>
                   </div>
                 ))}
@@ -762,11 +762,20 @@ function ResultsView({
 }
 
 function HandicapGauge({ handicap }: { handicap: { min: number; max: number; commentary: string } }) {
+  const [animatedRotation, setAnimatedRotation] = useState(-90);
   const midpoint = (handicap.min + handicap.max) / 2;
   const maxHandicap = 36;
 
-  // Calculate rotation for the needle (semicircle from -90deg to 90deg)
-  const rotation = -90 + (midpoint / maxHandicap) * 180;
+  // Calculate final rotation for the needle (semicircle from -90deg to 90deg)
+  const finalRotation = -90 + (midpoint / maxHandicap) * 180;
+
+  // Animate needle on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedRotation(finalRotation);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [finalRotation]);
 
   return (
     <div className="glass-card rounded-2xl p-6 shadow-lg">
@@ -775,7 +784,7 @@ function HandicapGauge({ handicap }: { handicap: { min: number; max: number; com
       {/* Gauge */}
       <div className="relative w-full max-w-xs mx-auto mb-4">
         {/* SVG Semicircular Gauge */}
-        <svg viewBox="0 0 200 120" className="w-full">
+        <svg viewBox="0 0 200 130" className="w-full">
           {/* Background arc */}
           <path
             d="M 20 100 A 80 80 0 0 1 180 100"
@@ -798,7 +807,7 @@ function HandicapGauge({ handicap }: { handicap: { min: number; max: number; com
           {/* Center point */}
           <circle cx="100" cy="100" r="3" fill="white" opacity="0.6" />
 
-          {/* Needle */}
+          {/* Needle with animation */}
           <line
             x1="100"
             y1="100"
@@ -807,7 +816,11 @@ function HandicapGauge({ handicap }: { handicap: { min: number; max: number; com
             stroke="white"
             strokeWidth="2"
             strokeLinecap="round"
-            style={{ transform: `rotate(${rotation}deg)`, transformOrigin: '100px 100px' }}
+            style={{
+              transform: `rotate(${animatedRotation}deg)`,
+              transformOrigin: '100px 100px',
+              transition: 'transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
+            }}
           />
 
           {/* Scale markers */}
@@ -815,11 +828,11 @@ function HandicapGauge({ handicap }: { handicap: { min: number; max: number; com
           <text x="60" y="45" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">10</text>
           <text x="100" y="25" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">18</text>
           <text x="140" y="45" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">28</text>
-          <text x="180" y="115" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">36</text>
+          <text x="180" y="115" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">36+</text>
 
-          {/* Labels */}
-          <text x="20" y="110" fill="rgba(255, 255, 255, 0.4)" fontSize="8" textAnchor="start">Scratch</text>
-          <text x="180" y="110" fill="rgba(255, 255, 255, 0.4)" fontSize="8" textAnchor="end">Beginner</text>
+          {/* Labels below numbers */}
+          <text x="20" y="125" fill="rgba(255, 255, 255, 0.4)" fontSize="8" textAnchor="middle">Scratch</text>
+          <text x="180" y="125" fill="rgba(255, 255, 255, 0.4)" fontSize="8" textAnchor="middle">Beginner</text>
         </svg>
 
         {/* Range display */}
