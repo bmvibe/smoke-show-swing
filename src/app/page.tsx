@@ -403,7 +403,6 @@ function ExpectCard({ icon, title, description }: { icon: string; title: string;
 
 function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing"; videoPreview: string | null }) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [hasStarted, setHasStarted] = useState(false);
 
   const steps = [
     "Checking grip and stance",
@@ -414,24 +413,24 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
   ];
 
   useEffect(() => {
-    if (state === "analyzing" && !hasStarted) {
-      // Immediately show first step as active
+    if (state === "analyzing") {
+      // Reset to first step when starting
       setCurrentStep(0);
-      setHasStarted(true);
 
       const stepDuration = 3000; // 3 seconds per step
       const interval = setInterval(() => {
         setCurrentStep((prev) => {
+          // Move to next step if not on the last one
           if (prev < steps.length - 1) {
             return prev + 1;
           }
-          return prev;
+          return prev; // Stay on last step
         });
       }, stepDuration);
 
       return () => clearInterval(interval);
     }
-  }, [state, hasStarted, steps.length]);
+  }, [state, steps.length]);
 
   const messages = {
     uploading: "Uploading your video...",
