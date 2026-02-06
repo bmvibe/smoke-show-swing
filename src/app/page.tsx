@@ -193,17 +193,19 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      {/* Floating Glass Logo */}
-      <div
-        className="fixed top-6 left-6 z-50 px-6 py-3 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-        style={{
-          transform: logoVisible ? 'translateY(0)' : 'translateY(-120px)',
-          opacity: logoVisible ? 1 : 0,
-          transition: 'transform 500ms ease-in-out, opacity 500ms ease-in-out'
-        }}
-      >
-        <span className="text-white text-lg font-light tracking-wide">striped.</span>
-      </div>
+      {/* Floating Glass Logo - only show on idle state */}
+      {state === "idle" && (
+        <div
+          className="fixed top-6 left-6 z-50 px-6 py-3 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
+          style={{
+            transform: logoVisible ? 'translateY(0)' : 'translateY(-120px)',
+            opacity: logoVisible ? 1 : 0,
+            transition: 'transform 500ms ease-in-out, opacity 500ms ease-in-out'
+          }}
+        >
+          <span className="text-white text-lg font-light tracking-wide">striped.</span>
+        </div>
+      )}
 
       <div className="max-w-4xl mx-auto px-4 py-4">
         {state === "idle" && (
@@ -271,7 +273,7 @@ export default function Home() {
                     {
                       icon: "clock",
                       title: "Video Length",
-                      description: "Keep it less than 20 secs. Just the good stuff: Setup, backswing, impact and follow through. We need the full story"
+                      description: "Keep it less than 20 secs. Just the good stuff: Setup, backswing, impact and follow through."
                     }
                   ]}
                 />
@@ -492,8 +494,8 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
   };
 
   const subMessages = {
-    uploading: "This'll just take a moment",
-    analyzing: "Hang tight, we're breaking down your swing",
+    uploading: "Don't refresh this screen",
+    analyzing: "Breaking down your swing",
   };
 
   return (
@@ -572,63 +574,74 @@ function ResultsView({
   onReset: () => void;
 }) {
   return (
-    <motion.div
-      className="space-y-6"
-      initial={{ opacity: 0, y: 600 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.8,
-        ease: [0.25, 0.1, 0.25, 1]
-      }}
-      style={{ willChange: "transform, opacity" }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="text-2xl font-light tracking-wide uppercase text-white">Your Analysis</h2>
-        <button
-          onClick={onReset}
-          className="px-4 py-2 text-xs font-light tracking-wide uppercase border border-accent/40 bg-accent/10 rounded-full hover:bg-accent/20 hover:border-accent text-white"
-        >
-          Analyze Another
-        </button>
-      </div>
+    <div className="space-y-6">
+      {/* First wave: Header + Video + Summary */}
+      <motion.div
+        initial={{ opacity: 0, y: 600 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: 0.8,
+          ease: [0.25, 0.1, 0.25, 1]
+        }}
+        style={{ willChange: "transform, opacity" }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between gap-4 mb-6">
+          <h2 className="text-2xl font-light tracking-wide uppercase text-white">Your Analysis</h2>
+          <button
+            onClick={onReset}
+            className="px-4 py-2 text-xs font-light tracking-wide uppercase border border-accent/40 bg-accent/10 rounded-full hover:bg-accent/20 hover:border-accent text-white"
+          >
+            Analyze Another
+          </button>
+        </div>
 
-      {/* Video + Summary */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {videoPreview && (
-          <div className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
-            <video
-              src={videoPreview}
-              className="w-full aspect-video object-cover"
-              controls
-              playsInline
-            />
-          </div>
-        )}
-        <div className="glass-card rounded-2xl p-4 shadow-lg">
-          <h3 className="font-light tracking-wide uppercase text-white text-sm mb-2">Summary</h3>
-          <p className="text-muted text-xs font-light">{analysis.summary}</p>
-
-          {analysis.strengths.length > 0 && (
-            <div className="mt-2">
-              <h4 className="text-xs font-light tracking-wide uppercase text-accent mb-1">What You're Doing Right 🔥</h4>
-              <ul className="space-y-0.5">
-                {analysis.strengths.map((strength, i) => (
-                  <li key={i} className="text-xs text-muted flex items-start gap-2 font-light">
-                    <span className="text-accent mt-0.5">✓</span>
-                    {strength}
-                  </li>
-                ))}
-              </ul>
+        {/* Video + Summary */}
+        <div className="grid gap-4 md:grid-cols-2">
+          {videoPreview && (
+            <div className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
+              <video
+                src={videoPreview}
+                className="w-full aspect-video object-cover"
+                controls
+                playsInline
+                preload="metadata"
+              />
             </div>
           )}
-        </div>
-      </div>
+          <div className="glass-card rounded-2xl p-4 shadow-lg">
+            <h3 className="font-light tracking-wide uppercase text-white text-sm mb-2">Summary</h3>
+            <p className="text-muted text-xs font-light">{analysis.summary}</p>
 
-      {/* Handicap Prediction */}
-      <div>
+            {analysis.strengths.length > 0 && (
+              <div className="mt-2">
+                <h4 className="text-xs font-light tracking-wide uppercase text-accent mb-1">What You're Doing Right 🔥</h4>
+                <ul className="space-y-0.5">
+                  {analysis.strengths.map((strength, i) => (
+                    <li key={i} className="text-xs text-muted flex items-start gap-2 font-light">
+                      <span className="text-accent mt-0.5">✓</span>
+                      {strength}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Second wave: Handicap Prediction */}
+      <motion.div
+        initial={{ opacity: 0, y: 100 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: 0.6,
+          delay: 0.5,
+          ease: [0.25, 0.1, 0.25, 1]
+        }}
+      >
         <HandicapGauge handicap={analysis.handicap} proComparison={analysis.proComparison} />
-      </div>
+      </motion.div>
 
       {/* Improvements */}
       <section>
