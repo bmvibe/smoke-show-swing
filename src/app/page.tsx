@@ -200,11 +200,11 @@ export default function Home() {
         {state === "idle" && (
           <>
             {/* Hero */}
-            <section className="text-center mb-8 py-12">
-              <h2 className="text-[3.6rem] mb-6 text-white leading-tight font-light tracking-wide">
+            <section className="text-center mb-16 pt-16 pb-8">
+              <h2 className="text-[3.6rem] mb-8 text-white leading-tight font-light tracking-wide uppercase">
                 Fix your golf swing in a minute
               </h2>
-              <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed font-light tracking-wide uppercase">
+              <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed font-light">
                 Simply upload a video of your swing and we'll show you what needs to be fixed.
               </p>
             </section>
