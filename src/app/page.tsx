@@ -163,7 +163,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Floating Glass Logo */}
-      <div className="fixed top-6 right-6 z-50 px-6 py-3 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+      <div className="fixed top-6 left-6 z-50 px-6 py-3 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
         <span className="text-white text-lg font-light tracking-wide">striped</span>
       </div>
 
@@ -172,10 +172,10 @@ export default function Home() {
           <>
             {/* Hero */}
             <section className="text-center mb-16 py-8">
-              <h2 className="text-[3.6rem] mb-6 text-white leading-tight font-doto-extrabold">
+              <h2 className="text-[3.6rem] mb-6 text-white leading-tight font-light tracking-wide uppercase">
                 Fix your golf swing in a minute
               </h2>
-              <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed">
+              <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed font-light">
                 Simply upload a video of your swing and we'll show you what needs to be fixed.
               </p>
             </section>
