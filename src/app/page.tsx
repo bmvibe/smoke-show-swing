@@ -36,7 +36,32 @@ export default function Home() {
   const [analysis, setAnalysis] = useState<SwingAnalysis | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
+  const [logoVisible, setLogoVisible] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const lastScrollY = useRef(0);
+
+  // Handle logo visibility on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY < 10) {
+        // Always show at top of page
+        setLogoVisible(true);
+      } else if (currentScrollY > lastScrollY.current) {
+        // Scrolling down - hide logo
+        setLogoVisible(false);
+      } else {
+        // Scrolling up - show logo
+        setLogoVisible(true);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleFileSelect = useCallback(async (file: File) => {
     // Validate file
@@ -163,16 +188,20 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Floating Glass Logo */}
-      <div className="fixed top-6 left-6 z-50 px-6 py-3 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-        <span className="text-white text-lg font-light tracking-wide">striped</span>
+      <div
+        className={`fixed left-6 z-50 px-6 py-3 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-300 ease-in-out ${
+          logoVisible ? 'top-6 opacity-100' : '-top-20 opacity-0'
+        }`}
+      >
+        <span className="text-white text-lg font-light tracking-wide">striped.</span>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-4">
         {state === "idle" && (
           <>
             {/* Hero */}
-            <section className="text-center mb-16 py-8">
-              <h2 className="text-[3.6rem] mb-6 text-white leading-tight font-light tracking-wide uppercase">
+            <section className="text-center mb-16 py-16">
+              <h2 className="text-[3.6rem] mb-8 text-white leading-tight font-light tracking-wide uppercase">
                 Fix your golf swing in a minute
               </h2>
               <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed font-light">
@@ -329,6 +358,10 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
     setCurrentIndex(index);
   };
 
+  const goToNextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % tips.length);
+  };
+
   return (
     <div
       className="space-y-8"
@@ -347,7 +380,12 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
       {/* Mobile carousel */}
       <div className="sm:hidden">
         <div className="transition-opacity duration-300">
-          <TipCard icon={tips[currentIndex].icon} title={tips[currentIndex].title} description={tips[currentIndex].description} />
+          <TipCard
+            icon={tips[currentIndex].icon}
+            title={tips[currentIndex].title}
+            description={tips[currentIndex].description}
+            onClick={goToNextSlide}
+          />
         </div>
 
         {/* Navigation dots */}
@@ -373,7 +411,7 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
   );
 }
 
-function TipCard({ icon, title, description }: { icon: string; title: string; description: string }) {
+function TipCard({ icon, title, description, onClick }: { icon: string; title: string; description: string; onClick?: () => void }) {
   const iconMap: { [key: string]: ReactElement } = {
     camera: <CameraIcon />,
     sun: <SunIcon />,
@@ -382,7 +420,12 @@ function TipCard({ icon, title, description }: { icon: string; title: string; de
   };
 
   return (
-    <div className="glass-card rounded-xl p-4 hover:bg-card-hover hover:border-accent/40 cursor-default flex flex-col w-full h-full">
+    <div
+      className={`glass-card rounded-xl p-4 hover:bg-card-hover hover:border-accent/40 flex flex-col w-full h-full ${
+        onClick ? 'cursor-pointer' : 'cursor-default'
+      }`}
+      onClick={onClick}
+    >
       <div className="text-white mb-2">{iconMap[icon]}</div>
       <h4 className="font-light tracking-wide uppercase mb-1 text-white text-sm">{title}</h4>
       <p className="text-xs text-muted leading-tight flex-1 font-light">{description}</p>
