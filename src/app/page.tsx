@@ -713,7 +713,7 @@ function ResultsView({
           Upload Another Video
         </button>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
