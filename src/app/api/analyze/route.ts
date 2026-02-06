@@ -149,6 +149,7 @@ Analyze this golf swing video and provide feedback in the following JSON format.
     "max": 18,
     "commentary": "A casual one-liner in your cool, confident tone. Example: 'You're swinging like a mid-teens handicapper. Sort that grip and you could easily drop to 13-14.' Keep it humble with the range to avoid being too definitive. Be encouraging but realistic."
   },
+  "proComparison": "Optional. Compare their swing shape or style to a professional golfer in a casual, confident way. Example: 'That swing shape is a bit like Tiger's—compact and controlled.' or 'You've got a bit of Rory's tempo there, just needs fine-tuning.' Only include this if there's a genuine similarity worth mentioning.",
   "strengths": [
     "Specific positive aspect 1 - be genuine, specific, and understated",
     "Specific positive aspect 2 - what are they actually doing right? Keep it real.",

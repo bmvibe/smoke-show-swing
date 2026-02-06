@@ -14,6 +14,7 @@ interface SwingAnalysis {
     max: number;
     commentary: string;
   };
+  proComparison?: string;
   strengths: string[];
   improvements: {
     area: string;
@@ -626,7 +627,7 @@ function ResultsView({
 
       {/* Handicap Prediction */}
       <div>
-        <HandicapGauge handicap={analysis.handicap} />
+        <HandicapGauge handicap={analysis.handicap} proComparison={analysis.proComparison} />
       </div>
 
       {/* Improvements */}
@@ -703,7 +704,7 @@ function ResultsView({
   );
 }
 
-function HandicapGauge({ handicap }: { handicap: { min: number; max: number; commentary: string } }) {
+function HandicapGauge({ handicap, proComparison }: { handicap: { min: number; max: number; commentary: string }; proComparison?: string }) {
   const [animatedRotation, setAnimatedRotation] = useState(-90);
   const midpoint = (handicap.min + handicap.max) / 2;
   const maxHandicap = 36;
@@ -767,9 +768,9 @@ function HandicapGauge({ handicap }: { handicap: { min: number; max: number; com
 
           {/* Scale markers */}
           <text x="20" y="115" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">0</text>
-          <text x="60" y="45" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">10</text>
-          <text x="100" y="25" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">18</text>
-          <text x="140" y="45" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">28</text>
+          <text x="60" y="53" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">10</text>
+          <text x="100" y="38" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">18</text>
+          <text x="140" y="53" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">28</text>
           <text x="180" y="115" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">36+</text>
 
           {/* Labels below numbers */}
@@ -789,6 +790,13 @@ function HandicapGauge({ handicap }: { handicap: { min: number; max: number; com
       <p className="text-xs text-muted font-light text-center leading-relaxed">
         {handicap.commentary}
       </p>
+
+      {/* Pro Comparison */}
+      {proComparison && (
+        <p className="text-xs text-accent font-light text-center leading-relaxed mt-3 pt-3 border-t border-white/10">
+          {proComparison}
+        </p>
+      )}
     </div>
   );
 }
