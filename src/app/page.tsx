@@ -182,8 +182,8 @@ export default function Home() {
 
             {/* Upload */}
             <section className="mb-10">
-              <h3 className="text-base font-bold mb-3 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50">1</span>
+              <h3 className="text-base font-light tracking-wide uppercase mb-3 flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-light border border-accent/50">1</span>
                 Upload your swing here
               </h3>
               <div
@@ -203,8 +203,8 @@ export default function Home() {
                 <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-accent/10 border border-accent/40 flex items-center justify-center shadow-lg">
                   <UploadIcon />
                 </div>
-                <p className="font-semibold mb-2 text-sm text-[#E1E4E8]">Drop your video here or click to browse</p>
-                <p className="text-xs text-[#a8adb5]">Under 20 seconds will get the best results</p>
+                <p className="font-light mb-2 text-sm text-[#E1E4E8]">Drop your video here or click to browse</p>
+                <p className="text-xs text-[#a8adb5] font-light">Under 20 seconds will get the best results</p>
               </div>
               {error && (
                 <p className="mt-6 text-red-300 text-sm text-center bg-red-500/10 border border-red-500/30 rounded-xl py-3 px-4">{error}</p>
@@ -212,7 +212,7 @@ export default function Home() {
 
               {/* How to Film - Part of Step 1 */}
               <div className="mt-6">
-                <h4 className="text-sm font-bold mb-3 text-[#E1E4E8]">How to Film</h4>
+                <h4 className="text-sm font-light tracking-wide uppercase mb-3 text-[#E1E4E8]">How to Film</h4>
                 <TipCarousel
                   tips={[
                     {
@@ -242,8 +242,8 @@ export default function Home() {
 
             {/* What to Expect */}
             <section>
-              <h3 className="text-base font-bold mb-3 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50">2</span>
+              <h3 className="text-base font-light tracking-wide uppercase mb-3 flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-light border border-accent/50">2</span>
                 What You'll Get
               </h3>
               <div className="grid gap-4 sm:grid-cols-3">
@@ -284,11 +284,11 @@ export default function Home() {
             <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-red-500/20 border border-red-500/40 flex items-center justify-center shadow-lg text-red-400">
               <ErrorIcon />
             </div>
-            <h2 className="text-xl font-bold mb-2 text-white">Upload Failed</h2>
-            <p className="text-muted mb-4 text-xs">{error || "We couldn't process your video. Please try again."}</p>
+            <h2 className="text-xl font-light tracking-wide uppercase mb-2 text-white">Upload Failed</h2>
+            <p className="text-muted mb-4 text-xs font-light">{error || "We couldn't process your video. Please try again."}</p>
             <button
               onClick={reset}
-              className="px-6 py-2 bg-accent text-black font-semibold rounded-full hover:bg-accent-dim accent-button shadow-lg text-sm"
+              className="px-6 py-2 bg-accent text-black font-light tracking-wide uppercase rounded-full hover:bg-accent-dim accent-button shadow-lg text-sm"
             >
               Start Over
             </button>
@@ -365,7 +365,7 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
         </div>
 
         {/* Step indicator */}
-        <div className="text-center mt-4 text-sm text-muted">
+        <div className="text-center mt-4 text-sm text-muted font-light">
           {currentIndex + 1} of {tips.length}
         </div>
       </div>
@@ -384,8 +384,8 @@ function TipCard({ icon, title, description }: { icon: string; title: string; de
   return (
     <div className="glass-card rounded-xl p-4 hover:bg-card-hover hover:border-accent/40 cursor-default flex flex-col w-full h-full">
       <div className="text-white mb-2">{iconMap[icon]}</div>
-      <h4 className="font-semibold mb-1 text-white text-sm">{title}</h4>
-      <p className="text-xs text-muted leading-tight flex-1">{description}</p>
+      <h4 className="font-light tracking-wide uppercase mb-1 text-white text-sm">{title}</h4>
+      <p className="text-xs text-muted leading-tight flex-1 font-light">{description}</p>
     </div>
   );
 }
@@ -400,8 +400,8 @@ function ExpectCard({ icon, title, description }: { icon: string; title: string;
   return (
     <div className="glass-card rounded-xl p-4 text-center hover:bg-card-hover hover:border-accent/40 cursor-default">
       <div className="text-white mb-2 flex justify-center">{iconMap[icon]}</div>
-      <h4 className="font-semibold mb-1 text-white text-sm">{title}</h4>
-      <p className="text-xs text-muted leading-tight">{description}</p>
+      <h4 className="font-light tracking-wide uppercase mb-1 text-white text-sm">{title}</h4>
+      <p className="text-xs text-muted leading-tight font-light">{description}</p>
     </div>
   );
 }
@@ -479,8 +479,8 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
           exit={{ opacity: 0 }}
           transition={{ duration: 1.0 }}
         >
-          <h2 className="text-2xl font-bold text-white mb-2">{messages[state]}</h2>
-          <p className="text-muted text-sm mb-4">{subMessages[state]}</p>
+          <h2 className="text-2xl font-light tracking-wide uppercase text-white mb-2">{messages[state]}</h2>
+          <p className="text-muted text-sm mb-4 font-light">{subMessages[state]}</p>
 
           {state === "analyzing" && (
             <div className="mt-4 space-y-2 max-w-xs">
@@ -502,7 +502,7 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
 
 function LoadingStep({ text, done, active }: { text: string; done?: boolean; active?: boolean }) {
   return (
-    <div className={`flex items-center gap-3 ${done ? "text-white" : !active ? "text-muted" : "text-white"}`}>
+    <div className={`flex items-center gap-3 font-light ${done ? "text-white" : !active ? "text-muted" : "text-white"}`}>
       {done ? (
         <span className="text-accent shrink-0">✓</span>
       ) : active ? (
@@ -543,10 +543,10 @@ function ResultsView({
         }}
         style={{ willChange: "transform, opacity" }}
       >
-        <h2 className="text-2xl font-bold text-white">Your Analysis</h2>
+        <h2 className="text-2xl font-light tracking-wide uppercase text-white">Your Analysis</h2>
         <button
           onClick={onReset}
-          className="px-4 py-2 text-xs font-medium border border-accent/40 bg-accent/10 rounded-full hover:bg-accent/20 hover:border-accent text-white"
+          className="px-4 py-2 text-xs font-light tracking-wide uppercase border border-accent/40 bg-accent/10 rounded-full hover:bg-accent/20 hover:border-accent text-white"
         >
           Analyze Another
         </button>
@@ -575,15 +575,15 @@ function ResultsView({
           </div>
         )}
         <div className="glass-card rounded-2xl p-4 shadow-lg">
-          <h3 className="font-bold text-white text-sm mb-2">Summary</h3>
-          <p className="text-muted text-xs">{analysis.summary}</p>
+          <h3 className="font-light tracking-wide uppercase text-white text-sm mb-2">Summary</h3>
+          <p className="text-muted text-xs font-light">{analysis.summary}</p>
 
           {analysis.strengths.length > 0 && (
             <div className="mt-2">
-              <h4 className="text-xs font-medium text-accent mb-1">What You're Doing Right 🔥</h4>
+              <h4 className="text-xs font-light tracking-wide uppercase text-accent mb-1">What You're Doing Right 🔥</h4>
               <ul className="space-y-0.5">
                 {analysis.strengths.map((strength, i) => (
-                  <li key={i} className="text-xs text-muted flex items-start gap-2">
+                  <li key={i} className="text-xs text-muted flex items-start gap-2 font-light">
                     <span className="text-accent mt-0.5">✓</span>
                     {strength}
                   </li>
@@ -605,20 +605,20 @@ function ResultsView({
         }}
         style={{ willChange: "transform, opacity" }}
       >
-        <h3 className="text-base font-bold mb-3 text-white">Areas to Improve</h3>
-        <p className="text-xs text-muted mb-4">These are the money shots—fix these and you'll be striping it down the fairway in no time. 🎯</p>
+        <h3 className="text-base font-light tracking-wide uppercase mb-3 text-white">Areas to Improve</h3>
+        <p className="text-xs text-muted mb-4 font-light">These are the money shots—fix these and you'll be striping it down the fairway in no time. 🎯</p>
         <div className="space-y-4">
           {analysis.improvements.map((item, i) => (
             <div key={i} className="glass-card rounded-xl p-4 shadow-lg hover:shadow-xl hover:border-accent/40">
               <div className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-bold border border-accent/50 shrink-0">
+                <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-light border border-accent/50 shrink-0">
                   {i + 1}
                 </span>
                 <div className="flex-1">
-                  <h4 className="font-semibold mb-1 text-white text-sm">{item.area}</h4>
-                  <p className="text-xs text-muted mb-2">{item.issue}</p>
+                  <h4 className="font-light tracking-wide uppercase mb-1 text-white text-sm">{item.area}</h4>
+                  <p className="text-xs text-muted mb-2 font-light">{item.issue}</p>
                   <div className="bg-accent/15 border border-accent/30 rounded-lg p-2">
-                    <p className="text-xs text-white"><span className="font-semibold text-[#E1E4E8]">Fix:</span> {item.fix}</p>
+                    <p className="text-xs text-white font-light"><span className="font-light tracking-wide uppercase text-[#E1E4E8]">Fix:</span> {item.fix}</p>
                   </div>
                 </div>
               </div>
@@ -638,28 +638,28 @@ function ResultsView({
         }}
         style={{ willChange: "transform, opacity" }}
       >
-        <h3 className="text-base font-bold mb-3 text-white">Training Plan</h3>
-        <p className="text-xs text-muted mb-4">Your personalized roadmap to crushing it on the course. Stick with this and watch your handicap drop. 💪</p>
+        <h3 className="text-base font-light tracking-wide uppercase mb-3 text-white">Training Plan</h3>
+        <p className="text-xs text-muted mb-4 font-light">Your personalized roadmap to crushing it on the course. Stick with this and watch your handicap drop. 💪</p>
         <div className="space-y-4">
           {analysis.trainingPlan.map((week) => (
             <div key={week.weekNumber} className="glass-card rounded-xl p-3 shadow-lg">
               <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-1 bg-accent/30 text-[#E1E4E8] text-xs font-semibold rounded-full border border-accent/50">
+                <span className="px-2 py-1 bg-accent/30 text-[#E1E4E8] text-xs font-light tracking-wide uppercase rounded-full border border-accent/50">
                   W{week.weekNumber}
                 </span>
-                <span className="text-xs text-muted font-medium">{week.focus}</span>
+                <span className="text-xs text-muted font-light">{week.focus}</span>
               </div>
               <div className="space-y-2">
                 {week.drills.map((drill, i) => (
                   <div key={i} className="border-l-2 border-accent/40 pl-2">
-                    <h5 className="font-semibold text-white text-xs">{drill.name}</h5>
-                    <p className="text-xs text-muted mb-1">{drill.description}</p>
-                    <p className="text-xs text-accent/80 font-medium mb-2">{drill.reps}</p>
+                    <h5 className="font-light tracking-wide uppercase text-white text-xs">{drill.name}</h5>
+                    <p className="text-xs text-muted mb-1 font-light">{drill.description}</p>
+                    <p className="text-xs text-accent/80 font-light mb-2">{drill.reps}</p>
                     <a
                       href={`https://www.youtube.com/results?search_query=golf+${encodeURIComponent(drill.name)}+drill+tutorial`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 transition-colors font-medium"
+                      className="inline-flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 transition-colors font-light"
                     >
                       <PlayIcon />
                       <span>Watch tutorial videos</span>
@@ -684,10 +684,10 @@ function ResultsView({
         }}
         style={{ willChange: "transform, opacity" }}
       >
-        <p className="text-muted mb-3 text-xs">Got more swings to analyze? Let's keep the momentum going!</p>
+        <p className="text-muted mb-3 text-xs font-light">Got more swings to analyze? Let's keep the momentum going!</p>
         <button
           onClick={onReset}
-          className="px-6 py-2 bg-accent text-black font-semibold rounded-full hover:bg-accent-dim accent-button shadow-lg hover:shadow-xl transition-all text-sm"
+          className="px-6 py-2 bg-accent text-black font-light tracking-wide uppercase rounded-full hover:bg-accent-dim accent-button shadow-lg hover:shadow-xl transition-all text-sm"
         >
           Upload Another Video
         </button>
