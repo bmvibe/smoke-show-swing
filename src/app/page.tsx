@@ -250,7 +250,7 @@ export default function Home() {
                     {
                       icon: "camera",
                       title: "Camera setup",
-                      description: "Set your phone at about waist height. Keep it steady (tripod's ideal but not essential). Stand about 10 feet back, filming from behind."
+                      description: "Phone at waist height, kept steady. Film from behind, about 10 feet back."
                     },
                     {
                       icon: "sun",
