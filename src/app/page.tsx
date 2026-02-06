@@ -470,7 +470,7 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
         )}
 
         <motion.div
-          className="text-left pl-8"
+          className="text-left px-16"
           exit={{ opacity: 0 }}
           transition={{ duration: 1.0 }}
         >
