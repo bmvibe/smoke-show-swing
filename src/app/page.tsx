@@ -189,7 +189,7 @@ export default function Home() {
     <main className="min-h-screen">
       {/* Floating Glass Logo */}
       <div
-        className="fixed top-6 left-6 z-50 px-6 py-3 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-1000 ease-in-out"
+        className="fixed top-6 left-6 z-50 px-6 py-3 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-[1500ms] ease-in-out"
         style={{
           transform: logoVisible ? 'translateY(0)' : 'translateY(-120px)',
           opacity: logoVisible ? 1 : 0
@@ -203,7 +203,7 @@ export default function Home() {
           <>
             {/* Hero */}
             <section className="text-center mb-16 pt-16 pb-8">
-              <h2 className="text-[3.6rem] mb-8 text-white leading-tight font-light tracking-wide uppercase">
+              <h2 className="text-[3.6rem] mb-8 text-white leading-tight font-[200] tracking-wide uppercase">
                 Fix your golf swing in a minute
               </h2>
               <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed font-light">
