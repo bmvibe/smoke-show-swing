@@ -193,7 +193,7 @@ export default function Home() {
         style={{
           transform: logoVisible ? 'translateY(0)' : 'translateY(-120px)',
           opacity: logoVisible ? 1 : 0,
-          transition: 'transform 1500ms ease-in-out, opacity 1500ms ease-in-out'
+          transition: 'transform 500ms ease-in-out, opacity 500ms ease-in-out'
         }}
       >
         <span className="text-white text-lg font-light tracking-wide">striped.</span>
@@ -580,10 +580,10 @@ function ResultsView({
       {/* Header */}
       <motion.div
         className="flex items-center justify-between gap-4"
-        initial={{ opacity: 0, y: 200 }}
+        initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
-          duration: 0.6,
+          duration: 0.8,
           ease: [0.25, 0.1, 0.25, 1],
           delay: 2.0
         }}
@@ -601,10 +601,10 @@ function ResultsView({
       {/* Video + Summary */}
       <motion.div
         className="grid gap-4 md:grid-cols-2"
-        initial={{ opacity: 0, y: 200 }}
+        initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
-          duration: 0.6,
+          duration: 0.8,
           ease: [0.25, 0.1, 0.25, 1],
           delay: 2.0
         }}
@@ -642,12 +642,12 @@ function ResultsView({
 
       {/* Improvements */}
       <motion.section
-        initial={{ opacity: 0, y: 150 }}
+        initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
-          duration: 0.6,
+          duration: 0.8,
           ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.2
+          delay: 2.0
         }}
         style={{ willChange: "transform, opacity" }}
       >
@@ -675,12 +675,12 @@ function ResultsView({
 
       {/* Training Plan */}
       <motion.section
-        initial={{ opacity: 0, y: 150 }}
+        initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
-          duration: 0.6,
+          duration: 0.8,
           ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.4
+          delay: 2.0
         }}
         style={{ willChange: "transform, opacity" }}
       >
@@ -724,9 +724,9 @@ function ResultsView({
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
-          duration: 0.6,
+          duration: 0.8,
           ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.6
+          delay: 2.0
         }}
         style={{ willChange: "transform, opacity" }}
       >
