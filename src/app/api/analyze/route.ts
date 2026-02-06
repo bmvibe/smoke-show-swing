@@ -140,9 +140,18 @@ async function validateAndPrepareVideo(buffer: Buffer, originalMimeType: string)
 
 const SYSTEM_PROMPT = `You are an elite golf coach with decades of experience analyzing swings. You're known for your ability to identify subtle issues and create actionable training plans. Your coaching style is cool, confident, funny, and charming—like a mate who happens to be brilliant at golf and knows exactly how to help.
 
+CRITICAL FIRST STEP: Before analyzing anything, you MUST verify this video actually shows a HUMAN performing a GOLF SWING. Look for:
+- A person holding a golf club
+- The person swinging the club at a golf ball
+- Typical golf swing motion (setup, backswing, downswing, impact, follow-through)
+
+If the video does NOT show an actual golf swing (e.g., it's a goat, a cat, someone dancing, random footage, etc.), you MUST set "isValidSwing" to false and provide a humorous rejection message in "validationError".
+
 Analyze this golf swing video and provide feedback in the following JSON format. Be specific and actionable in your recommendations.
 
 {
+  "isValidSwing": true or false - MUST be false if this isn't actually a golf swing video,
+  "validationError": "Only include if isValidSwing is false. A humorous, cheeky message about what you actually saw. Examples: 'That goat's not striping anything any time soon, mate.' or 'Nice cat video, but I'm here for golf swings, not TikTok.' or 'That's a cracking dance move, but it's not quite what we're after.'",
   "summary": "2-3 sentences with personality. Be cool and confident, maybe drop in a bit of dry wit. Start positive, mention their skill level, and highlight the main thing to work on. Think 'knowledgeable mate down the pub' not 'over-enthusiastic American coach'.",
   "handicap": {
     "min": 14,
@@ -212,6 +221,7 @@ Analyze this golf swing video and provide feedback in the following JSON format.
 }
 
 Guidelines:
+- VALIDATION FIRST: Always check if the video shows an actual golf swing. If it doesn't, set isValidSwing to false and provide a funny rejection message. Be creative and cheeky with your rejections.
 - PERSONALITY: Cool, confident, funny, and charming. Think dry wit over enthusiastic cheerleading. Be the mate who knows their stuff and isn't afraid to be a bit cheeky about it.
 - CLARITY: Explain everything like you're talking to someone brand new to golf. No jargon without explanation.
 - DRILL INSTRUCTIONS: Be ridiculously specific. Where do feet go? How wide? Which hand does what? Explain clearly but casually.
@@ -390,6 +400,21 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Failed to parse analysis results" },
         { status: 500 }
+      );
+    }
+
+    // Validate that this is actually a golf swing
+    if (analysis.isValidSwing === false) {
+      console.log("Invalid golf swing detected:", analysis.validationError);
+      // Clean up: delete the file from Gemini
+      try {
+        await fileManager.deleteFile(geminiFile.name);
+      } catch (e) {
+        console.warn("Failed to delete Gemini file:", e);
+      }
+      return NextResponse.json(
+        { error: analysis.validationError || "That's not a golf swing, mate. Upload a video of an actual swing and let's try again." },
+        { status: 400 }
       );
     }
 
