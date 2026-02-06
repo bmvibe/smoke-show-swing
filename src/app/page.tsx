@@ -9,6 +9,11 @@ type AnalysisState = "idle" | "uploading" | "analyzing" | "complete" | "error";
 
 interface SwingAnalysis {
   summary: string;
+  handicap: {
+    min: number;
+    max: number;
+    commentary: string;
+  };
   strengths: string[];
   improvements: {
     area: string;
@@ -640,6 +645,20 @@ function ResultsView({
         </div>
       </motion.div>
 
+      {/* Handicap Prediction */}
+      <motion.div
+        initial={{ opacity: 0, y: 100 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: 0.8,
+          ease: [0.25, 0.1, 0.25, 1],
+          delay: 2.0
+        }}
+        style={{ willChange: "transform, opacity" }}
+      >
+        <HandicapGauge handicap={analysis.handicap} />
+      </motion.div>
+
       {/* Improvements */}
       <motion.section
         initial={{ opacity: 0, y: 100 }}
@@ -739,6 +758,83 @@ function ResultsView({
         </button>
       </motion.div>
     </motion.div>
+  );
+}
+
+function HandicapGauge({ handicap }: { handicap: { min: number; max: number; commentary: string } }) {
+  const midpoint = (handicap.min + handicap.max) / 2;
+  const maxHandicap = 36;
+
+  // Calculate rotation for the needle (semicircle from -90deg to 90deg)
+  const rotation = -90 + (midpoint / maxHandicap) * 180;
+
+  return (
+    <div className="glass-card rounded-2xl p-6 shadow-lg">
+      <h3 className="font-light tracking-wide uppercase text-white text-sm mb-4 text-center">Handicap Estimate</h3>
+
+      {/* Gauge */}
+      <div className="relative w-full max-w-xs mx-auto mb-4">
+        {/* SVG Semicircular Gauge */}
+        <svg viewBox="0 0 200 120" className="w-full">
+          {/* Background arc */}
+          <path
+            d="M 20 100 A 80 80 0 0 1 180 100"
+            fill="none"
+            stroke="rgba(255, 255, 255, 0.1)"
+            strokeWidth="12"
+            strokeLinecap="round"
+          />
+
+          {/* Accent arc highlighting the range */}
+          <path
+            d={`M ${20 + ((handicap.min / maxHandicap) * 160)} ${100 - Math.sqrt(80 * 80 - Math.pow(((handicap.min / maxHandicap) * 160) - 80, 2))}
+                A 80 80 0 0 1 ${20 + ((handicap.max / maxHandicap) * 160)} ${100 - Math.sqrt(80 * 80 - Math.pow(((handicap.max / maxHandicap) * 160) - 80, 2))}`}
+            fill="none"
+            stroke="rgba(255, 255, 255, 0.4)"
+            strokeWidth="12"
+            strokeLinecap="round"
+          />
+
+          {/* Center point */}
+          <circle cx="100" cy="100" r="3" fill="white" opacity="0.6" />
+
+          {/* Needle */}
+          <line
+            x1="100"
+            y1="100"
+            x2="100"
+            y2="30"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            style={{ transform: `rotate(${rotation}deg)`, transformOrigin: '100px 100px' }}
+          />
+
+          {/* Scale markers */}
+          <text x="20" y="115" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">0</text>
+          <text x="60" y="45" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">10</text>
+          <text x="100" y="25" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">18</text>
+          <text x="140" y="45" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">28</text>
+          <text x="180" y="115" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">36</text>
+
+          {/* Labels */}
+          <text x="20" y="110" fill="rgba(255, 255, 255, 0.4)" fontSize="8" textAnchor="start">Scratch</text>
+          <text x="180" y="110" fill="rgba(255, 255, 255, 0.4)" fontSize="8" textAnchor="end">Beginner</text>
+        </svg>
+
+        {/* Range display */}
+        <div className="text-center mt-2">
+          <div className="text-3xl font-light text-white">
+            {handicap.min}–{handicap.max}
+          </div>
+        </div>
+      </div>
+
+      {/* Commentary */}
+      <p className="text-xs text-muted font-light text-center leading-relaxed">
+        {handicap.commentary}
+      </p>
+    </div>
   );
 }
 
