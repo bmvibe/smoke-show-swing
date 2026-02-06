@@ -201,7 +201,7 @@ export default function Home() {
           transition: 'transform 500ms ease-in-out, opacity 500ms ease-in-out'
         }}
       >
-        <span className="text-white text-lg font-semibold tracking-wide">striped.</span>
+        <span className="text-white text-lg font-light tracking-wide">striped.</span>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-4">
@@ -527,24 +527,22 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
 
         <motion.div
           className="text-left px-16"
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1.0 }}
+          exit={{ opacity: 0, y: -100 }}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <h2 className="text-2xl font-light tracking-wide uppercase text-white mb-2">{messages[state]}</h2>
           <p className="text-muted text-sm mb-4 font-light">{subMessages[state]}</p>
 
-          {state === "analyzing" && (
-            <div className="mt-4 space-y-2 max-w-xs">
-              {steps.map((text, index) => (
-                <LoadingStep
-                  key={text}
-                  text={text}
-                  done={index < currentStep}
-                  active={index === currentStep}
-                />
-              ))}
-            </div>
-          )}
+          <div className="mt-4 space-y-2 max-w-xs">
+            {steps.map((text, index) => (
+              <LoadingStep
+                key={text}
+                text={text}
+                done={state === "analyzing" && index < currentStep}
+                active={state === "analyzing" && index === currentStep}
+              />
+            ))}
+          </div>
         </motion.div>
       </div>
     </motion.div>
@@ -590,7 +588,7 @@ function ResultsView({
         transition={{
           duration: 0.8,
           ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.0
+          delay: 2.8
         }}
         style={{ willChange: "transform, opacity" }}
       >
@@ -611,7 +609,7 @@ function ResultsView({
         transition={{
           duration: 0.8,
           ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.0
+          delay: 2.8
         }}
         style={{ willChange: "transform, opacity" }}
       >
@@ -652,7 +650,7 @@ function ResultsView({
         transition={{
           duration: 0.8,
           ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.0
+          delay: 2.8
         }}
         style={{ willChange: "transform, opacity" }}
       >
@@ -666,7 +664,7 @@ function ResultsView({
         transition={{
           duration: 0.8,
           ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.0
+          delay: 2.8
         }}
         style={{ willChange: "transform, opacity" }}
       >
@@ -699,7 +697,7 @@ function ResultsView({
         transition={{
           duration: 0.8,
           ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.0
+          delay: 2.8
         }}
         style={{ willChange: "transform, opacity" }}
       >
@@ -724,7 +722,7 @@ function ResultsView({
                       href={`https://www.youtube.com/results?search_query=golf+${encodeURIComponent(drill.name)}+drill+tutorial`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3 py-1.5 mt-1 text-xs text-white bg-red-600 hover:bg-red-500 rounded-lg transition-colors font-light tracking-wide uppercase"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 mt-1 text-xs text-white bg-[#2C3E50] hover:bg-[#34495E] rounded-lg transition-colors font-light tracking-wide uppercase"
                     >
                       <PlayIcon />
                       <span>Watch Tutorials</span>
@@ -745,7 +743,7 @@ function ResultsView({
         transition={{
           duration: 0.8,
           ease: [0.25, 0.1, 0.25, 1],
-          delay: 2.0
+          delay: 2.8
         }}
         style={{ willChange: "transform, opacity" }}
       >
@@ -769,11 +767,11 @@ function HandicapGauge({ handicap }: { handicap: { min: number; max: number; com
   // Calculate final rotation for the needle (semicircle from -90deg to 90deg)
   const finalRotation = -90 + (midpoint / maxHandicap) * 180;
 
-  // Animate needle on mount
+  // Animate needle after content settles (delay to match ResultsView animation + duration)
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimatedRotation(finalRotation);
-    }, 100);
+    }, 3600); // 2.8s delay + 0.8s duration = 3.6s
     return () => clearTimeout(timer);
   }, [finalRotation]);
 
