@@ -691,7 +691,7 @@ function ResultsView({
             <div key={week.weekNumber} className="glass-card rounded-xl p-3 shadow-lg">
               <div className="flex items-center gap-2 mb-2">
                 <span className="px-2 py-1 bg-accent/30 text-[#E1E4E8] text-xs font-light tracking-wide uppercase rounded-full border border-accent/50">
-                  W{week.weekNumber}
+                  Week {week.weekNumber}
                 </span>
                 <span className="text-xs text-muted font-light">{week.focus}</span>
               </div>
