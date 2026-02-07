@@ -29,6 +29,11 @@ interface SwingAnalysis {
       description: string;
       reps: string;
     }[];
+    videos: {
+      title: string;
+      url: string;
+      description: string;
+    }[];
   }[];
   resources: {
     title: string;
@@ -685,19 +690,29 @@ function ResultsView({
                   <div key={i} className="border-l-2 border-accent/40 pl-2">
                     <h5 className="font-light tracking-wide uppercase text-white text-xs">{drill.name}</h5>
                     <p className="text-xs text-muted mb-1 font-light">{drill.description}</p>
-                    <p className="text-xs text-accent/80 font-light mb-2">{drill.reps}</p>
-                    <a
-                      href={`https://www.youtube.com/results?search_query=golf+${encodeURIComponent(drill.name)}+drill+tutorial`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3 py-1.5 mt-1 text-xs text-white bg-[#2C3E50] hover:bg-[#34495E] rounded-lg transition-colors font-light tracking-wide uppercase"
-                    >
-                      <PlayIcon />
-                      <span>Watch Tutorials</span>
-                    </a>
+                    <p className="text-xs text-accent/80 font-light">{drill.reps}</p>
                   </div>
                 ))}
               </div>
+              {week.videos && week.videos.length > 0 && (
+                <div className="mt-3 pt-2 border-t border-white/10">
+                  <p className="text-[10px] text-muted/50 uppercase tracking-wide font-light mb-1.5">Watch</p>
+                  <div className="space-y-1.5">
+                    {week.videos.map((video, i) => (
+                      <a
+                        key={i}
+                        href={video.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-start gap-2 text-xs text-white hover:text-accent font-light"
+                      >
+                        <span className="text-red-400 mt-0.5 shrink-0"><PlayIcon /></span>
+                        <span>{video.title}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -718,89 +733,60 @@ function ResultsView({
 }
 
 function HandicapGauge({ handicap, proComparison }: { handicap: { min: number; max: number; commentary: string }; proComparison?: string }) {
-  const [animatedRotation, setAnimatedRotation] = useState(-90);
-  const midpoint = (handicap.min + handicap.max) / 2;
   const maxHandicap = 36;
+  const minPct = (handicap.min / maxHandicap) * 100;
+  const rangePct = ((handicap.max - handicap.min) / maxHandicap) * 100;
+  const midPct = ((handicap.min + handicap.max) / 2 / maxHandicap) * 100;
 
-  // Calculate final rotation for the needle (semicircle from -90deg to 90deg)
-  const finalRotation = -90 + (midpoint / maxHandicap) * 180;
-
-  // Animate needle after content settles
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setAnimatedRotation(finalRotation);
-    }, 800); // Match ResultsView animation duration
-    return () => clearTimeout(timer);
-  }, [finalRotation]);
+  const ticks = [0, 10, 18, 28, 36];
 
   return (
     <div className="glass-card rounded-2xl p-6 shadow-lg">
-      <h3 className="font-light tracking-wide uppercase text-white text-sm mb-4 text-center">Handicap Estimate</h3>
+      <h3 className="font-light tracking-wide uppercase text-white text-sm mb-1 text-center">Handicap Estimate</h3>
 
-      {/* Gauge */}
-      <div className="relative w-full max-w-xs mx-auto mb-4">
-        {/* SVG Semicircular Gauge */}
-        <svg viewBox="0 0 200 130" className="w-full">
-          {/* Background arc */}
-          <path
-            d="M 20 100 A 80 80 0 0 1 180 100"
-            fill="none"
-            stroke="rgba(255, 255, 255, 0.1)"
-            strokeWidth="12"
-            strokeLinecap="round"
+      <div className="text-center mb-5">
+        <span className="text-3xl font-light text-white">{handicap.min}–{handicap.max}</span>
+      </div>
+
+      {/* Linear scale */}
+      <div className="relative mx-4 mb-2">
+        {/* Track */}
+        <div className="h-1.5 rounded-full bg-white/10 relative">
+          {/* Range highlight */}
+          <div
+            className="absolute h-full rounded-full bg-accent"
+            style={{ left: `${minPct}%`, width: `${rangePct}%` }}
           />
-
-          {/* Accent arc highlighting the range */}
-          <path
-            d={`M ${20 + ((handicap.min / maxHandicap) * 160)} ${100 - Math.sqrt(80 * 80 - Math.pow(((handicap.min / maxHandicap) * 160) - 80, 2))}
-                A 80 80 0 0 1 ${20 + ((handicap.max / maxHandicap) * 160)} ${100 - Math.sqrt(80 * 80 - Math.pow(((handicap.max / maxHandicap) * 160) - 80, 2))}`}
-            fill="none"
-            stroke="rgba(255, 255, 255, 0.4)"
-            strokeWidth="12"
-            strokeLinecap="round"
+          {/* Midpoint dot */}
+          <div
+            className="absolute top-1/2 w-3 h-3 rounded-full bg-white border-2 border-accent shadow-md"
+            style={{ left: `${midPct}%`, transform: 'translate(-50%, -50%)' }}
           />
+        </div>
 
-          {/* Center point */}
-          <circle cx="100" cy="100" r="3" fill="white" opacity="0.6" />
+        {/* Ticks and numbers */}
+        <div className="relative h-7 mt-1.5">
+          {ticks.map((val) => (
+            <div
+              key={val}
+              className="absolute flex flex-col items-center"
+              style={{ left: `${(val / maxHandicap) * 100}%`, transform: 'translateX(-50%)' }}
+            >
+              <div className="w-px h-1.5 bg-white/20" />
+              <span className="text-[10px] text-muted/70 mt-0.5 font-light">{val === 36 ? '36+' : val}</span>
+            </div>
+          ))}
+        </div>
 
-          {/* Needle with animation */}
-          <line
-            x1="100"
-            y1="100"
-            x2="100"
-            y2="30"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            style={{
-              transform: `rotate(${animatedRotation}deg)`,
-              transformOrigin: '100px 100px',
-              transition: 'transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
-            }}
-          />
-
-          {/* Scale markers */}
-          <text x="20" y="115" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">0</text>
-          <text x="60" y="53" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">10</text>
-          <text x="100" y="38" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">18</text>
-          <text x="140" y="53" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">28</text>
-          <text x="180" y="115" fill="rgba(255, 255, 255, 0.5)" fontSize="10" textAnchor="middle">36+</text>
-
-          {/* Labels below numbers */}
-          <text x="20" y="125" fill="rgba(255, 255, 255, 0.4)" fontSize="8" textAnchor="middle">Scratch</text>
-          <text x="180" y="125" fill="rgba(255, 255, 255, 0.4)" fontSize="8" textAnchor="middle">Beginner</text>
-        </svg>
-
-        {/* Range display */}
-        <div className="text-center mt-2">
-          <div className="text-3xl font-light text-white">
-            {handicap.min}–{handicap.max}
-          </div>
+        {/* End labels */}
+        <div className="flex justify-between -mt-0.5">
+          <span className="text-[10px] text-muted/50 font-light">Scratch</span>
+          <span className="text-[10px] text-muted/50 font-light">Beginner</span>
         </div>
       </div>
 
       {/* Commentary */}
-      <p className="text-xs text-muted font-light text-center leading-relaxed">
+      <p className="text-xs text-muted font-light text-center leading-relaxed mt-4">
         {handicap.commentary}
       </p>
 

@@ -186,6 +186,23 @@ If it IS a valid golf swing, return the full analysis in this JSON format:
           "name": "Simple, clear drill name that explains what it does",
           "description": "Crystal-clear instructions that a complete beginner could follow. Use simple, everyday language. Explain EXACTLY what to do with their body, club, and ball. No golf jargon unless you immediately explain it in parentheses. Be cool and confident in your explanations.",
           "reps": "e.g., 3 sets of 10 swings, or 5 minutes daily"
+        },
+        {
+          "name": "Second drill name",
+          "description": "Another clear drill with beginner-friendly instructions.",
+          "reps": "e.g., 3 sets of 10 swings"
+        }
+      ],
+      "videos": [
+        {
+          "title": "YouTube video title relevant to this week's focus",
+          "url": "https://youtube.com/watch?v=...",
+          "description": "Why this video helps with this week's drills"
+        },
+        {
+          "title": "Second YouTube video title",
+          "url": "https://youtube.com/watch?v=...",
+          "description": "Why this video helps"
         }
       ]
     },
@@ -193,33 +210,36 @@ If it IS a valid golf swing, return the full analysis in this JSON format:
       "weekNumber": 2,
       "focus": "Build on week 1",
       "drills": [
-        {
-          "name": "Drill name",
-          "description": "Clear instructions anyone can follow. Explain where to put their feet, hands, club, like you're chatting to a mate who's picking up a club for the first time.",
-          "reps": "e.g., 3 sets of 10 swings"
-        }
+        { "name": "Drill name", "description": "Clear instructions anyone can follow.", "reps": "e.g., 3 sets of 10 swings" },
+        { "name": "Second drill name", "description": "Another clear drill.", "reps": "e.g., 3 sets of 10 swings" }
+      ],
+      "videos": [
+        { "title": "Video title", "url": "https://youtube.com/watch?v=...", "description": "Why this helps" },
+        { "title": "Video title", "url": "https://youtube.com/watch?v=...", "description": "Why this helps" }
       ]
     },
     {
       "weekNumber": 3,
       "focus": "Continue building",
       "drills": [
-        {
-          "name": "Drill name",
-          "description": "Ultra-clear, beginner-friendly instructions. No assumptions about golf knowledge. Keep it casual.",
-          "reps": "e.g., 3 sets of 10 swings"
-        }
+        { "name": "Drill name", "description": "Ultra-clear, beginner-friendly instructions.", "reps": "e.g., 3 sets of 10 swings" },
+        { "name": "Second drill name", "description": "Another clear drill.", "reps": "e.g., 3 sets of 10 swings" }
+      ],
+      "videos": [
+        { "title": "Video title", "url": "https://youtube.com/watch?v=...", "description": "Why this helps" },
+        { "title": "Video title", "url": "https://youtube.com/watch?v=...", "description": "Why this helps" }
       ]
     },
     {
       "weekNumber": 4,
       "focus": "Integration and practice",
       "drills": [
-        {
-          "name": "Drill name",
-          "description": "Simple, actionable steps that anyone can execute. Confident but not cocky.",
-          "reps": "e.g., 3 sets of 10 swings"
-        }
+        { "name": "Drill name", "description": "Simple, actionable steps.", "reps": "e.g., 3 sets of 10 swings" },
+        { "name": "Second drill name", "description": "Another clear drill.", "reps": "e.g., 3 sets of 10 swings" }
+      ],
+      "videos": [
+        { "title": "Video title", "url": "https://youtube.com/watch?v=...", "description": "Why this helps" },
+        { "title": "Video title", "url": "https://youtube.com/watch?v=...", "description": "Why this helps" }
       ]
     }
   ],
@@ -235,7 +255,8 @@ Guidelines:
 - HANDICAP PREDICTION: Provide a realistic range (usually 3-5 point spread) based on swing fundamentals. Be humble and use ranges - never definitive single numbers. Keep commentary casual and encouraging. Examples: "14-18" for intermediate, "8-12" for decent player, "20-25" for beginner.
 - Identify 2-4 key improvements, prioritized by impact
 - Each week's training plan should build on the previous week
-- Include 2-3 drills per week that can be done at a driving range
+- Include exactly 2 drills per week that can be done at a driving range
+- Include exactly 2 real YouTube tutorial videos per week from well-known golf instructors (Rick Shiels, Me and My Golf, Athletic Motion Golf, etc.) that are relevant to that week's focus area
 - IMPORTANT: Always return an empty array for "resources" - we don't use this section
 
 IMPORTANT: Return ONLY valid JSON, no markdown formatting or code blocks.`;
