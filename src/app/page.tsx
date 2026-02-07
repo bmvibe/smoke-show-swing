@@ -92,10 +92,16 @@ export default function Home() {
       console.log("===== Starting video processing =====");
       console.log("Original file:", { name: file.name, size: file.size, type: file.type });
 
-      const { blob: processedBlob, filename: processedFilename } = await processVideoFile(file, (progress) => {
-        console.log(`Video processing progress: ${progress}%`);
-      });
+      const processedVideo = await Promise.race([
+        processVideoFile(file, (progress) => {
+          console.log(`Video processing progress: ${progress}%`);
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Video processing timed out after 60 seconds. Try a shorter video.")), 60000)
+        )
+      ]) as { blob: Blob; filename: string };
 
+      const { blob: processedBlob, filename: processedFilename } = processedVideo;
       console.log(`✓ Video processed: ${processedFilename} (${processedBlob.size} bytes, ${(processedBlob.size / (1024 * 1024)).toFixed(2)}MB)`);
 
       // Create a File object from the processed blob
@@ -103,13 +109,19 @@ export default function Home() {
         type: "video/mp4",
       });
 
+      console.log("===== Starting upload to Vercel Blob =====");
       // Step 1: Upload processed video to Vercel Blob (bypasses serverless function limit)
-      const blob = await upload(processedFile.name, processedFile, {
-        access: "public",
-        handleUploadUrl: "/api/upload",
-      });
+      const blob = await Promise.race([
+        upload(processedFile.name, processedFile, {
+          access: "public",
+          handleUploadUrl: "/api/upload",
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Upload timed out after 60 seconds. Check your connection.")), 60000)
+        )
+      ]) as { url: string };
 
-      console.log("Upload complete, blob URL:", blob.url);
+      console.log("✓ Upload complete, blob URL:", blob.url);
 
       // Step 2: Wait for blob to be accessible (CDN propagation)
       setState("analyzing");
@@ -137,15 +149,23 @@ export default function Home() {
         throw new Error("Video upload succeeded but file is not accessible. Please try again.");
       }
 
+      console.log("===== Starting AI analysis =====");
       // Step 3: Send blob URL to analyze endpoint
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          videoUrl: blob.url,
-          mimeType: file.type,
+      const response = await Promise.race([
+        fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            videoUrl: blob.url,
+            mimeType: file.type,
+          }),
         }),
-      });
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("AI analysis timed out. The video might be too complex or too long.")), 90000)
+        )
+      ]) as Response;
+
+      console.log("✓ AI analysis response received:", response.status);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -153,6 +173,7 @@ export default function Home() {
       }
 
       const result = await response.json();
+      console.log("✓ Analysis complete");
       setAnalysis(result);
       setState("complete");
     } catch (err) {
