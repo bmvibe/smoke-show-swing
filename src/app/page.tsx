@@ -29,11 +29,6 @@ interface SwingAnalysis {
       description: string;
       reps: string;
     }[];
-    videos: {
-      title: string;
-      url: string;
-      description: string;
-    }[];
   }[];
   resources: {
     title: string;
@@ -509,15 +504,11 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 1.0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
     >
       <div className="max-w-md mx-auto">
         {videoPreview && (
-          <motion.div
-            className="mb-4 rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card"
-            exit={{ height: "120px" }}
-            transition={{ duration: 1.0, ease: "easeInOut", delay: 1.0 }}
-          >
+          <div className="mb-4 rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
             <video
               src={videoPreview}
               className="w-full object-cover"
@@ -527,14 +518,10 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
               muted
               playsInline
             />
-          </motion.div>
+          </div>
         )}
 
-        <motion.div
-          className="text-left px-16"
-          exit={{ opacity: 0, y: -100 }}
-          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-        >
+        <div className="text-left px-16">
           <h2 className="text-2xl font-light tracking-wide uppercase text-white mb-2">{messages[state]}</h2>
           <p className="text-muted text-sm mb-4 font-light">{subMessages[state]}</p>
 
@@ -548,7 +535,7 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
               />
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </motion.div>
   );
@@ -579,19 +566,21 @@ function ResultsView({
   onReset: () => void;
 }) {
   return (
-    <div className="space-y-6">
-      {/* First wave: Header + Video + Summary */}
+    <motion.div
+      className="space-y-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.1 }}
+    >
+      {/* Wave 1: Header + Video + Summary + Handicap */}
       <motion.div
-        initial={{ opacity: 0, y: 600 }}
+        className="space-y-6"
+        initial={{ opacity: 0, y: 80 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 0.8,
-          ease: [0.25, 0.1, 0.25, 1]
-        }}
-        style={{ willChange: "transform, opacity" }}
+        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="flex items-center justify-between gap-4">
           <h2 className="text-2xl font-light tracking-wide uppercase text-white">Your Analysis</h2>
           <button
             onClick={onReset}
@@ -633,20 +622,18 @@ function ResultsView({
             )}
           </div>
         </div>
-      </motion.div>
 
-      {/* Second wave: Handicap Prediction */}
-      <motion.div
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 0.6,
-          delay: 0.5,
-          ease: [0.25, 0.1, 0.25, 1]
-        }}
-      >
+        {/* Handicap Prediction */}
         <HandicapGauge handicap={analysis.handicap} proComparison={analysis.proComparison} />
       </motion.div>
+
+      {/* Wave 2: Improvements + Training + CTA */}
+      <motion.div
+        className="space-y-6"
+        initial={{ opacity: 0, y: 60 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+      >
 
       {/* Improvements */}
       <section>
@@ -690,29 +677,19 @@ function ResultsView({
                   <div key={i} className="border-l-2 border-accent/40 pl-2">
                     <h5 className="font-light tracking-wide uppercase text-white text-xs">{drill.name}</h5>
                     <p className="text-xs text-muted mb-1 font-light">{drill.description}</p>
-                    <p className="text-xs text-accent/80 font-light">{drill.reps}</p>
+                    <p className="text-xs text-accent/80 font-light mb-1">{drill.reps}</p>
+                    <a
+                      href={`https://www.youtube.com/results?search_query=golf+${encodeURIComponent(drill.name)}+drill`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs text-white/60 hover:text-white font-light"
+                    >
+                      <PlayIcon />
+                      <span>Watch tutorials</span>
+                    </a>
                   </div>
                 ))}
               </div>
-              {week.videos && week.videos.length > 0 && (
-                <div className="mt-3 pt-2 border-t border-white/10">
-                  <p className="text-[10px] text-muted/50 uppercase tracking-wide font-light mb-1.5">Watch</p>
-                  <div className="space-y-1.5">
-                    {week.videos.map((video, i) => (
-                      <a
-                        key={i}
-                        href={video.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-start gap-2 text-xs text-white hover:text-accent font-light"
-                      >
-                        <span className="text-red-400 mt-0.5 shrink-0"><PlayIcon /></span>
-                        <span>{video.title}</span>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           ))}
         </div>
@@ -728,7 +705,9 @@ function ResultsView({
           Upload Another Video
         </button>
       </div>
-    </div>
+
+      </motion.div>
+    </motion.div>
   );
 }
 

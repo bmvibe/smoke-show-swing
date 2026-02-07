@@ -192,18 +192,6 @@ If it IS a valid golf swing, return the full analysis in this JSON format:
           "description": "Another clear drill with beginner-friendly instructions.",
           "reps": "e.g., 3 sets of 10 swings"
         }
-      ],
-      "videos": [
-        {
-          "title": "YouTube video title relevant to this week's focus",
-          "url": "https://youtube.com/watch?v=...",
-          "description": "Why this video helps with this week's drills"
-        },
-        {
-          "title": "Second YouTube video title",
-          "url": "https://youtube.com/watch?v=...",
-          "description": "Why this video helps"
-        }
       ]
     },
     {
@@ -212,10 +200,6 @@ If it IS a valid golf swing, return the full analysis in this JSON format:
       "drills": [
         { "name": "Drill name", "description": "Clear instructions anyone can follow.", "reps": "e.g., 3 sets of 10 swings" },
         { "name": "Second drill name", "description": "Another clear drill.", "reps": "e.g., 3 sets of 10 swings" }
-      ],
-      "videos": [
-        { "title": "Video title", "url": "https://youtube.com/watch?v=...", "description": "Why this helps" },
-        { "title": "Video title", "url": "https://youtube.com/watch?v=...", "description": "Why this helps" }
       ]
     },
     {
@@ -224,10 +208,6 @@ If it IS a valid golf swing, return the full analysis in this JSON format:
       "drills": [
         { "name": "Drill name", "description": "Ultra-clear, beginner-friendly instructions.", "reps": "e.g., 3 sets of 10 swings" },
         { "name": "Second drill name", "description": "Another clear drill.", "reps": "e.g., 3 sets of 10 swings" }
-      ],
-      "videos": [
-        { "title": "Video title", "url": "https://youtube.com/watch?v=...", "description": "Why this helps" },
-        { "title": "Video title", "url": "https://youtube.com/watch?v=...", "description": "Why this helps" }
       ]
     },
     {
@@ -236,10 +216,6 @@ If it IS a valid golf swing, return the full analysis in this JSON format:
       "drills": [
         { "name": "Drill name", "description": "Simple, actionable steps.", "reps": "e.g., 3 sets of 10 swings" },
         { "name": "Second drill name", "description": "Another clear drill.", "reps": "e.g., 3 sets of 10 swings" }
-      ],
-      "videos": [
-        { "title": "Video title", "url": "https://youtube.com/watch?v=...", "description": "Why this helps" },
-        { "title": "Video title", "url": "https://youtube.com/watch?v=...", "description": "Why this helps" }
       ]
     }
   ],
@@ -252,11 +228,10 @@ Guidelines:
 - CLARITY: Explain everything like you're talking to someone brand new to golf. No jargon without explanation.
 - DRILL INSTRUCTIONS: Be ridiculously specific. Where do feet go? How wide? Which hand does what? Explain clearly but casually.
 - TONE: Confident, understated, maybe a touch of dry humour. Make them feel like you've got their back without being over the top about it.
-- HANDICAP PREDICTION: Provide a realistic range (usually 3-5 point spread) based on swing fundamentals. Be humble and use ranges - never definitive single numbers. Keep commentary casual and encouraging. Examples: "14-18" for intermediate, "8-12" for decent player, "20-25" for beginner.
+- HANDICAP PREDICTION: Provide a realistic range with a +/-4 spread based on swing fundamentals. If you're unsure, go wider rather than narrower. Be humble and use ranges - never definitive single numbers. Keep commentary casual and encouraging. Examples: "12-20" for intermediate, "6-14" for decent player, "18-26" for beginner.
 - Identify 2-4 key improvements, prioritized by impact
 - Each week's training plan should build on the previous week
-- Include exactly 2 drills per week that can be done at a driving range
-- Include exactly 2 real YouTube tutorial videos per week from well-known golf instructors (Rick Shiels, Me and My Golf, Athletic Motion Golf, etc.) that are relevant to that week's focus area
+- Include exactly 2 drills per week that can be done at a driving range. Use clear, searchable drill names (users will search YouTube for tutorials on each drill)
 - IMPORTANT: Always return an empty array for "resources" - we don't use this section
 
 IMPORTANT: Return ONLY valid JSON, no markdown formatting or code blocks.`;
