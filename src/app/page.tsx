@@ -541,18 +541,13 @@ function ResultsView({
   onReset: () => void;
 }) {
   return (
-    <motion.div
-      className="space-y-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.1 }}
-    >
+    <div className="space-y-6">
       {/* Wave 1: Header + Video + Summary + Handicap */}
       <motion.div
         className="space-y-6"
-        initial={{ opacity: 0, y: 80 }}
+        initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
       >
         {/* Header */}
         <div className="flex items-center justify-between gap-4">
@@ -605,9 +600,9 @@ function ResultsView({
       {/* Wave 2: Improvements + Training + CTA */}
       <motion.div
         className="space-y-6"
-        initial={{ opacity: 0, y: 60 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+        transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
 
       {/* Improvements */}
@@ -682,7 +677,7 @@ function ResultsView({
       </div>
 
       </motion.div>
-    </motion.div>
+    </div>
   );
 }
 

@@ -73,9 +73,9 @@ body {
   background: rgba(255, 255, 255, 0.5);
 }
 
-/* Smooth animations */
+/* Smooth animations - opacity and transform excluded (handled by framer-motion) */
 * {
-  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
