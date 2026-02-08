@@ -9,19 +9,11 @@ import { v2 as cloudinary } from "cloudinary";
 
 // Helper function to detect video codec from file
 function detectCodecFromBuffer(buffer: Buffer): { codec: string; details: string } {
-  // Check for ftypisom (MP4 file signature)
   if (buffer.toString("hex", 4, 8) === "66747970") {
-    // It's an MP4 container, codec detection is more complex
-    // For now, we trust the client has done proper H.264 conversion
-    return { codec: "h264", details: "MP4 container (client-converted)" };
+    return { codec: "h264", details: "MP4 container" };
   }
 
-  // Check for common video file signatures
   const hex = buffer.toString("hex", 0, 12);
-  console.log("File signature:", hex);
-
-  // HEVC signature is harder to detect without parsing
-  // but MOV files often have 'ftyp' with mdat
   if (hex.includes("6674797070") || hex.includes("6d646174")) {
     return { codec: "unknown", details: "MOV container detected" };
   }
@@ -45,30 +37,23 @@ async function convertHevcToMp4(buffer: Buffer, originalFilename: string): Promi
       api_secret: process.env.CLOUDINARY_API_SECRET,
     });
 
-    // Create a temporary file for upload
     const tempInputPath = join(tmpdir(), `hevc-input-${Date.now()}.mov`);
     await writeFile(tempInputPath, buffer);
 
-    console.log("Uploading HEVC file to Cloudinary for conversion...");
-
-    // Upload to Cloudinary with a resource type of "video"
+    // Upload to Cloudinary for conversion
     const uploadResult = await cloudinary.uploader.upload(tempInputPath, {
       resource_type: "video",
       public_id: `golf-swing-${Date.now()}`,
       overwrite: true,
     });
 
-    console.log("Upload successful, requesting MP4 conversion...");
-
-    // Get the converted MP4 URL using Cloudinary's transformation
+    // Get the converted MP4 URL
     const mp4Url = cloudinary.url(uploadResult.public_id, {
       resource_type: "video",
       format: "mp4",
       quality: "auto",
       fetch_format: "auto",
     });
-
-    console.log("Downloading converted MP4 from:", mp4Url);
 
     // Download the converted MP4
     const downloadResponse = await fetch(mp4Url);
@@ -77,15 +62,14 @@ async function convertHevcToMp4(buffer: Buffer, originalFilename: string): Promi
     }
 
     const convertedBuffer = Buffer.from(await downloadResponse.arrayBuffer());
-    console.log(`✓ Successfully converted HEVC to MP4: ${buffer.length} bytes -> ${convertedBuffer.length} bytes`);
 
     // Clean up
     try {
       await unlink(tempInputPath);
       // Delete from Cloudinary
       await cloudinary.uploader.destroy(uploadResult.public_id, { resource_type: "video" });
-    } catch (e) {
-      console.warn("Failed to cleanup Cloudinary resources:", e);
+    } catch {
+      // Cleanup is best-effort
     }
 
     return convertedBuffer;
@@ -102,28 +86,15 @@ async function convertHevcToMp4(buffer: Buffer, originalFilename: string): Promi
 // Server-side video validation and minimal processing
 async function validateAndPrepareVideo(buffer: Buffer, originalMimeType: string): Promise<Buffer> {
   const { codec, details } = detectCodecFromBuffer(buffer);
-  console.log(`Detected codec info: ${codec} - ${details}`);
 
-  // Log file info for debugging
-  console.log(`Video buffer size: ${buffer.length} bytes`);
-  console.log(`Original MIME type: ${originalMimeType}`);
-
-  // Check for iOS QuickTime/MOV format (indicates HEVC from iPhone)
   const isQuickTime = originalMimeType === "video/quicktime" || originalMimeType === "video/mov";
   const isMOVContainer = details.includes("MOV");
 
-  console.log(`Is QuickTime/MOV: ${isQuickTime}, MOV container: ${isMOVContainer}`);
-
-  // If it's a .mov file from iOS, it's likely HEVC which Gemini doesn't support well
   if (isQuickTime || isMOVContainer) {
-    console.log("MOV/QuickTime file detected - likely HEVC from iOS, converting automatically...");
-    const convertedBuffer = await convertHevcToMp4(buffer, "golf-swing.mov");
-    return convertedBuffer;
+    return await convertHevcToMp4(buffer, "golf-swing.mov");
   }
 
-  // If client sent proper H.264/MP4, use it directly
   if (codec === "h264" || originalMimeType === "video/mp4") {
-    console.log("Video appears to be H.264/MP4, proceeding with Gemini upload");
     return buffer;
   }
 
@@ -262,37 +233,21 @@ export async function POST(request: Request) {
       );
     }
 
-    // Download video (client should have verified it's accessible)
-    console.log("Downloading video from:", videoUrl);
-
     const downloadResponse = await fetch(videoUrl, {
-      headers: {
-        'Accept': '*/*',
-        'Cache-Control': 'no-cache',
-      },
+      headers: { 'Accept': '*/*', 'Cache-Control': 'no-cache' },
     });
-
-    console.log("Download response:", downloadResponse.status, downloadResponse.statusText);
 
     if (!downloadResponse.ok) {
       throw new Error(`Download failed: ${downloadResponse.status} ${downloadResponse.statusText}`);
     }
 
     const videoBuffer = Buffer.from(await downloadResponse.arrayBuffer());
-    console.log("Download successful, size:", videoBuffer.length);
-
-    // Validate and prepare video (ensure it's H.264/MP4)
-    console.log("Validating video format...");
     const validatedBuffer = await validateAndPrepareVideo(videoBuffer, mimeType || "video/mp4");
 
-    // Save file for Gemini upload
     tempFilePath = join(tmpdir(), `golf-swing-${Date.now()}.mp4`);
     await writeFile(tempFilePath, validatedBuffer);
-    console.log("Video file saved to:", tempFilePath);
 
-    // Always use video/mp4 for Gemini (client has already converted to this)
     const uploadMimeType = "video/mp4";
-    console.log("Uploading to Gemini as:", uploadMimeType);
 
     // Upload to Gemini File API
     const fileManager = new GoogleAIFileManager(process.env.GEMINI_API_KEY);
@@ -301,19 +256,15 @@ export async function POST(request: Request) {
       displayName: "golf-swing",
     });
 
-    console.log("File uploaded to Gemini:", uploadResult.file.uri, "state:", uploadResult.file.state);
-
-    // Wait for file to be processed
+    // Wait for Gemini to process the file (max 2 minutes)
     let geminiFile = uploadResult.file;
     let processingAttempts = 0;
-    const maxProcessingAttempts = 60; // Max 2 minutes (60 * 2 seconds)
+    const maxProcessingAttempts = 60;
 
     while (geminiFile.state === "PROCESSING" && processingAttempts < maxProcessingAttempts) {
       processingAttempts++;
-      console.log(`Waiting for Gemini to process file (attempt ${processingAttempts}/${maxProcessingAttempts})...`);
       await new Promise((resolve) => setTimeout(resolve, 2000));
       geminiFile = await fileManager.getFile(geminiFile.name);
-      console.log("File state:", geminiFile.state);
     }
 
     if (geminiFile.state === "PROCESSING") {
@@ -330,9 +281,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("Gemini file ready:", geminiFile.state, geminiFile.mimeType);
-
-    // Generate content using the uploaded file with retry logic for rate limits
+    // Generate analysis with retry logic for rate limits
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
@@ -342,7 +291,6 @@ export async function POST(request: Request) {
 
     while (retryCount < maxRetries) {
       try {
-        console.log(`Calling Gemini generateContent (attempt ${retryCount + 1}/${maxRetries})...`);
         result = await model.generateContent([
           {
             fileData: {
@@ -355,15 +303,12 @@ export async function POST(request: Request) {
         break; // Success, exit retry loop
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        console.warn(`Attempt ${retryCount + 1} failed:`, errorMsg);
 
         // Check if it's a rate limit error (429)
         if (errorMsg.includes("429") || errorMsg.includes("Too Many Requests") || errorMsg.includes("exhausted")) {
           retryCount++;
           if (retryCount < maxRetries) {
-            // Exponential backoff: 2s, 4s, 8s
             const delayMs = Math.pow(2, retryCount) * 1000;
-            console.log(`Rate limited. Waiting ${delayMs}ms before retry...`);
             await new Promise((resolve) => setTimeout(resolve, delayMs));
             continue; // Retry
           } else {
@@ -383,10 +328,7 @@ export async function POST(request: Request) {
       throw new Error("Failed to generate analysis after retries");
     }
 
-    const response = result.response;
-    const text = response.text();
-
-    console.log("Gemini response received, length:", text.length);
+    const text = result.response.text();
 
     // Parse the JSON response
     let analysis;
@@ -396,9 +338,7 @@ export async function POST(request: Request) {
         .replace(/```\n?/g, "")
         .trim();
       analysis = JSON.parse(cleanedText);
-    } catch (parseError) {
-      console.error("Failed to parse Gemini response:", text);
-      console.error("Parse error:", parseError);
+    } catch {
       return NextResponse.json(
         { error: "Failed to parse analysis results" },
         { status: 500 }
@@ -407,29 +347,17 @@ export async function POST(request: Request) {
 
     // Validate that this is actually a golf swing
     if (analysis.isValidSwing === false) {
-      console.log("Invalid golf swing detected:", analysis.validationError);
-      // Clean up: delete the file from Gemini
-      try {
-        await fileManager.deleteFile(geminiFile.name);
-      } catch (e) {
-        console.warn("Failed to delete Gemini file:", e);
-      }
+      try { await fileManager.deleteFile(geminiFile.name); } catch { /* best-effort */ }
       return NextResponse.json(
         { error: analysis.validationError || "That's not a golf swing, mate. Upload a video of an actual swing and let's try again." },
         { status: 400 }
       );
     }
 
-    // Clean up: delete the file from Gemini
-    try {
-      await fileManager.deleteFile(geminiFile.name);
-    } catch (e) {
-      console.warn("Failed to delete Gemini file:", e);
-    }
+    try { await fileManager.deleteFile(geminiFile.name); } catch { /* best-effort */ }
 
     return NextResponse.json(analysis);
   } catch (error) {
-    console.error("Analysis error:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       { error: `Analysis failed: ${errorMessage}` },
@@ -438,21 +366,10 @@ export async function POST(request: Request) {
   } finally {
     // Clean up temporary video file
     if (tempFilePath) {
-      try {
-        await unlink(tempFilePath);
-        console.log("Cleaned up temporary file:", tempFilePath);
-      } catch (e) {
-        console.warn("Failed to delete temporary video file:", e);
-      }
+      try { await unlink(tempFilePath); } catch { /* best-effort */ }
     }
-    // Clean up Vercel Blob (the source file)
     if (blobUrl) {
-      try {
-        await del(blobUrl);
-        console.log("Deleted blob:", blobUrl);
-      } catch (e) {
-        console.warn("Failed to delete blob:", e);
-      }
+      try { await del(blobUrl); } catch { /* best-effort */ }
     }
   }
 }

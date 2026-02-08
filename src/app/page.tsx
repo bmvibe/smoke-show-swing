@@ -30,11 +30,6 @@ interface SwingAnalysis {
       reps: string;
     }[];
   }[];
-  resources: {
-    title: string;
-    url: string;
-    description: string;
-  }[];
 }
 
 export default function Home() {
@@ -88,15 +83,7 @@ export default function Home() {
     setState("uploading");
 
     try {
-      // Step 0: Process video (convert HEVC to H.264 for Gemini compatibility)
-      console.log("===== Starting video processing =====");
-      console.log("Original file:", { name: file.name, size: file.size, type: file.type });
-
-      const { blob: processedBlob, filename: processedFilename } = await processVideoFile(file, (progress) => {
-        console.log(`Video processing progress: ${progress}%`);
-      });
-
-      console.log(`✓ Video processed: ${processedFilename} (${processedBlob.size} bytes, ${(processedBlob.size / (1024 * 1024)).toFixed(2)}MB)`);
+      const { blob: processedBlob, filename: processedFilename } = await processVideoFile(file);
 
       // Create a File object from the processed blob
       const processedFile = new File([processedBlob], processedFilename, {
@@ -109,13 +96,10 @@ export default function Home() {
         handleUploadUrl: "/api/upload",
       });
 
-      console.log("Upload complete, blob URL:", blob.url);
-
-      // Step 2: Wait for blob to be accessible (CDN propagation)
+      // Wait for blob to be accessible (CDN propagation)
       setState("analyzing");
       let blobAccessible = false;
       for (let i = 0; i < 30; i++) {
-        console.log(`Checking blob accessibility, attempt ${i + 1}/30`);
         try {
           const checkResponse = await fetch(blob.url, {
             method: "GET",
@@ -123,11 +107,10 @@ export default function Home() {
           });
           if (checkResponse.status >= 200 && checkResponse.status < 300) {
             blobAccessible = true;
-            console.log("Blob is accessible");
             break;
           }
-        } catch (err) {
-          console.log(`Attempt ${i + 1} failed, retrying...`);
+        } catch {
+          // Retry
         }
         // Wait 1 second between checks
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -137,7 +120,6 @@ export default function Home() {
         throw new Error("Video upload succeeded but file is not accessible. Please try again.");
       }
 
-      // Step 3: Send blob URL to analyze endpoint
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -156,12 +138,7 @@ export default function Home() {
       setAnalysis(result);
       setState("complete");
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Something went wrong";
-      console.error("===== Upload Error =====");
-      console.error("Error message:", errorMsg);
-      console.error("Full error:", err);
-      console.error("=======================");
-      setError(errorMsg);
+      setError(err instanceof Error ? err.message : "Something went wrong");
       setState("error");
     }
   }, []);
@@ -339,7 +316,6 @@ export default function Home() {
 function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; description: string }> }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   // Handle touch swipe
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -347,7 +323,6 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    setTouchEnd(e.changedTouches[0].clientX);
     if (touchStart !== null) {
       const distance = touchStart - e.changedTouches[0].clientX;
       const isSwipeLeft = distance > 50;
@@ -793,14 +768,6 @@ function UploadIcon() {
         strokeWidth={1.5}
         d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
       />
-    </svg>
-  );
-}
-
-function FlameIcon() {
-  return (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2c.8 2.2 2 4.2 4 6-1 1-1.5 2.5-1.5 4 0 2.5 2 4.5 4.5 4.5.3 0 .5 0 .8-.1-1.1 2.8-3.8 4.6-7.3 4.6-4.1 0-7.5-3.4-7.5-7.5 0-2.4 1.2-4.6 3-6C9 5 10.2 3.5 12 2z" />
     </svg>
   );
 }
