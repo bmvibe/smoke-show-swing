@@ -284,7 +284,7 @@ export default function Home() {
           </>
         )}
 
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout">
           {(state === "uploading" || state === "analyzing") && (
             <LoadingState key="loading" state={state} videoPreview={videoPreview} />
           )}
@@ -475,15 +475,20 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
 
   return (
     <motion.div
+      layout
       className="py-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      transition={{ duration: 0.2 }}
     >
       <div className="max-w-md mx-auto">
         {videoPreview && (
-          <div className="mb-4 rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
+          <motion.div
+            layoutId="swing-video"
+            className="mb-4 rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card"
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          >
             <video
               src={videoPreview}
               className="w-full object-cover"
@@ -493,7 +498,7 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
               muted
               playsInline
             />
-          </div>
+          </motion.div>
         )}
 
         <div className="text-left px-16">
@@ -541,69 +546,63 @@ function ResultsView({
   onReset: () => void;
 }) {
   return (
-    <div className="space-y-6">
-      {/* Wave 1: Header + Video + Summary + Handicap */}
-      <motion.div
-        className="space-y-6"
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="text-2xl font-light tracking-wide uppercase text-white">Your Analysis</h2>
-          <button
-            onClick={onReset}
-            className="px-4 py-2 text-xs font-light tracking-wide uppercase border border-accent/40 bg-accent/10 rounded-full hover:bg-accent/20 hover:border-accent text-white"
-          >
-            Analyze Another
-          </button>
-        </div>
+    <motion.div
+      layout
+      className="space-y-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: "spring", damping: 30, stiffness: 300, mass: 0.8 }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4">
+        <h2 className="text-2xl font-light tracking-wide uppercase text-white">Your Analysis</h2>
+        <button
+          onClick={onReset}
+          className="px-4 py-2 text-xs font-light tracking-wide uppercase border border-accent/40 bg-accent/10 rounded-full hover:bg-accent/20 hover:border-accent text-white"
+        >
+          Analyze Another
+        </button>
+      </div>
 
-        {/* Video + Summary */}
-        <div className="grid gap-4 md:grid-cols-2">
-          {videoPreview && (
-            <div className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card">
-              <video
-                src={videoPreview}
-                className="w-full aspect-video object-cover"
-                controls
-                playsInline
-                preload="metadata"
-              />
+      {/* Video + Summary */}
+      <div className="grid gap-4 md:grid-cols-2">
+        {videoPreview && (
+          <motion.div
+            layoutId="swing-video"
+            className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card"
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          >
+            <video
+              src={videoPreview}
+              className="w-full aspect-video object-cover"
+              controls
+              playsInline
+              preload="metadata"
+            />
+          </motion.div>
+        )}
+        <div className="glass-card rounded-2xl p-4 shadow-lg">
+          <h3 className="font-light tracking-wide uppercase text-white text-sm mb-2">Summary</h3>
+          <p className="text-muted text-xs font-light">{analysis.summary}</p>
+
+          {analysis.strengths.length > 0 && (
+            <div className="mt-2">
+              <h4 className="text-xs font-light tracking-wide uppercase text-accent mb-1">What You're Doing Right 🔥</h4>
+              <ul className="space-y-0.5">
+                {analysis.strengths.map((strength, i) => (
+                  <li key={i} className="text-xs text-muted flex items-start gap-2 font-light">
+                    <span className="text-accent mt-0.5">✓</span>
+                    {strength}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
-          <div className="glass-card rounded-2xl p-4 shadow-lg">
-            <h3 className="font-light tracking-wide uppercase text-white text-sm mb-2">Summary</h3>
-            <p className="text-muted text-xs font-light">{analysis.summary}</p>
-
-            {analysis.strengths.length > 0 && (
-              <div className="mt-2">
-                <h4 className="text-xs font-light tracking-wide uppercase text-accent mb-1">What You're Doing Right 🔥</h4>
-                <ul className="space-y-0.5">
-                  {analysis.strengths.map((strength, i) => (
-                    <li key={i} className="text-xs text-muted flex items-start gap-2 font-light">
-                      <span className="text-accent mt-0.5">✓</span>
-                      {strength}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
         </div>
+      </div>
 
-        {/* Handicap Prediction */}
-        <HandicapGauge handicap={analysis.handicap} proComparison={analysis.proComparison} />
-      </motion.div>
-
-      {/* Wave 2: Improvements + Training + CTA */}
-      <motion.div
-        className="space-y-6"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-      >
+      {/* Handicap Prediction */}
+      <HandicapGauge handicap={analysis.handicap} proComparison={analysis.proComparison} />
 
       {/* Improvements */}
       <section>
@@ -676,8 +675,7 @@ function ResultsView({
         </button>
       </div>
 
-      </motion.div>
-    </div>
+    </motion.div>
   );
 }
 
