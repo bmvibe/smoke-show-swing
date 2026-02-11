@@ -286,7 +286,7 @@ export default function Home() {
           </>
         )}
 
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence mode="wait">
           {(state === "uploading" || state === "analyzing") && (
             <LoadingState key="loading" state={state} videoPreview={videoPreview} />
           )}
@@ -482,7 +482,7 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.4 }}
     >
       <div className="max-w-md mx-auto">
         {videoPreview && (
@@ -549,14 +549,18 @@ function ResultsView({
 }) {
   return (
     <motion.div
-      layout
       className="space-y-6"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", damping: 30, stiffness: 300, mass: 0.8 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between gap-4">
+      <motion.div
+        className="flex items-center justify-between gap-4"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
         <h2 className="text-2xl font-light tracking-wide uppercase text-white">Your Analysis</h2>
         <button
           onClick={onReset}
@@ -564,10 +568,15 @@ function ResultsView({
         >
           Analyze Another
         </button>
-      </div>
+      </motion.div>
 
       {/* Video + Summary */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <motion.div
+        className="grid gap-4 md:grid-cols-2"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+      >
         {videoPreview && (
           <motion.div
             layoutId="swing-video"
@@ -601,13 +610,25 @@ function ResultsView({
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Swing Score */}
-      {analysis.score && <SwingScore score={analysis.score} />}
+      {analysis.score && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.4 }}
+        >
+          <SwingScore score={analysis.score} />
+        </motion.div>
+      )}
 
       {/* Improvements */}
-      <section>
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.6 }}
+      >
         <h3 className="text-base font-light tracking-wide uppercase mb-3 text-white">Areas to Improve</h3>
         <p className="text-xs text-muted mb-4 font-light">These are the money shots, fix these and you'll be striping it down the fairway in no time. 🎯</p>
         <div className="space-y-4">
@@ -628,12 +649,16 @@ function ResultsView({
             </div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Training Plan */}
-      <section>
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.8 }}
+      >
         <h3 className="text-base font-light tracking-wide uppercase mb-3 text-white">Training Plan</h3>
-        <p className="text-xs text-muted mb-4 font-light">Your personalized roadmap to crushing it on the course. Stick with this and watch your handicap drop. 💪</p>
+        <p className="text-xs text-muted mb-4 font-light">Your personalized roadmap to crushing it on the course. Stick with this and watch your score climb. 💪</p>
         <div className="space-y-4">
           {analysis.trainingPlan.map((week) => (
             <div key={week.weekNumber} className="glass-card rounded-xl p-3 shadow-lg">
@@ -664,10 +689,15 @@ function ResultsView({
             </div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* CTA */}
-      <div className="text-center py-4 border-t border-accent/20">
+      <motion.div
+        className="text-center py-4 border-t border-accent/20"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 1.0 }}
+      >
         <p className="text-muted mb-3 text-xs font-light">Got more swings to analyze? Let's keep the momentum going!</p>
         <button
           onClick={onReset}
@@ -675,7 +705,7 @@ function ResultsView({
         >
           Upload Another Video
         </button>
-      </div>
+      </motion.div>
 
     </motion.div>
   );
@@ -691,10 +721,12 @@ function getScoreColor(score: number): string {
 
 function SwingScore({ score }: { score: SwingAnalysis["score"] }) {
   const [animatedOverall, setAnimatedOverall] = useState(0);
+  const [barPct, setBarPct] = useState(0);
+  const [expanded, setExpanded] = useState(false);
   const [barWidths, setBarWidths] = useState<number[]>(score.categories.map(() => 0));
 
   useEffect(() => {
-    const duration = 1200;
+    const duration = 1500;
     const startTime = performance.now();
     const target = score.overall;
 
@@ -703,63 +735,103 @@ function SwingScore({ score }: { score: SwingAnalysis["score"] }) {
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setAnimatedOverall(Math.round(eased * target));
+      setBarPct(eased * target);
       if (progress < 1) requestAnimationFrame(animate);
     }
     requestAnimationFrame(animate);
-
-    score.categories.forEach((cat, i) => {
-      setTimeout(() => {
-        setBarWidths(prev => {
-          const next = [...prev];
-          next[i] = cat.score;
-          return next;
-        });
-      }, 200 + i * 150);
-    });
   }, [score]);
+
+  // Animate category bars when expanded
+  useEffect(() => {
+    if (expanded) {
+      score.categories.forEach((cat, i) => {
+        setTimeout(() => {
+          setBarWidths(prev => {
+            const next = [...prev];
+            next[i] = cat.score;
+            return next;
+          });
+        }, 100 + i * 120);
+      });
+    } else {
+      setBarWidths(score.categories.map(() => 0));
+    }
+  }, [expanded, score]);
 
   return (
     <div className="glass-card rounded-2xl p-6 shadow-lg">
-      <h3 className="font-light tracking-wide uppercase text-white text-sm mb-4">Swing Score</h3>
-
-      {/* Overall score */}
-      <div className="mb-5">
-        <div className="flex items-baseline gap-3 mb-2">
-          <span className="text-4xl font-light text-white">{animatedOverall}</span>
-          <span className="text-sm font-light" style={{ color: "#C5A059" }}>{score.label}</span>
-          <span className="text-xs text-muted/70 font-light">/ 100</span>
+      {/* Overall score — always visible */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="font-light tracking-wide uppercase text-white text-sm mb-2">Swing Score</h3>
+          <div className="flex items-baseline gap-3">
+            <span className="text-4xl font-light text-white">{animatedOverall}</span>
+            <span className="text-sm font-light" style={{ color: "#C5A059" }}>{score.label}</span>
+            <span className="text-xs text-muted/70 font-light">/ 100</span>
+          </div>
         </div>
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="text-xs text-muted font-light hover:text-white flex items-center gap-1.5"
+        >
+          <span>{expanded ? "Hide" : "Breakdown"}</span>
+          <svg
+            className="w-3.5 h-3.5 transition-transform duration-300"
+            style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Overall bar */}
+      <div className="mt-3">
         <div className="w-full h-3 rounded-full bg-white/10">
           <div
-            className="h-full rounded-full score-bar-fill"
+            className="h-full rounded-full"
             style={{
-              width: `${score.overall}%`,
+              width: `${barPct}%`,
               backgroundColor: getScoreColor(score.overall),
             }}
           />
         </div>
       </div>
 
-      {/* Category breakdown */}
-      <div className="space-y-3">
-        {score.categories.map((cat, i) => (
-          <div key={cat.name}>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-muted font-light">{cat.name}</span>
-              <span className="text-xs font-light text-white">{cat.score}</span>
+      {/* Category breakdown — expandable */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="space-y-3 pt-4 mt-4 border-t border-white/10">
+              {score.categories.map((cat, i) => (
+                <div key={cat.name}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-muted font-light">{cat.name}</span>
+                    <span className="text-xs font-light text-white">{cat.score}</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-white/10">
+                    <div
+                      className="h-full rounded-full transition-all duration-700 ease-out"
+                      style={{
+                        width: `${barWidths[i]}%`,
+                        backgroundColor: getScoreColor(cat.score),
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="w-full h-2 rounded-full bg-white/10">
-              <div
-                className="h-full rounded-full transition-all duration-700 ease-out"
-                style={{
-                  width: `${barWidths[i]}%`,
-                  backgroundColor: getScoreColor(cat.score),
-                }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
