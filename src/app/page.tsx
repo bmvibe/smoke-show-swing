@@ -9,12 +9,14 @@ type AnalysisState = "idle" | "uploading" | "analyzing" | "complete" | "error";
 
 interface SwingAnalysis {
   summary: string;
-  handicap: {
-    min: number;
-    max: number;
-    commentary: string;
+  score: {
+    overall: number;
+    label: string;
+    categories: {
+      name: string;
+      score: number;
+    }[];
   };
-  proComparison?: string;
   strengths: string[];
   improvements: {
     area: string;
@@ -266,8 +268,8 @@ export default function Home() {
               <div className="grid gap-4 sm:grid-cols-3">
                 <ExpectCard
                   icon="chart"
-                  title="Swing Analysis"
-                  description="A proper look at everything, how you stand, hold the club, swing back, come through, and finish. The full story."
+                  title="Swing Score"
+                  description="A 0-100 score with breakdowns for setup, backswing, downswing, follow-through, and tempo. Your number to chase."
                 />
                 <ExpectCard
                   icon="target"
@@ -601,8 +603,8 @@ function ResultsView({
         </div>
       </div>
 
-      {/* Handicap Prediction */}
-      <HandicapGauge handicap={analysis.handicap} proComparison={analysis.proComparison} />
+      {/* Swing Score */}
+      {analysis.score && <SwingScore score={analysis.score} />}
 
       {/* Improvements */}
       <section>
@@ -679,70 +681,85 @@ function ResultsView({
   );
 }
 
-function HandicapGauge({ handicap, proComparison }: { handicap: { min: number; max: number; commentary: string }; proComparison?: string }) {
-  const maxHandicap = 36;
-  const minPct = (handicap.min / maxHandicap) * 100;
-  const rangePct = ((handicap.max - handicap.min) / maxHandicap) * 100;
-  const midPct = ((handicap.min + handicap.max) / 2 / maxHandicap) * 100;
+function getScoreColor(score: number): string {
+  if (score <= 30) return "#ef4444";
+  if (score <= 50) return "#f97316";
+  if (score <= 70) return "#eab308";
+  if (score <= 85) return "#22c55e";
+  return "#C5A059";
+}
 
-  const ticks = [0, 10, 18, 28, 36];
+function SwingScore({ score }: { score: SwingAnalysis["score"] }) {
+  const [animatedOverall, setAnimatedOverall] = useState(0);
+  const [barWidths, setBarWidths] = useState<number[]>(score.categories.map(() => 0));
+
+  useEffect(() => {
+    const duration = 1200;
+    const startTime = performance.now();
+    const target = score.overall;
+
+    function animate(currentTime: number) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setAnimatedOverall(Math.round(eased * target));
+      if (progress < 1) requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
+    score.categories.forEach((cat, i) => {
+      setTimeout(() => {
+        setBarWidths(prev => {
+          const next = [...prev];
+          next[i] = cat.score;
+          return next;
+        });
+      }, 200 + i * 150);
+    });
+  }, [score]);
 
   return (
     <div className="glass-card rounded-2xl p-6 shadow-lg">
-      <h3 className="font-light tracking-wide uppercase text-white text-sm mb-1 text-center">Handicap Estimate</h3>
+      <h3 className="font-light tracking-wide uppercase text-white text-sm mb-4">Swing Score</h3>
 
-      <div className="text-center mb-5">
-        <span className="text-3xl font-light text-white">{handicap.min}–{handicap.max}</span>
-      </div>
-
-      {/* Linear scale */}
-      <div className="relative mx-4 mb-2">
-        {/* Track */}
-        <div className="h-1.5 rounded-full bg-white/10 relative">
-          {/* Range highlight */}
+      {/* Overall score */}
+      <div className="mb-5">
+        <div className="flex items-baseline gap-3 mb-2">
+          <span className="text-4xl font-light text-white">{animatedOverall}</span>
+          <span className="text-sm font-light" style={{ color: "#C5A059" }}>{score.label}</span>
+          <span className="text-xs text-muted/70 font-light">/ 100</span>
+        </div>
+        <div className="w-full h-3 rounded-full bg-white/10">
           <div
-            className="absolute h-full rounded-full bg-accent"
-            style={{ left: `${minPct}%`, width: `${rangePct}%` }}
-          />
-          {/* Midpoint dot */}
-          <div
-            className="absolute top-1/2 w-3 h-3 rounded-full bg-white border-2 border-accent shadow-md"
-            style={{ left: `${midPct}%`, transform: 'translate(-50%, -50%)' }}
+            className="h-full rounded-full score-bar-fill"
+            style={{
+              width: `${score.overall}%`,
+              backgroundColor: getScoreColor(score.overall),
+            }}
           />
         </div>
+      </div>
 
-        {/* Ticks and numbers */}
-        <div className="relative h-7 mt-1.5">
-          {ticks.map((val) => (
-            <div
-              key={val}
-              className="absolute flex flex-col items-center"
-              style={{ left: `${(val / maxHandicap) * 100}%`, transform: 'translateX(-50%)' }}
-            >
-              <div className="w-px h-1.5 bg-white/20" />
-              <span className="text-[10px] text-muted/70 mt-0.5 font-light">{val === 36 ? '36+' : val}</span>
+      {/* Category breakdown */}
+      <div className="space-y-3">
+        {score.categories.map((cat, i) => (
+          <div key={cat.name}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-muted font-light">{cat.name}</span>
+              <span className="text-xs font-light text-white">{cat.score}</span>
             </div>
-          ))}
-        </div>
-
-        {/* End labels */}
-        <div className="flex justify-between -mt-0.5">
-          <span className="text-[10px] text-muted/50 font-light">Scratch</span>
-          <span className="text-[10px] text-muted/50 font-light">Beginner</span>
-        </div>
+            <div className="w-full h-2 rounded-full bg-white/10">
+              <div
+                className="h-full rounded-full transition-all duration-700 ease-out"
+                style={{
+                  width: `${barWidths[i]}%`,
+                  backgroundColor: getScoreColor(cat.score),
+                }}
+              />
+            </div>
+          </div>
+        ))}
       </div>
-
-      {/* Commentary */}
-      <p className="text-xs text-muted font-light text-center leading-relaxed mt-4">
-        {handicap.commentary}
-      </p>
-
-      {/* Pro Comparison */}
-      {proComparison && (
-        <p className="text-xs text-accent font-light text-center leading-relaxed mt-3 pt-3 border-t border-white/10">
-          {proComparison}
-        </p>
-      )}
     </div>
   );
 }

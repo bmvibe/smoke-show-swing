@@ -111,6 +111,17 @@ body {
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(197, 160, 89, 0.2);
 }
 
+/* Score bar fill animation */
+@keyframes score-bar-fill {
+  from {
+    width: 0%;
+  }
+}
+
+.score-bar-fill {
+  animation: score-bar-fill 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 /* Luxury accent for logo/special elements */
 .luxury-accent {
   color: var(--smoked-gold);
