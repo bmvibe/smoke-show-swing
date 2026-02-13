@@ -559,37 +559,40 @@ function ResultsView({
         </button>
       </motion.div>
 
+      {/* Video Preview */}
+      {videoPreview && (
+        <motion.div
+          layoutId="swing-video"
+          className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card"
+          initial={{ opacity: 0, y: 20, scale: 0.98, filter: "blur(8px)" }}
+          animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+          transition={{ type: "spring", damping: 25, stiffness: 200, delay: 0.1 }}
+        >
+          <video
+            src={videoPreview}
+            className="w-full object-cover aspect-[9/16] max-h-[50vh] md:max-h-[60vh]"
+            autoPlay
+            loop
+            muted
+            playsInline
+            controls
+          />
+        </motion.div>
+      )}
+
       {/* Swing Score */}
       {analysis.score && (
         <motion.div
-          {...reveal(0.12)}
+          {...reveal(0.2)}
         >
           <SwingScore score={analysis.score} />
         </motion.div>
       )}
 
-      {/* Video + Summary */}
+      {/* Summary */}
       <motion.div
-        className="grid gap-4 md:grid-cols-2"
-        {...reveal(0.25)}
+        {...reveal(0.3)}
       >
-        {videoPreview && (
-          <motion.div
-            layoutId="swing-video"
-            className="rounded-2xl overflow-hidden border border-accent/30 shadow-lg enhanced-card"
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          >
-            <video
-              src={videoPreview}
-              className="w-full object-cover aspect-[9/16] max-h-[50vh] md:max-h-[60vh]"
-              autoPlay
-              loop
-              muted
-              playsInline
-              controls
-            />
-          </motion.div>
-        )}
         <div className="glass-card rounded-2xl p-4 shadow-lg">
           <h3 className="font-light tracking-wide uppercase text-white text-sm mb-2">Summary</h3>
           <p className="text-muted text-xs font-light">{analysis.summary}</p>
