@@ -818,8 +818,8 @@ function SwingScore({ score }: { score: SwingAnalysis["score"] }) {
           <h3 className="font-light tracking-wide uppercase text-white text-sm mb-2">Swing Score</h3>
           <div className="flex items-baseline gap-3">
             <span className="text-4xl font-light text-white">{animatedOverall}</span>
-            <span className="text-sm font-light" style={{ color: "#C5A059" }}>{score.label}</span>
             <span className="text-xs text-muted/70 font-light">/ 100</span>
+            <span className="text-sm font-light" style={{ color: "#C5A059" }}>{score.label}</span>
           </div>
         </div>
         <button
