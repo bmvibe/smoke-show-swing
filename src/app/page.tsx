@@ -207,7 +207,7 @@ export default function Home() {
           <>
             {/* Hero */}
             <section className="text-center mb-16 pt-16 pb-8">
-              <h1 className="text-3xl sm:text-5xl md:text-[3.6rem] mb-8 text-white leading-tight font-[200] tracking-wide uppercase">
+              <h1 className="text-4xl sm:text-5xl md:text-[3.6rem] mb-8 text-white leading-tight font-[200] tracking-wide uppercase">
                 Fix your golf swing in a minute
               </h1>
               <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed font-light">
@@ -353,44 +353,8 @@ export default function Home() {
 }
 
 function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; description: string }> }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(1);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStart !== null) {
-      const distance = touchStart - e.changedTouches[0].clientX;
-      if (distance > 50) {
-        setDirection(1);
-        setCurrentIndex((prev) => (prev + 1) % tips.length);
-      } else if (distance < -50) {
-        setDirection(-1);
-        setCurrentIndex((prev) => (prev - 1 + tips.length) % tips.length);
-      }
-    }
-    setTouchStart(null);
-  };
-
-  const goToSlide = (index: number) => {
-    setDirection(index > currentIndex ? 1 : -1);
-    setCurrentIndex(index);
-  };
-
-  const goToNextSlide = () => {
-    setDirection(1);
-    setCurrentIndex((prev) => (prev + 1) % tips.length);
-  };
-
   return (
-    <div
-      className="space-y-8"
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
+    <div className="space-y-8">
       {/* Grid on desktop */}
       <div className="hidden sm:grid gap-4 sm:grid-cols-2" style={{ gridAutoRows: '1fr' }}>
         {tips.map((tip, idx) => (
@@ -400,47 +364,14 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
         ))}
       </div>
 
-      {/* Mobile carousel with horizontal slide */}
-      <div className="sm:hidden">
-        <div className="overflow-hidden">
-          <AnimatePresence mode="wait" initial={false} custom={direction}>
-            <motion.div
-              key={currentIndex}
-              custom={direction}
-              initial={{ x: direction * 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: direction * -100, opacity: 0 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              onClick={goToNextSlide}
-            >
-              <TipCard
-                icon={tips[currentIndex].icon}
-                title={tips[currentIndex].title}
-                description={tips[currentIndex].description}
-              />
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* Navigation dots */}
-        <div className="flex justify-center gap-1 mt-6">
+      {/* Mobile horizontal scroll */}
+      <div className="sm:hidden -mx-4 px-4 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-3" style={{ width: `${tips.length * 75}%` }}>
           {tips.map((tip, idx) => (
-            <button
-              key={idx}
-              onClick={() => goToSlide(idx)}
-              className="min-w-[44px] min-h-[44px] flex items-center justify-center"
-              aria-label={`Go to tip ${idx + 1}: ${tip.title}`}
-            >
-              <span className={`block h-2 rounded-full transition-all duration-300 ${
-                idx === currentIndex ? "w-8 bg-accent" : "w-2 bg-accent/30"
-              }`} />
-            </button>
+            <div key={idx} className="flex-shrink-0" style={{ width: `${100 / tips.length}%` }}>
+              <TipCard icon={tip.icon} title={tip.title} description={tip.description} />
+            </div>
           ))}
-        </div>
-
-        {/* Step indicator */}
-        <div className="text-center mt-4 text-sm text-muted font-light">
-          {currentIndex + 1} of {tips.length}
         </div>
       </div>
     </div>
@@ -530,10 +461,10 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
     <motion.div
       layout
       className="py-8"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.4 }}
+      initial={{ opacity: 0, filter: "blur(6px)" }}
+      animate={{ opacity: 1, filter: "blur(0px)" }}
+      exit={{ opacity: 0, scale: 0.98, filter: "blur(6px)" }}
+      transition={{ type: "spring", damping: 30, stiffness: 300, opacity: { duration: 0.4 } }}
     >
       <div className="max-w-md mx-auto">
         {videoPreview && (
@@ -600,19 +531,24 @@ function ResultsView({
   videoPreview: string | null;
   onReset: () => void;
 }) {
+  const spring = { type: "spring" as const, damping: 30, stiffness: 300 };
+  const reveal = (delay: number) => ({
+    initial: { opacity: 0, y: 20, scale: 0.98, filter: "blur(8px)" },
+    animate: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" },
+    transition: { ...spring, delay, opacity: { duration: 0.5, delay } },
+  });
+
   return (
     <motion.div
       className="space-y-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.5 }}
     >
       {/* Header */}
       <motion.div
         className="flex items-center justify-between gap-4"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
+        {...reveal(0.05)}
       >
         <h2 className="text-2xl font-light tracking-wide uppercase text-white">Your Analysis</h2>
         <button
@@ -626,9 +562,7 @@ function ResultsView({
       {/* Video + Summary */}
       <motion.div
         className="grid gap-4 md:grid-cols-2"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
+        {...reveal(0.15)}
       >
         {videoPreview && (
           <motion.div
@@ -638,10 +572,12 @@ function ResultsView({
           >
             <video
               src={videoPreview}
-              className="w-full aspect-video object-cover"
-              controls
+              className="w-full object-cover aspect-[9/16] max-h-[50vh] md:max-h-[60vh]"
+              autoPlay
+              loop
+              muted
               playsInline
-              preload="metadata"
+              controls
             />
           </motion.div>
         )}
@@ -670,9 +606,7 @@ function ResultsView({
       {/* Swing Score */}
       {analysis.score && (
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.4 }}
+          {...reveal(0.3)}
         >
           <SwingScore score={analysis.score} />
         </motion.div>
@@ -680,9 +614,7 @@ function ResultsView({
 
       {/* Improvements */}
       <motion.section
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.6 }}
+        {...reveal(0.45)}
       >
         <h3 className="text-base font-light tracking-wide uppercase mb-3 text-white">Areas to Improve</h3>
         <p className="text-xs text-muted mb-4 font-light">
@@ -692,7 +624,13 @@ function ResultsView({
         </p>
         <div className="space-y-4">
           {analysis.improvements.map((item, i) => (
-            <div key={i} className="glass-card rounded-xl p-4 shadow-lg hover:shadow-xl hover:border-accent/40">
+            <motion.div
+              key={i}
+              className="glass-card rounded-xl p-4 shadow-lg hover:shadow-xl hover:border-accent/40"
+              initial={{ opacity: 0, x: -16, filter: "blur(4px)" }}
+              animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+              transition={{ ...spring, delay: 0.55 + i * 0.1 }}
+            >
               <div className="flex items-start gap-3">
                 <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-light border border-accent/50 shrink-0">
                   {i + 1}
@@ -705,22 +643,26 @@ function ResultsView({
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </motion.section>
 
       {/* Training Plan */}
       <motion.section
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.8 }}
+        {...reveal(0.7)}
       >
         <h3 className="text-base font-light tracking-wide uppercase mb-3 text-white">Training Plan</h3>
         <p className="text-xs text-muted mb-4 font-light">Your personalized roadmap to crushing it on the course. Stick with this and watch your score climb. 💪</p>
         <div className="space-y-4">
-          {analysis.trainingPlan.map((week) => (
-            <div key={week.weekNumber} className="glass-card rounded-xl p-3 shadow-lg">
+          {analysis.trainingPlan.map((week, wi) => (
+            <motion.div
+              key={week.weekNumber}
+              className="glass-card rounded-xl p-3 shadow-lg"
+              initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ ...spring, delay: 0.8 + wi * 0.08 }}
+            >
               <div className="flex items-center gap-2 mb-2">
                 <span className="px-2 py-1 bg-accent/30 text-[#E1E4E8] text-xs font-light tracking-wide uppercase rounded-full border border-accent/50">
                   Week {week.weekNumber}
@@ -746,7 +688,7 @@ function ResultsView({
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </motion.section>
@@ -754,9 +696,7 @@ function ResultsView({
       {/* CTA */}
       <motion.div
         className="text-center py-4 border-t border-accent/20"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 1.0 }}
+        {...reveal(1.1)}
       >
         <p className="text-muted mb-3 text-xs font-light">Got more swings to analyze? Let's keep the momentum going!</p>
         <button
