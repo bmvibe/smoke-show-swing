@@ -252,7 +252,7 @@ export default function Home() {
                 <p className="font-light mb-2 text-sm text-[#E1E4E8]">
                   {isDragging ? 'Drop it right here' : 'Drop your video here or click to browse'}
                 </p>
-                <p className="text-xs text-[#a8adb5] font-light">Under 20 seconds will get the best results</p>
+                <p className="text-xs text-[#a8adb5] font-light">Slow-mo videos under 20 seconds get the best results</p>
               </div>
               {error && (
                 <p className="mt-6 text-red-300 text-sm text-center bg-red-500/10 border border-red-500/30 rounded-xl py-3 px-4">{error}</p>
@@ -340,7 +340,7 @@ export default function Home() {
               <p className="text-muted mb-4 text-xs font-light">{error || "We couldn't process your video. Please try again."}</p>
               <button
                 onClick={reset}
-                className="px-6 py-2 bg-accent text-black font-light tracking-wide uppercase rounded-full hover:bg-accent-dim accent-button shadow-lg text-sm"
+                className="px-6 py-2 bg-accent text-black font-medium tracking-wide uppercase rounded-full hover:bg-accent-dim accent-button shadow-lg text-sm"
               >
                 Start Over
               </button>
@@ -761,7 +761,7 @@ function ResultsView({
         <p className="text-muted mb-3 text-xs font-light">Got more swings to analyze? Let's keep the momentum going!</p>
         <button
           onClick={onReset}
-          className="px-6 py-2 bg-accent text-black font-light tracking-wide uppercase rounded-full hover:bg-accent-dim accent-button shadow-lg hover:shadow-xl transition-all text-sm"
+          className="px-6 py-2 bg-accent text-black font-medium tracking-wide uppercase rounded-full hover:bg-accent-dim accent-button shadow-lg hover:shadow-xl transition-all text-sm"
         >
           Upload Another Video
         </button>
