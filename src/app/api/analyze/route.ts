@@ -132,7 +132,7 @@ If it IS a valid golf swing, return the full analysis in this JSON format:
   "summary": "2-3 sentences with personality. Be cool and confident, maybe drop in a bit of dry wit. Start positive and highlight the main thing to work on. Think 'knowledgeable mate down the pub' not 'over-enthusiastic American coach'.",
   "score": {
     "overall": "<number 0-100 — weighted average of category scores, NOT a default>",
-    "label": "<must match overall: 0-30 Beginner, 31-50 Developing, 51-70 Intermediate, 71-85 Advanced, 86-100 Elite>",
+    "label": "<must match overall: 0-30 Air Shot, 31-50 Chunked, 51-70 Ball Striker, 71-85 Dialled In, 86-100 Striped>",
     "categories": [
       { "name": "Setup & Address", "score": "<number 0-100>" },
       { "name": "Backswing", "score": "<number 0-100>" },
