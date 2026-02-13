@@ -340,7 +340,7 @@ export default function Home() {
               <p className="text-muted mb-4 text-xs font-light">{error || "We couldn't process your video. Please try again."}</p>
               <button
                 onClick={reset}
-                className="px-6 py-2 bg-accent text-black font-medium tracking-wide uppercase rounded-full hover:bg-accent-dim accent-button shadow-lg text-sm"
+                className="px-6 py-2 text-sm font-light tracking-wide uppercase border border-accent/40 bg-accent/10 rounded-full hover:bg-accent/20 hover:border-accent text-white"
               >
                 Start Over
               </button>
@@ -761,7 +761,7 @@ function ResultsView({
         <p className="text-muted mb-3 text-xs font-light">Got more swings to analyze? Let's keep the momentum going!</p>
         <button
           onClick={onReset}
-          className="px-6 py-2 bg-accent text-black font-medium tracking-wide uppercase rounded-full hover:bg-accent-dim accent-button shadow-lg hover:shadow-xl transition-all text-sm"
+          className="px-6 py-2 text-sm font-light tracking-wide uppercase border border-accent/40 bg-accent/10 rounded-full hover:bg-accent/20 hover:border-accent text-white"
         >
           Upload Another Video
         </button>

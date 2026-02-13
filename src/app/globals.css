@@ -96,11 +96,6 @@ a, button, input, select, textarea, [role="button"], .glass-card, .enhanced-card
   border: 1px solid rgba(197, 160, 89, 0.2);
 }
 
-/* Accent button hover effect */
-.accent-button:hover {
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(197, 160, 89, 0.2);
-}
-
 /* Screen-reader only utility */
 .sr-only {
   position: absolute;
