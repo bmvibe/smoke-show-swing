@@ -771,14 +771,6 @@ function ResultsView({
   );
 }
 
-function getScoreColor(score: number): string {
-  if (score <= 30) return "#2C3E50"; // dark steel blue
-  if (score <= 50) return "#4A6580"; // mid blue
-  if (score <= 70) return "#7A9BB5"; // light blue
-  if (score <= 85) return "#B0C4D8"; // pale silver-blue
-  return "#FFFFFF";                  // white hot
-}
-
 function SwingScore({ score }: { score: SwingAnalysis["score"] }) {
   const [animatedOverall, setAnimatedOverall] = useState(0);
   const [barPct, setBarPct] = useState(0);
@@ -863,7 +855,8 @@ function SwingScore({ score }: { score: SwingAnalysis["score"] }) {
             className="h-full rounded-full"
             style={{
               width: `${barPct}%`,
-              backgroundColor: getScoreColor(score.overall),
+              backgroundImage: 'linear-gradient(to right, #2C3E50, #FFFFFF)',
+              backgroundSize: `${10000 / Math.max(score.overall, 1)}% 100%`,
             }}
           />
         </div>
@@ -892,7 +885,8 @@ function SwingScore({ score }: { score: SwingAnalysis["score"] }) {
                       className="h-full rounded-full transition-all duration-700 ease-out"
                       style={{
                         width: `${barWidths[i]}%`,
-                        backgroundColor: getScoreColor(cat.score),
+                        backgroundImage: 'linear-gradient(to right, #2C3E50, #FFFFFF)',
+                        backgroundSize: `${10000 / Math.max(cat.score, 1)}% 100%`,
                       }}
                     />
                   </div>
