@@ -3,7 +3,7 @@
 :root {
   /* Style Guide Colors */
   --obsidian: #0F1115;
-  --ignition-blue: #FFFFFF;
+  --primary-white: #FFFFFF;
   --smoked-gold: #C5A059;
   --cloud-silver: #E1E4E8;
   --steel-blue: #2C3E50;
@@ -12,7 +12,7 @@
   --background: var(--obsidian);
   --background-gradient: linear-gradient(135deg, var(--obsidian) 0%, #1a1f2e 50%, #0d0f14 100%);
   --foreground: var(--cloud-silver);
-  --accent: var(--ignition-blue);
+  --accent: var(--primary-white);
   --accent-dim: #E1E4E8;
   --card: rgba(44, 62, 80, 0.6);
   --card-hover: rgba(44, 62, 80, 0.85);
@@ -73,8 +73,8 @@ body {
   background: rgba(255, 255, 255, 0.5);
 }
 
-/* Smooth animations - opacity and transform excluded (handled by framer-motion) */
-* {
+/* Smooth transitions scoped to interactive elements only */
+a, button, input, select, textarea, [role="button"], .glass-card, .enhanced-card {
   transition-property: background-color, border-color, color, fill, stroke, box-shadow;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
@@ -96,33 +96,20 @@ body {
   border: 1px solid rgba(197, 160, 89, 0.2);
 }
 
-/* Smooth gradient animation */
-@keyframes gradient-shift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
 /* Accent button hover effect */
 .accent-button:hover {
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(197, 160, 89, 0.2);
 }
 
-/* Score bar fill animation */
-@keyframes score-bar-fill {
-  from {
-    width: 0%;
-  }
-}
-
-.score-bar-fill {
-  animation: score-bar-fill 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-/* Luxury accent for logo/special elements */
-.luxury-accent {
-  color: var(--smoked-gold);
+/* Screen-reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

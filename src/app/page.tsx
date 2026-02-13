@@ -40,7 +40,9 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [logoVisible, setLogoVisible] = useState(true);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dragCounter = useRef(0);
   const lastScrollY = useRef(0);
 
   // Handle logo visibility on scroll
@@ -145,9 +147,23 @@ export default function Home() {
     }
   }, []);
 
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    dragCounter.current++;
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    dragCounter.current--;
+    if (dragCounter.current === 0) setIsDragging(false);
+  }, []);
+
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
+      dragCounter.current = 0;
+      setIsDragging(false);
       const file = e.dataTransfer.files[0];
       if (file) handleFileSelect(file);
     },
@@ -191,9 +207,9 @@ export default function Home() {
           <>
             {/* Hero */}
             <section className="text-center mb-16 pt-16 pb-8">
-              <h2 className="text-[3.6rem] mb-8 text-white leading-tight font-[200] tracking-wide uppercase">
+              <h1 className="text-3xl sm:text-5xl md:text-[3.6rem] mb-8 text-white leading-tight font-[200] tracking-wide uppercase">
                 Fix your golf swing in a minute
-              </h2>
+              </h1>
               <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed font-light">
                 Upload a video of your swing and we'll help you make the fixes to start striping that drive
               </p>
@@ -207,10 +223,18 @@ export default function Home() {
               </h3>
               <div
                 onDragOver={(e) => e.preventDefault()}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all enhanced-card shadow-lg hover:shadow-xl hover:border-[#C5A059]/40"
-                style={{ borderColor: 'rgba(255, 255, 255, 0.3)' }}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInputRef.current?.click(); } }}
+                role="button"
+                tabIndex={0}
+                aria-label="Upload a golf swing video. Drop a file or click to browse."
+                className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all enhanced-card shadow-lg hover:shadow-xl hover:border-[#C5A059]/40 ${
+                  isDragging ? 'border-[#C5A059] bg-[#C5A059]/10 scale-[1.02]' : ''
+                }`}
+                style={{ borderColor: isDragging ? '#C5A059' : 'rgba(255, 255, 255, 0.3)' }}
               >
                 <input
                   ref={fileInputRef}
@@ -218,11 +242,16 @@ export default function Home() {
                   accept="video/*"
                   onChange={handleInputChange}
                   className="hidden"
+                  aria-label="Choose a golf swing video file"
                 />
-                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-accent/10 border border-accent/40 flex items-center justify-center shadow-lg">
+                <div className={`w-12 h-12 mx-auto mb-3 rounded-full border flex items-center justify-center shadow-lg transition-all ${
+                  isDragging ? 'bg-accent/20 border-accent/60 scale-110' : 'bg-accent/10 border-accent/40'
+                }`}>
                   <UploadIcon />
                 </div>
-                <p className="font-light mb-2 text-sm text-[#E1E4E8]">Drop your video here or click to browse</p>
+                <p className="font-light mb-2 text-sm text-[#E1E4E8]">
+                  {isDragging ? 'Drop it right here' : 'Drop your video here or click to browse'}
+                </p>
                 <p className="text-xs text-[#a8adb5] font-light">Under 20 seconds will get the best results</p>
               </div>
               {error && (
@@ -295,21 +324,29 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        {state === "error" && (
-          <div className="text-center py-8">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-red-500/20 border border-red-500/40 flex items-center justify-center shadow-lg text-red-400">
-              <ErrorIcon />
-            </div>
-            <h2 className="text-xl font-light tracking-wide uppercase mb-2 text-white">Upload Failed</h2>
-            <p className="text-muted mb-4 text-xs font-light">{error || "We couldn't process your video. Please try again."}</p>
-            <button
-              onClick={reset}
-              className="px-6 py-2 bg-accent text-black font-light tracking-wide uppercase rounded-full hover:bg-accent-dim accent-button shadow-lg text-sm"
+        <AnimatePresence>
+          {state === "error" && (
+            <motion.div
+              className="text-center py-8"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
             >
-              Start Over
-            </button>
-          </div>
-        )}
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-red-500/20 border border-red-500/40 flex items-center justify-center shadow-lg text-red-400">
+                <ErrorIcon />
+              </div>
+              <h2 className="text-xl font-light tracking-wide uppercase mb-2 text-white">Upload Failed</h2>
+              <p className="text-muted mb-4 text-xs font-light">{error || "We couldn't process your video. Please try again."}</p>
+              <button
+                onClick={reset}
+                className="px-6 py-2 bg-accent text-black font-light tracking-wide uppercase rounded-full hover:bg-accent-dim accent-button shadow-lg text-sm"
+              >
+                Start Over
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </main>
   );
@@ -317,9 +354,9 @@ export default function Home() {
 
 function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; description: string }> }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
   const [touchStart, setTouchStart] = useState<number | null>(null);
 
-  // Handle touch swipe
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
   };
@@ -327,12 +364,11 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStart !== null) {
       const distance = touchStart - e.changedTouches[0].clientX;
-      const isSwipeLeft = distance > 50;
-      const isSwipeRight = distance < -50;
-
-      if (isSwipeLeft) {
+      if (distance > 50) {
+        setDirection(1);
         setCurrentIndex((prev) => (prev + 1) % tips.length);
-      } else if (isSwipeRight) {
+      } else if (distance < -50) {
+        setDirection(-1);
         setCurrentIndex((prev) => (prev - 1 + tips.length) % tips.length);
       }
     }
@@ -340,10 +376,12 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
   };
 
   const goToSlide = (index: number) => {
+    setDirection(index > currentIndex ? 1 : -1);
     setCurrentIndex(index);
   };
 
   const goToNextSlide = () => {
+    setDirection(1);
     setCurrentIndex((prev) => (prev + 1) % tips.length);
   };
 
@@ -353,7 +391,7 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Carousel on mobile, grid on desktop */}
+      {/* Grid on desktop */}
       <div className="hidden sm:grid gap-4 sm:grid-cols-2" style={{ gridAutoRows: '1fr' }}>
         {tips.map((tip, idx) => (
           <div key={idx} className="flex">
@@ -362,28 +400,41 @@ function TipCarousel({ tips }: { tips: Array<{ icon: string; title: string; desc
         ))}
       </div>
 
-      {/* Mobile carousel */}
+      {/* Mobile carousel with horizontal slide */}
       <div className="sm:hidden">
-        <div className="transition-opacity duration-300">
-          <TipCard
-            icon={tips[currentIndex].icon}
-            title={tips[currentIndex].title}
-            description={tips[currentIndex].description}
-            onClick={goToNextSlide}
-          />
+        <div className="overflow-hidden">
+          <AnimatePresence mode="wait" initial={false} custom={direction}>
+            <motion.div
+              key={currentIndex}
+              custom={direction}
+              initial={{ x: direction * 100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: direction * -100, opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              onClick={goToNextSlide}
+            >
+              <TipCard
+                icon={tips[currentIndex].icon}
+                title={tips[currentIndex].title}
+                description={tips[currentIndex].description}
+              />
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Navigation dots */}
-        <div className="flex justify-center gap-3 mt-6">
-          {tips.map((_, idx) => (
+        <div className="flex justify-center gap-1 mt-6">
+          {tips.map((tip, idx) => (
             <button
               key={idx}
               onClick={() => goToSlide(idx)}
-              className={`h-2 rounded-full transition-all duration-300 ${
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center"
+              aria-label={`Go to tip ${idx + 1}: ${tip.title}`}
+            >
+              <span className={`block h-2 rounded-full transition-all duration-300 ${
                 idx === currentIndex ? "w-8 bg-accent" : "w-2 bg-accent/30"
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
-            />
+              }`} />
+            </button>
           ))}
         </div>
 
@@ -493,8 +544,7 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
           >
             <video
               src={videoPreview}
-              className="w-full object-cover"
-              style={{ minHeight: "500px", maxHeight: "600px" }}
+              className="w-full object-cover aspect-[9/16] max-h-[70vh]"
               autoPlay
               loop
               muted
@@ -503,10 +553,13 @@ function LoadingState({ state, videoPreview }: { state: "uploading" | "analyzing
           </motion.div>
         )}
 
-        <div className="text-left px-16">
+        <div className="text-left px-4 sm:px-16">
           <h2 className="text-2xl font-light tracking-wide uppercase text-white mb-2">{messages[state]}</h2>
           <p className="text-muted text-sm mb-4 font-light">{subMessages[state]}</p>
 
+          <div aria-live="polite" className="sr-only">
+            {state === "analyzing" && steps[currentStep]}
+          </div>
           <div className="mt-4 space-y-2 max-w-xs">
             {steps.map((text, index) => (
               <LoadingStep
@@ -596,9 +649,9 @@ function ResultsView({
           <h3 className="font-light tracking-wide uppercase text-white text-sm mb-2">Summary</h3>
           <p className="text-muted text-xs font-light">{analysis.summary}</p>
 
-          {analysis.strengths.length > 0 && (
-            <div className="mt-2">
-              <h4 className="text-xs font-light tracking-wide uppercase text-accent mb-1">What You're Doing Right 🔥</h4>
+          <div className="mt-2">
+            <h4 className="text-xs font-light tracking-wide uppercase text-accent mb-1">What You're Doing Right 🔥</h4>
+            {analysis.strengths.length > 0 ? (
               <ul className="space-y-0.5">
                 {analysis.strengths.map((strength, i) => (
                   <li key={i} className="text-xs text-muted flex items-start gap-2 font-light">
@@ -607,8 +660,10 @@ function ResultsView({
                   </li>
                 ))}
               </ul>
-            </div>
-          )}
+            ) : (
+              <p className="text-xs text-muted/60 font-light italic">We'll find the positives once you upload a longer clip.</p>
+            )}
+          </div>
         </div>
       </motion.div>
 
@@ -630,7 +685,11 @@ function ResultsView({
         transition={{ duration: 0.4, delay: 0.6 }}
       >
         <h3 className="text-base font-light tracking-wide uppercase mb-3 text-white">Areas to Improve</h3>
-        <p className="text-xs text-muted mb-4 font-light">These are the money shots, fix these and you'll be striping it down the fairway in no time. 🎯</p>
+        <p className="text-xs text-muted mb-4 font-light">
+          {analysis.improvements.length > 0
+            ? "These are the money shots, fix these and you'll be striping it down the fairway in no time. 🎯"
+            : "Looking solid — nothing major to flag right now. Keep filming your swings and we'll catch any drift early."}
+        </p>
         <div className="space-y-4">
           {analysis.improvements.map((item, i) => (
             <div key={i} className="glass-card rounded-xl p-4 shadow-lg hover:shadow-xl hover:border-accent/40">
@@ -678,6 +737,7 @@ function ResultsView({
                       href={`https://www.youtube.com/results?search_query=golf+${encodeURIComponent(drill.name)}+drill`}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={`Watch ${drill.name} tutorials on YouTube (opens in new tab)`}
                       className="inline-flex items-center gap-1.5 text-xs text-white/60 hover:text-white font-light"
                     >
                       <PlayIcon />
@@ -772,6 +832,8 @@ function SwingScore({ score }: { score: SwingAnalysis["score"] }) {
         </div>
         <button
           onClick={() => setExpanded(!expanded)}
+          aria-expanded={expanded}
+          aria-controls="score-breakdown"
           className="text-xs text-muted font-light hover:text-white flex items-center gap-1.5"
         >
           <span>{expanded ? "Hide" : "Breakdown"}</span>
@@ -789,7 +851,14 @@ function SwingScore({ score }: { score: SwingAnalysis["score"] }) {
 
       {/* Overall bar */}
       <div className="mt-3">
-        <div className="w-full h-3 rounded-full bg-white/10">
+        <div
+          className="w-full h-3 rounded-full bg-white/10"
+          role="progressbar"
+          aria-valuenow={animatedOverall}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`Swing score: ${animatedOverall} out of 100`}
+        >
           <div
             className="h-full rounded-full"
             style={{
@@ -804,6 +873,7 @@ function SwingScore({ score }: { score: SwingAnalysis["score"] }) {
       <AnimatePresence>
         {expanded && (
           <motion.div
+            id="score-breakdown"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
