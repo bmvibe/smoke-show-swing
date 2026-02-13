@@ -207,11 +207,11 @@ export default function Home() {
           <>
             {/* Hero */}
             <section className="text-center mb-16 pt-16 pb-8">
-              <h1 className="text-4xl sm:text-5xl md:text-[3.6rem] mb-8 text-white leading-tight font-[200] tracking-wide uppercase">
+              <h1 className="text-5xl sm:text-5xl md:text-[3.6rem] mb-8 text-white leading-tight font-[200] tracking-wide uppercase">
                 Fix your golf swing in a minute
               </h1>
               <p className="text-muted text-xl max-w-2xl mx-auto leading-relaxed font-light">
-                Upload a video of your swing and we'll help you make the fixes to start striping that drive
+                Upload a video of your swing and we&apos;ll show you how to start striping it
               </p>
             </section>
 
@@ -559,10 +559,19 @@ function ResultsView({
         </button>
       </motion.div>
 
+      {/* Swing Score */}
+      {analysis.score && (
+        <motion.div
+          {...reveal(0.12)}
+        >
+          <SwingScore score={analysis.score} />
+        </motion.div>
+      )}
+
       {/* Video + Summary */}
       <motion.div
         className="grid gap-4 md:grid-cols-2"
-        {...reveal(0.15)}
+        {...reveal(0.25)}
       >
         {videoPreview && (
           <motion.div
@@ -603,18 +612,9 @@ function ResultsView({
         </div>
       </motion.div>
 
-      {/* Swing Score */}
-      {analysis.score && (
-        <motion.div
-          {...reveal(0.3)}
-        >
-          <SwingScore score={analysis.score} />
-        </motion.div>
-      )}
-
       {/* Improvements */}
       <motion.section
-        {...reveal(0.45)}
+        {...reveal(0.4)}
       >
         <h3 className="text-base font-light tracking-wide uppercase mb-3 text-white">Areas to Improve</h3>
         <p className="text-xs text-muted mb-4 font-light">
@@ -629,7 +629,7 @@ function ResultsView({
               className="glass-card rounded-xl p-4 shadow-lg hover:shadow-xl hover:border-accent/40"
               initial={{ opacity: 0, x: -16, filter: "blur(4px)" }}
               animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-              transition={{ ...spring, delay: 0.55 + i * 0.1 }}
+              transition={{ ...spring, delay: 0.5 + i * 0.1 }}
             >
               <div className="flex items-start gap-3">
                 <span className="w-6 h-6 rounded-full bg-accent/30 text-[#E1E4E8] flex items-center justify-center text-xs font-light border border-accent/50 shrink-0">
@@ -650,7 +650,7 @@ function ResultsView({
 
       {/* Training Plan */}
       <motion.section
-        {...reveal(0.7)}
+        {...reveal(0.65)}
       >
         <h3 className="text-base font-light tracking-wide uppercase mb-3 text-white">Training Plan</h3>
         <p className="text-xs text-muted mb-4 font-light">Your personalized roadmap to crushing it on the course. Stick with this and watch your score climb. 💪</p>
@@ -661,7 +661,7 @@ function ResultsView({
               className="glass-card rounded-xl p-3 shadow-lg"
               initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ ...spring, delay: 0.8 + wi * 0.08 }}
+              transition={{ ...spring, delay: 0.75 + wi * 0.08 }}
             >
               <div className="flex items-center gap-2 mb-2">
                 <span className="px-2 py-1 bg-accent/30 text-[#E1E4E8] text-xs font-light tracking-wide uppercase rounded-full border border-accent/50">
@@ -680,7 +680,7 @@ function ResultsView({
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`Watch ${drill.name} tutorials on YouTube (opens in new tab)`}
-                      className="inline-flex items-center gap-1.5 text-xs text-white/60 hover:text-white font-light"
+                      className="inline-flex items-center gap-1.5 text-xs text-white/70 hover:text-white font-light border border-white/20 hover:border-white/40 rounded-full px-2.5 py-1 transition-all duration-200"
                     >
                       <PlayIcon />
                       <span>Watch tutorials</span>
@@ -696,7 +696,7 @@ function ResultsView({
       {/* CTA */}
       <motion.div
         className="text-center py-4 border-t border-accent/20"
-        {...reveal(1.1)}
+        {...reveal(1.0)}
       >
         <p className="text-muted mb-3 text-xs font-light">Got more swings to analyze? Let's keep the momentum going!</p>
         <button
