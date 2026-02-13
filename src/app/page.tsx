@@ -772,11 +772,11 @@ function ResultsView({
 }
 
 function getScoreColor(score: number): string {
-  if (score <= 30) return "#ef4444";
-  if (score <= 50) return "#f97316";
-  if (score <= 70) return "#eab308";
-  if (score <= 85) return "#22c55e";
-  return "#C5A059";
+  if (score <= 30) return "#7A8B9C"; // cool steel
+  if (score <= 50) return "#8C8D72"; // warm khaki
+  if (score <= 70) return "#B39B5C"; // bronze
+  if (score <= 85) return "#C5A059"; // smoked gold
+  return "#D9C07A";                  // bright gold
 }
 
 function SwingScore({ score }: { score: SwingAnalysis["score"] }) {
