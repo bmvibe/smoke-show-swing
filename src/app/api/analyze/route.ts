@@ -125,11 +125,26 @@ If the video does NOT show an actual golf swing (animal, person not golfing, ran
   "validationError": "A humorous, cheeky one-liner about what you saw. Examples: 'That goat's not striping anything any time soon, mate.' or 'Nice cat video, but I'm here for golf swings, not TikTok.' or 'Lovely sunset, but where's the golf swing?'"
 }
 
-If it IS a valid golf swing, return the full analysis in this JSON format:
+If it IS a valid golf swing, you MUST follow this two-step process:
+
+STEP 1 — OBSERVE (fill in the "observations" field FIRST, before anything else):
+Watch the video frame by frame. For each swing phase, write down EXACTLY what you see — body positions, angles, club path, timing. Be specific and factual. This is your evidence. If you can't see a phase clearly, say so.
+
+STEP 2 — SCORE AND ANALYZE (only AFTER completing observations):
+Use your observations as evidence to score each category. Every score must be justified by something you wrote in observations. If your observation says "excellent hip clearance" but you're scoring Downswing at 45, something is wrong — go back and check.
+
+Return the full analysis in this JSON format:
 
 {
   "isValidSwing": true,
-  "summary": "2-3 sentences with personality. Be cool and confident, maybe drop in a bit of dry wit. Start positive and highlight the main thing to work on. Think 'knowledgeable mate down the pub' not 'over-enthusiastic American coach'.",
+  "observations": {
+    "setup": "EXACTLY what you see at address — grip type, stance width, ball position, spine angle, weight distribution, alignment. Be factual, not interpretive.",
+    "backswing": "EXACTLY what you see — takeaway direction, wrist hinge point, shoulder turn amount, hip turn, arm position, club position at top. Reference specific frames if possible.",
+    "downswing": "EXACTLY what you see — transition move, hip/hand sequence, lag angle, shaft lean at impact, clubface orientation, divot/contact point.",
+    "followThrough": "EXACTLY what you see — extension, balance at finish, where belt buckle faces, weight distribution, club finish position.",
+    "tempo": "EXACTLY what you see — relative speed of backswing vs downswing, any pause at top, smoothness of transition, any rushing or deceleration."
+  },
+  "summary": "2-3 sentences with personality. Be cool and confident, maybe drop in a bit of dry wit. Start positive and highlight the main thing to work on. Think 'knowledgeable mate down the pub' not 'over-enthusiastic American coach'. Reference SPECIFIC things you observed — not generic filler.",
   "score": {
     "overall": "<number 0-100 — weighted average of category scores, NOT a default>",
     "label": "<must match overall: 0-30 Air Shot, 31-50 Chunked, 51-70 Ball Striker, 71-85 Dialled In, 86-100 Striped>",
@@ -226,16 +241,16 @@ Guidelines:
 
   MANDATORY VARIANCE RULE: Your 5 category scores MUST have a spread of at least 15 points between the highest and lowest category. Real golfers are NEVER equally good at everything. A typical amateur might have Setup 62, Backswing 48, Downswing 35, Follow-through 55, Tempo 44. If your categories are all within 10 points of each other, you are NOT watching the video — go back and look again.
 
-  SCORE EACH CATEGORY BY ACTUALLY WATCHING THE VIDEO — describe to yourself what you see BEFORE picking a number:
-  1. Setup & Address: LOOK AT the grip (neutral/strong/weak?), stance width relative to club, ball position, spine angle at address, weight distribution, and alignment to target. A beginner with a death grip and feet together = 15-25. Textbook setup = 85+.
-  2. Backswing: LOOK AT the takeaway path (inside/outside/on-plane?), wrist hinge timing, shoulder turn depth (full 90° = good), hip rotation restraint, arm structure (connected vs flying elbow?), and club position at the top (parallel, across the line, or laid off?). A beginner who lifts the club with their arms = 20-30. Full coil with on-plane club = 85+.
-  3. Downswing & Impact: LOOK AT the transition (bump/slide vs spin-out?), sequencing (hips leading hands?), lag retention, shaft lean at impact, clubface angle at impact (open/closed/square?), divot location (ball-first contact?), and hip clearance. An over-the-top casting motion = 25-40. Proper lag with ball-first contact = 80+.
-  4. Follow-through: LOOK AT extension through the ball, balance at finish (can they hold the finish?), belt buckle facing target?, weight fully on front foot?, club finishing over the shoulder?, and overall body position. Falling off balance = 20-35. Held finish facing target = 80+.
-  5. Tempo & Rhythm: LOOK AT the ratio of backswing to downswing time (ideal ~3:1), smoothness of transition, any rushing or deceleration, consistency of pace throughout the swing. Jerky rushed swing = 20-35. Smooth Ernie Els tempo = 85+.
+  SCORE EACH CATEGORY USING YOUR OBSERVATIONS AS EVIDENCE — your score must be consistent with what you wrote:
+  1. Setup & Address: Score based on what you wrote in observations.setup. A beginner with a death grip and feet together = 15-25. Textbook setup = 85+.
+  2. Backswing: Score based on what you wrote in observations.backswing. A beginner who lifts the club with their arms = 20-30. Full coil with on-plane club = 85+.
+  3. Downswing & Impact: Score based on what you wrote in observations.downswing. An over-the-top casting motion = 25-40. Proper lag with ball-first contact = 80+.
+  4. Follow-through: Score based on what you wrote in observations.followThrough. Falling off balance = 20-35. Held finish facing target = 80+.
+  5. Tempo & Rhythm: Score based on what you wrote in observations.tempo. Jerky rushed swing = 20-35. Smooth Ernie Els tempo = 85+.
 
   The overall score must be a WEIGHTED average: Downswing & Impact (30%), Backswing (25%), Setup & Address (20%), Follow-through (15%), Tempo & Rhythm (10%). CALCULATE this mathematically, don't just pick a number. The label MUST match the overall score range exactly.
 
-  SELF-CHECK before finalizing scores: (1) Is the spread between highest and lowest category >= 15? (2) Did I actually calculate the weighted average or just guess? (3) Would a real golf coach agree with this score, or am I being generous to avoid offending?
+  SELF-CHECK before finalizing scores: (1) Is the spread between highest and lowest category >= 15? (2) Did I actually calculate the weighted average or just guess? (3) Does each score match what I wrote in observations? If I wrote "strong shoulder turn" but scored Backswing at 40, something's wrong. (4) Would a real golf coach agree with this score, or am I being generous to avoid offending? (5) Are my observations specific to THIS video, or could they describe any golfer? If they're generic, go back and look again.
 - Identify 2-4 key improvements, prioritized by impact
 - Each week's training plan should build on the previous week
 - Include exactly 2 drills per week that can be done at a driving range. Use clear, searchable drill names (users will search YouTube for tutorials on each drill)
@@ -319,7 +334,12 @@ export async function POST(request: Request) {
 
     // Generate analysis with retry logic for rate limits
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+      generationConfig: {
+        temperature: 0.2,
+      },
+    });
 
     let result;
     let retryCount = 0;

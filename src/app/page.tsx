@@ -8,6 +8,13 @@ import { motion, AnimatePresence } from "framer-motion";
 type AnalysisState = "idle" | "uploading" | "analyzing" | "complete" | "error";
 
 interface SwingAnalysis {
+  observations?: {
+    setup: string;
+    backswing: string;
+    downswing: string;
+    followThrough: string;
+    tempo: string;
+  };
   summary: string;
   score: {
     overall: number;
