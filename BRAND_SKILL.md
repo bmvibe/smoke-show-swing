@@ -66,11 +66,11 @@ These are the official tier labels used throughout the product. They replace gen
 
 | Range | Label | Meaning |
 |-------|-------|---------|
-| 0–30 | Fresh Air | Never played before, fundamentals completely absent. Named after the golf term for a complete whiff. |
-| 31–50 | Hacker | Some basics in place but major mechanical flaws. The classic coaching term for someone hacking around the course. |
-| 51–70 | Ball Striker | Decent fundamentals, inconsistencies in key areas. Understated coach compliment — you can hit it, but there's work to do. |
+| 0–30 | Air Shot | Never played before, fundamentals completely absent. The club went over the ball. |
+| 31–50 | Chunked | Some basics in place but major mechanical flaws. Hit the ground before the ball. |
+| 51–70 | Ball Striker | Decent fundamentals, inconsistencies in key areas. You can hit it, but there's work to do. |
 | 71–85 | Dialled In | Strong mechanics throughout, minor refinements needed. Everything's clicking. |
-| 86–100 | Stripe Show | Near-professional or professional quality. You're striping it. The top tier ties directly into the Striped. brand. |
+| 86–100 | Striped | Near-professional or professional quality. Right down the middle. |
 
 ---
 
@@ -113,15 +113,15 @@ Combine a precise technical observation with a dry, witty jab.
 
 | Instead of | Use |
 |---|---|
-| "Great job!" | "Pure." or "Stripe show." |
+| "Great job!" | "Pure." or "Striped." |
 | "Improve your swing" | "Refine the ritual." or "Close the gap." |
 | "Welcome to the app" | "You're in." or "Let's get to work." |
 | "Check your stats" | "The Data." or "The Truth." |
-| "Beginner" | "Fresh Air" |
-| "Developing" | "Hacker" |
+| "Beginner" | "Air Shot" |
+| "Developing" | "Chunked" |
 | "Intermediate" | "Ball Striker" |
 | "Advanced" | "Dialled In" |
-| "Elite" | "Stripe Show" |
+| "Elite" | "Striped" |
 
 ---
 
@@ -149,4 +149,4 @@ You are here to help golfers stripe it down the middle. Refine their swing with 
 - [ ] Push notifications use the approved templates
 - [ ] Loading states use approved micro-copy
 - [ ] No exclamation marks anywhere on the platform
-- [ ] Scoring tiers use coach terms (Fresh Air → Stripe Show)
+- [ ] Scoring tiers use coach terms (Air Shot → Striped)

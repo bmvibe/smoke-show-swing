@@ -207,11 +207,11 @@ Guidelines:
 - SWING SCORE — THIS IS CRITICAL. You MUST actually evaluate the swing you see in the video. DO NOT default to 72 or any fixed number. Every swing is different and must be scored based on what you observe.
 
   SCORING RANGES:
-  0-30 Fresh Air: Never played before, fundamentals completely absent
-  31-50 Hacker: Some basics in place but major mechanical flaws
+  0-30 Air Shot: Never played before, fundamentals completely absent
+  31-50 Chunked: Some basics in place but major mechanical flaws
   51-70 Ball Striker: Decent fundamentals, inconsistencies in key areas
   71-85 Dialled In: Strong mechanics throughout, minor refinements needed
-  86-100 Stripe Show: Near-professional or professional quality
+  86-100 Striped: Near-professional or professional quality
 
   CALIBRATION: A true beginner who barely makes contact = 15-25. A regular weekend golfer = 45-60. A low-handicap club player = 65-75. A scratch golfer = 78-85. A tour pro = 88-95.
 
