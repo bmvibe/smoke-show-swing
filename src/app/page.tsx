@@ -668,23 +668,23 @@ function ResultsView({
           {analysis.trainingPlan.map((week, wi) => (
             <motion.div
               key={week.weekNumber}
-              className="glass-card rounded-xl p-3 shadow-lg"
+              className="glass-card rounded-xl p-4 sm:p-5 shadow-lg"
               initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ ...spring, delay: 0.75 + wi * 0.08 }}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-1 bg-accent/30 text-[#E1E4E8] text-xs font-light tracking-wide uppercase rounded-full border border-accent/50">
+              <div className="flex items-center gap-2.5 mb-3">
+                <span className="whitespace-nowrap px-3 py-1 bg-accent/30 text-[#E1E4E8] text-xs font-light tracking-wide uppercase rounded-full border border-accent/50">
                   Week {week.weekNumber}
                 </span>
                 <span className="text-xs text-muted font-light">{week.focus}</span>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {week.drills.map((drill, i) => (
-                  <div key={i} className="border-l-2 border-accent/40 pl-2">
-                    <h5 className="font-light tracking-wide uppercase text-white text-xs">{drill.name}</h5>
-                    <p className="text-xs text-muted mb-1 font-light">{drill.description}</p>
-                    <p className="text-xs text-accent/80 font-light mb-1">{drill.reps}</p>
+                  <div key={i} className="border-l-2 border-accent/40 pl-3">
+                    <h5 className="font-light tracking-wide uppercase text-white text-xs mb-1">{drill.name}</h5>
+                    <p className="text-xs text-muted mb-1.5 font-light leading-relaxed">{drill.description}</p>
+                    <p className="text-xs text-accent/80 font-light mb-2">{drill.reps}</p>
                     <a
                       href={`https://www.youtube.com/results?search_query=golf+${encodeURIComponent(drill.name)}+drill`}
                       target="_blank"
