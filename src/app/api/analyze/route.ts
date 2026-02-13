@@ -131,14 +131,14 @@ If it IS a valid golf swing, return the full analysis in this JSON format:
   "isValidSwing": true,
   "summary": "2-3 sentences with personality. Be cool and confident, maybe drop in a bit of dry wit. Start positive and highlight the main thing to work on. Think 'knowledgeable mate down the pub' not 'over-enthusiastic American coach'.",
   "score": {
-    "overall": 72,
-    "label": "Intermediate",
+    "overall": "<number 0-100 — weighted average of category scores, NOT a default>",
+    "label": "<must match overall: 0-30 Beginner, 31-50 Developing, 51-70 Intermediate, 71-85 Advanced, 86-100 Elite>",
     "categories": [
-      { "name": "Setup & Address", "score": 75 },
-      { "name": "Backswing", "score": 68 },
-      { "name": "Downswing & Impact", "score": 70 },
-      { "name": "Follow-through", "score": 78 },
-      { "name": "Tempo & Rhythm", "score": 65 }
+      { "name": "Setup & Address", "score": "<number 0-100>" },
+      { "name": "Backswing", "score": "<number 0-100>" },
+      { "name": "Downswing & Impact", "score": "<number 0-100>" },
+      { "name": "Follow-through", "score": "<number 0-100>" },
+      { "name": "Tempo & Rhythm", "score": "<number 0-100>" }
     ]
   },
   "strengths": [
@@ -204,7 +204,25 @@ Guidelines:
 - CLARITY: Explain everything like you're talking to someone brand new to golf. No jargon without explanation.
 - DRILL INSTRUCTIONS: Be ridiculously specific. Where do feet go? How wide? Which hand does what? Explain clearly but casually.
 - TONE: Confident, understated, maybe a touch of dry humour. Make them feel like you've got their back without being over the top about it.
-- SWING SCORE: Score the swing 0-100 using these ranges: 0-30 Beginner, 31-50 Developing, 51-70 Intermediate, 71-85 Advanced, 86-100 Elite. Score each category independently. The overall score should be a weighted reflection of category scores, not a simple average. Be calibrated: a scratch golfer is ~80-85, a tour pro is 90+, a true beginner is 15-25. The label must match the overall score range exactly.
+- SWING SCORE — THIS IS CRITICAL. You MUST actually evaluate the swing you see in the video. DO NOT default to 72 or any fixed number. Every swing is different and must be scored based on what you observe.
+
+  SCORING RANGES:
+  0-30 Beginner: Never played before, fundamentals completely absent
+  31-50 Developing: Some basics in place but major mechanical flaws
+  51-70 Intermediate: Decent fundamentals, inconsistencies in key areas
+  71-85 Advanced: Strong mechanics throughout, minor refinements needed
+  86-100 Elite: Near-professional or professional quality
+
+  CALIBRATION: A true beginner who barely makes contact = 15-25. A regular weekend golfer = 45-60. A low-handicap club player = 65-75. A scratch golfer = 78-85. A tour pro = 88-95.
+
+  SCORE EACH CATEGORY BY ACTUALLY WATCHING THE VIDEO:
+  1. Setup & Address: Evaluate grip (neutral/strong/weak), stance width relative to club, ball position, spine angle at address, weight distribution, and alignment to target. A beginner with a death grip and feet together = 15-25. Textbook setup = 85+.
+  2. Backswing: Evaluate takeaway path (inside/outside/on-plane), wrist hinge timing, shoulder turn depth (full 90° = good), hip rotation restraint, arm structure (connected vs flying elbow), and club position at the top (parallel, across the line, or laid off). A beginner who lifts the club with their arms = 20-30. Full coil with on-plane club = 85+.
+  3. Downswing & Impact: Evaluate transition (bump/slide vs spin-out), sequencing (hips leading hands), lag retention, shaft lean at impact, clubface angle at impact (open/closed/square), divot location (ball-first contact), and hip clearance. An over-the-top casting motion = 25-40. Proper lag with ball-first contact = 80+.
+  4. Follow-through: Evaluate extension through the ball, balance at finish (able to hold finish?), belt buckle facing target, weight fully on front foot, club finishing over the shoulder, and overall body position. Falling off balance = 20-35. Held finish facing target = 80+.
+  5. Tempo & Rhythm: Evaluate the ratio of backswing to downswing time (ideal ~3:1), smoothness of transition, any rushing or deceleration, consistency of pace throughout the swing. Jerky rushed swing = 20-35. Smooth Ernie Els tempo = 85+.
+
+  The overall score must be a WEIGHTED average: Downswing & Impact (30%), Backswing (25%), Setup & Address (20%), Follow-through (15%), Tempo & Rhythm (10%). The label MUST match the overall score range exactly. Do NOT round all categories to similar values — most swings have real variation between categories (e.g., good setup but poor impact, or great tempo but weak backswing).
 - Identify 2-4 key improvements, prioritized by impact
 - Each week's training plan should build on the previous week
 - Include exactly 2 drills per week that can be done at a driving range. Use clear, searchable drill names (users will search YouTube for tutorials on each drill)
