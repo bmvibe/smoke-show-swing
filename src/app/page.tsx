@@ -16,12 +16,20 @@ interface SwingAnalysis {
   }[];
   trainingPlan: {
     weekNumber: number;
+    targetArea: string;
     focus: string;
+    sessionMinutes: number;
+    sessionsPerWeek: number;
     drills: {
       name: string;
-      description: string;
+      why: string;
+      setup: string;
+      feel: string;
+      checkpoint: string;
       reps: string;
+      equipment: string;
     }[];
+    progressCheck: string;
   }[];
   resources: {
     title: string;
@@ -555,26 +563,10 @@ function ResultsView({
 
       {/* Training Plan */}
       <section>
-        <h3 className="text-base font-bold mb-3 text-white">Training Plan</h3>
+        <h3 className="text-base font-bold mb-3 text-white">Your 4-Week Protocol</h3>
         <div className="space-y-4">
           {analysis.trainingPlan.map((week) => (
-            <div key={week.weekNumber} className="glass-card rounded-xl p-3 shadow-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-1 bg-accent/30 text-[#E1E4E8] text-xs font-semibold rounded-full border border-accent/50">
-                  W{week.weekNumber}
-                </span>
-                <span className="text-xs text-muted font-medium">{week.focus}</span>
-              </div>
-              <div className="space-y-2">
-                {week.drills.map((drill, i) => (
-                  <div key={i} className="border-l-2 border-accent/40 pl-2">
-                    <h5 className="font-semibold text-white text-xs">{drill.name}</h5>
-                    <p className="text-xs text-muted">{drill.description}</p>
-                    <p className="text-xs text-accent/80 font-medium">{drill.reps}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <WeekCard key={week.weekNumber} week={week} />
           ))}
         </div>
       </section>
@@ -612,6 +604,119 @@ function ResultsView({
         >
           Upload Another Video
         </button>
+      </div>
+    </div>
+  );
+}
+
+function WeekCard({ week }: { week: SwingAnalysis["trainingPlan"][number] }) {
+  const [expandedDrill, setExpandedDrill] = useState<number | null>(null);
+
+  return (
+    <div className="glass-card rounded-xl p-3 shadow-lg">
+      {/* Week header */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <span className="px-2 py-1 bg-accent/30 text-[#E1E4E8] text-xs font-semibold rounded-full border border-accent/50">
+            W{week.weekNumber}
+          </span>
+          <span className="text-xs font-semibold text-white">{week.targetArea}</span>
+        </div>
+        <div className="flex items-center gap-2 text-[10px] text-muted">
+          <span>{week.sessionMinutes} min</span>
+          <span className="w-1 h-1 rounded-full bg-muted/50" />
+          <span>{week.sessionsPerWeek}x/wk</span>
+        </div>
+      </div>
+
+      <p className="text-xs text-muted mb-3">{week.focus}</p>
+
+      {/* Drills */}
+      <div className="space-y-2">
+        {week.drills.map((drill, i) => {
+          const isExpanded = expandedDrill === i;
+          return (
+            <div key={i} className="rounded-lg border border-accent/20 overflow-hidden">
+              {/* Drill header - always visible */}
+              <button
+                onClick={() => setExpandedDrill(isExpanded ? null : i)}
+                className="w-full text-left px-3 py-2 flex items-center justify-between hover:bg-accent/5 transition-colors"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="w-5 h-5 rounded-full bg-accent/20 text-[#E1E4E8] flex items-center justify-center text-[10px] font-bold border border-accent/30 shrink-0">
+                    {i + 1}
+                  </span>
+                  <h5 className="font-semibold text-white text-xs truncate">{drill.name}</h5>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  {drill.equipment !== "none" && drill.equipment !== "None" && (
+                    <span className="text-[10px] text-[#C5A059] bg-[#C5A059]/10 border border-[#C5A059]/20 rounded-full px-1.5 py-0.5 hidden sm:inline">
+                      {drill.equipment}
+                    </span>
+                  )}
+                  <svg
+                    className={`w-3 h-3 text-muted transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </button>
+
+              {/* Expanded drill detail */}
+              {isExpanded && (
+                <div className="px-3 pb-3 space-y-2 border-t border-accent/10">
+                  {/* Why */}
+                  <div className="pt-2">
+                    <p className="text-xs text-muted">{drill.why}</p>
+                  </div>
+
+                  {/* Setup */}
+                  <div className="bg-accent/5 rounded-lg p-2">
+                    <h6 className="text-[10px] font-semibold text-accent/80 uppercase tracking-wider mb-1">Setup</h6>
+                    <p className="text-xs text-[#E1E4E8]">{drill.setup}</p>
+                  </div>
+
+                  {/* The Feel - highlighted as the coaching gold */}
+                  <div className="bg-[#C5A059]/10 border border-[#C5A059]/20 rounded-lg p-2">
+                    <h6 className="text-[10px] font-semibold text-[#C5A059] uppercase tracking-wider mb-1">The Feel</h6>
+                    <p className="text-xs text-[#E1E4E8] italic">{drill.feel}</p>
+                  </div>
+
+                  {/* Reps + Equipment row */}
+                  <div className="flex items-center gap-3 text-xs">
+                    <span className="text-accent/80 font-medium">{drill.reps}</span>
+                    {drill.equipment !== "none" && drill.equipment !== "None" && (
+                      <>
+                        <span className="w-1 h-1 rounded-full bg-muted/50" />
+                        <span className="text-[#C5A059]">{drill.equipment}</span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Self-check */}
+                  <div className="bg-accent/5 rounded-lg p-2">
+                    <h6 className="text-[10px] font-semibold text-accent/80 uppercase tracking-wider mb-1">Self-Check</h6>
+                    <p className="text-xs text-[#E1E4E8]">{drill.checkpoint}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Progress check */}
+      <div className="mt-3 pt-2 border-t border-accent/10">
+        <div className="flex items-start gap-2">
+          <span className="text-accent text-xs mt-0.5">
+            <TargetIcon />
+          </span>
+          <div>
+            <h6 className="text-[10px] font-semibold text-accent/80 uppercase tracking-wider mb-0.5">Week {week.weekNumber} Goal</h6>
+            <p className="text-xs text-muted">{week.progressCheck}</p>
+          </div>
+        </div>
       </div>
     </div>
   );
